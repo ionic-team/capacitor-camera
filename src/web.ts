@@ -8,10 +8,51 @@ import type {
   ImageOptions,
   PermissionStatus,
   Photo,
+  RecordVideoOptions,
+  MediaResult,
 } from './definitions';
 
 export class CameraWeb extends WebPlugin implements CameraPlugin {
+  async recordVideo(_options: RecordVideoOptions): Promise<MediaResult> {
+    throw this.unimplemented('recordVideo is not implemented on web.');
+  }
+
+  async playVideo(_options: { videoURI: string }): Promise<void> {
+    throw this.unimplemented('playVideo is not implemented on web.');
+  }
+
   async getPhoto(options: ImageOptions): Promise<Photo> {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise<Photo>(async (resolve, reject) => {
+      if (options.webUseInput || options.source === CameraSource.Photos) {
+        this.fileInputExperience(options, resolve, reject);
+      } else if (options.source === CameraSource.Prompt) {
+        let actionSheet: any = document.querySelector('pwa-action-sheet');
+        if (!actionSheet) {
+          actionSheet = document.createElement('pwa-action-sheet');
+          document.body.appendChild(actionSheet);
+        }
+        actionSheet.header = options.promptLabelHeader || 'Photo';
+        actionSheet.cancelable = false;
+        actionSheet.options = [
+          { title: options.promptLabelPhoto || 'From Photos' },
+          { title: options.promptLabelPicture || 'Take Picture' },
+        ];
+        actionSheet.addEventListener('onSelection', async (e: any) => {
+          const selection = e.detail;
+          if (selection === 0) {
+            this.fileInputExperience(options, resolve, reject);
+          } else {
+            this.cameraExperience(options, resolve, reject);
+          }
+        });
+      } else {
+        this.cameraExperience(options, resolve, reject);
+      }
+    });
+  }
+
+  async takePhoto(options: ImageOptions): Promise<Photo> {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise<Photo>(async (resolve, reject) => {
       if (options.webUseInput || options.source === CameraSource.Photos) {
