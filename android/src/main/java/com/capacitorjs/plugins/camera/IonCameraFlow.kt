@@ -23,8 +23,10 @@ import io.ionic.libs.ioncameralib.helper.OSCAMRFileHelper
 import io.ionic.libs.ioncameralib.helper.OSCAMRImageHelper
 import io.ionic.libs.ioncameralib.helper.OSCAMRMediaHelper
 import io.ionic.libs.ioncameralib.manager.CameraManager
+import io.ionic.libs.ioncameralib.manager.EditManager
 import io.ionic.libs.ioncameralib.manager.VideoManager
 import io.ionic.libs.ioncameralib.model.IONCameraParameters
+import io.ionic.libs.ioncameralib.model.IONEditParameters
 import io.ionic.libs.ioncameralib.model.IONError
 import io.ionic.libs.ioncameralib.model.IONMediaResult
 import kotlinx.coroutines.CoroutineScope
@@ -40,19 +42,25 @@ class IonCameraFlow(
     private var isFirstRequest = true
     private var cameraManager: CameraManager? = null
     private var videoManager: VideoManager? = null
+    private var editManager: EditManager? = null
     private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
     private lateinit var cropLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var videoLauncher: ActivityResultLauncher<Intent>
+    private lateinit var editLauncher: ActivityResultLauncher<Intent>
 
     private var currentCall: PluginCall? = null
     private var settings = CameraSettings()
     private var videoSettings = VideoSettings()
 
+    private var editParameters = IONEditParameters(
+        editURI = "", fromUri = false, saveToGallery = false, includeMetadata = false
+    )
+
     fun load() {
         setupLaunchers()
         cameraManager = CameraManager(
-            plugin.getAppId(),
+            plugin.appId,
             ".fileprovider",
             OSCAMRExifHelper(),
             OSCAMRFileHelper(),
@@ -63,6 +71,12 @@ class IonCameraFlow(
         videoManager = VideoManager(
             ".fileprovider",
             OSCAMRFileHelper(),
+        )
+
+        editManager = EditManager(
+            plugin.appId,
+            OSCAMRFileHelper(),
+            OSCAMRImageHelper()
         )
 
         cameraManager?.deleteVideoFilesFromCache(plugin.activity)
@@ -85,6 +99,11 @@ class IonCameraFlow(
         openPlayVideo(call)
     }
 
+    fun editPhoto(call: PluginCall) {
+        currentCall = call
+        callEditPhoto(call)
+    }
+
     // ----------------------------------------------------
     // Launchers
     // ----------------------------------------------------
@@ -105,6 +124,12 @@ class IonCameraFlow(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             handleVideoResult(result)
+        }
+
+        editLauncher = plugin.activity.registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            handleEditResult(result)
         }
 
     }
@@ -178,6 +203,19 @@ class IonCameraFlow(
         }
     }
 
+    private fun callEditPhoto(call: PluginCall) {
+        editParameters = IONEditParameters(
+            "",
+            fromUri = false,
+            saveToGallery = false,
+            includeMetadata = false
+        )
+        val imageBase64 = call.getString("image")
+        if (imageBase64 == null) return
+        editManager?.editImage(plugin.activity, imageBase64, editLauncher)
+    }
+
+
     private fun handleCameraResult(result: ActivityResult) {
         when (result.resultCode) {
             Activity.RESULT_OK -> {
@@ -209,6 +247,14 @@ class IonCameraFlow(
             }
 
             else -> sendError(IONError.CAPTURE_VIDEO_ERROR)
+        }
+    }
+
+    private fun handleEditResult(result: ActivityResult) {
+        when (result.resultCode) {
+            Activity.RESULT_OK -> processResultFromEdit(result)
+            Activity.RESULT_CANCELED -> sendError(IONError.EDIT_OPERATION_CANCELLED_ERROR)
+            else -> sendError(IONError.EDIT_IMAGE_ERROR)
         }
     }
 
@@ -352,6 +398,24 @@ class IonCameraFlow(
                     sendError(IONError.CAPTURE_VIDEO_ERROR)
                 })
         }
+    }
+
+    private fun processResultFromEdit(result: ActivityResult) {
+        val manager = editManager ?: return
+        manager.processResultFromEdit(
+            plugin.activity,
+            result.data,
+            editParameters,
+            { image ->
+                handleBase64Result(image)
+            },
+            { mediaResult ->
+                handleMediaResult(mediaResult)
+            },
+            { error ->
+                sendError(error)
+            }
+        )
     }
 
     private fun CameraSettings.toIonParameters(): IONCameraParameters {

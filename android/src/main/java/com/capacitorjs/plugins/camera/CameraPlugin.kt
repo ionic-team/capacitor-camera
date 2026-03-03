@@ -92,6 +92,16 @@ class CameraPlugin : Plugin() {
     }
 
     @PluginMethod
+    fun editPhoto(call: PluginCall) {
+        ionFlow.editPhoto(call)
+    }
+
+    @PluginMethod
+    fun editURIPhoto(call: PluginCall) {
+        ionFlow.editPhoto(call)
+    }
+
+    @PluginMethod
     fun pickImages(call: PluginCall) {
         legacyFlow.pickImages(call)
     }

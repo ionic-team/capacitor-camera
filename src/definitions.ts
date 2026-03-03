@@ -76,6 +76,12 @@ export interface RecordVideoOptions {
   includeMetadata?: boolean;
 }
 
+export interface EditPhotoOptions {
+  uri?: string;
+  saveToGallery?: boolean;
+  includeMetadata?: boolean
+}
+
 export interface MediaResult {
   path: string;
   webPath: string;
