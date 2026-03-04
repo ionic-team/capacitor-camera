@@ -103,14 +103,16 @@ const takePicture = async () => {
 <docgen-index>
 
 * [`getPhoto(...)`](#getphoto)
-* [`takePhoto(...)`](#takephoto)
 * [`pickImages(...)`](#pickimages)
 * [`pickLimitedLibraryPhotos()`](#picklimitedlibraryphotos)
 * [`getLimitedLibraryPhotos()`](#getlimitedlibraryphotos)
 * [`checkPermissions()`](#checkpermissions)
 * [`requestPermissions(...)`](#requestpermissions)
+* [`takePhoto(...)`](#takephoto)
 * [`recordVideo(...)`](#recordvideo)
 * [`playVideo(...)`](#playvideo)
+* [`editPhoto(...)`](#editphoto)
+* [`editURIPhoto(...)`](#edituriphoto)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 * [Enums](#enums)
@@ -124,26 +126,6 @@ const takePicture = async () => {
 
 ```typescript
 getPhoto(options: ImageOptions) => Promise<Photo>
-```
-
-Prompt the user to pick a photo from an album, or take a new photo
-with the camera.
-
-| Param         | Type                                                  |
-| ------------- | ----------------------------------------------------- |
-| **`options`** | <code><a href="#imageoptions">ImageOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#photo">Photo</a>&gt;</code>
-
-**Since:** 1.0.0
-
---------------------
-
-
-### takePhoto(...)
-
-```typescript
-takePhoto(options: ImageOptions) => Promise<Photo>
 ```
 
 Prompt the user to pick a photo from an album, or take a new photo
@@ -245,6 +227,25 @@ Request camera and photo album permissions
 --------------------
 
 
+### takePhoto(...)
+
+```typescript
+takePhoto(options: ImageOptions) => Promise<Photo>
+```
+
+Prompt the user to take a photo with the camera.
+
+| Param         | Type                                                  |
+| ------------- | ----------------------------------------------------- |
+| **`options`** | <code><a href="#imageoptions">ImageOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#photo">Photo</a>&gt;</code>
+
+**Since:** 2.0.0
+
+--------------------
+
+
 ### recordVideo(...)
 
 ```typescript
@@ -269,6 +270,44 @@ playVideo(options: { videoURI: string; }) => Promise<void>
 | Param         | Type                               |
 | ------------- | ---------------------------------- |
 | **`options`** | <code>{ videoURI: string; }</code> |
+
+--------------------
+
+
+### editPhoto(...)
+
+```typescript
+editPhoto(photo: string) => Promise<string>
+```
+
+Returns a string (base64) representing the photo that was edited
+
+| Param       | Type                |
+| ----------- | ------------------- |
+| **`photo`** | <code>string</code> |
+
+**Returns:** <code>Promise&lt;string&gt;</code>
+
+**Since:** 2.0.0
+
+--------------------
+
+
+### editURIPhoto(...)
+
+```typescript
+editURIPhoto(options: EditPhotoOptions) => Promise<MediaResult>
+```
+
+Returns a <a href="#mediaresult">MediaResult</a> object with info about the photo that was edited
+
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#editphotooptions">EditPhotoOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#mediaresult">MediaResult</a>&gt;</code>
+
+**Since:** 2.0.0
 
 --------------------
 
@@ -370,6 +409,15 @@ playVideo(options: { videoURI: string; }) => Promise<void>
 
 | Prop                  | Type                 |
 | --------------------- | -------------------- |
+| **`saveToGallery`**   | <code>boolean</code> |
+| **`includeMetadata`** | <code>boolean</code> |
+
+
+#### EditPhotoOptions
+
+| Prop                  | Type                 |
+| --------------------- | -------------------- |
+| **`uri`**             | <code>string</code>  |
 | **`saveToGallery`**   | <code>boolean</code> |
 | **`includeMetadata`** | <code>boolean</code> |
 

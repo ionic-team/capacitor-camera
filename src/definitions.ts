@@ -23,14 +23,6 @@ export interface CameraPlugin {
   getPhoto(options: ImageOptions): Promise<Photo>;
 
   /**
-   * Prompt the user to pick a photo from an album, or take a new photo
-   * with the camera.
-   *
-   * @since 1.0.0
-   */
-  takePhoto(options: ImageOptions): Promise<Photo>;
-
-  /**
    * Allows the user to pick multiple pictures from the photo gallery.
    *
    * @since 1.2.0
@@ -66,9 +58,30 @@ export interface CameraPlugin {
    */
   requestPermissions(permissions?: CameraPluginPermissions): Promise<PermissionStatus>;
 
+    /**
+   * Prompt the user to take a photo with the camera.
+   *
+   * @since 2.0.0
+   */
+  takePhoto(options: ImageOptions): Promise<Photo>;
+
   recordVideo(options: RecordVideoOptions): Promise<MediaResult>;
 
   playVideo(options: { videoURI: string }): Promise<void>;
+
+  /**
+   * Returns a string (base64) representing the photo that was edited
+   * 
+   * @since 2.0.0
+   */
+  editPhoto(photo: string): Promise<string>;
+
+  /**
+   * Returns a MediaResult object with info about the photo that was edited
+   * 
+   * @since 2.0.0
+   */
+  editURIPhoto(options: EditPhotoOptions): Promise<MediaResult>;
 }
 
 export interface RecordVideoOptions {
@@ -79,7 +92,7 @@ export interface RecordVideoOptions {
 export interface EditPhotoOptions {
   uri?: string;
   saveToGallery?: boolean;
-  includeMetadata?: boolean
+  includeMetadata?: boolean;
 }
 
 export interface MediaResult {

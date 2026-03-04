@@ -9,16 +9,25 @@ import type {
   PermissionStatus,
   Photo,
   RecordVideoOptions,
+  EditPhotoOptions,
   MediaResult,
 } from './definitions';
 
 export class CameraWeb extends WebPlugin implements CameraPlugin {
   async recordVideo(_options: RecordVideoOptions): Promise<MediaResult> {
-    throw this.unimplemented('recordVideo is not implemented on web.');
+    throw this.unimplemented('recordVideo is not implemented on Web.');
   }
 
   async playVideo(_options: { videoURI: string }): Promise<void> {
-    throw this.unimplemented('playVideo is not implemented on web.');
+    throw this.unimplemented('playVideo is not implemented on Web.');
+  }
+
+  async editPhoto(_photo: string): Promise<string> {
+    throw this.unimplemented('editPhoto is not implemented on Web.');
+  }
+
+  async editURIPhoto(_options: EditPhotoOptions): Promise<MediaResult> {
+    throw this.unimplemented('editURIPhoto is not implemented on Web.');
   }
 
   async getPhoto(options: ImageOptions): Promise<Photo> {

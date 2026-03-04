@@ -13,6 +13,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import com.getcapacitor.FileUtils
 import com.getcapacitor.JSObject
 import com.getcapacitor.Logger
@@ -75,6 +76,7 @@ class IonCameraFlow(
 
         editManager = EditManager(
             plugin.appId,
+            ".fileprovider",
             OSCAMRFileHelper(),
             OSCAMRImageHelper()
         )
@@ -102,6 +104,11 @@ class IonCameraFlow(
     fun editPhoto(call: PluginCall) {
         currentCall = call
         callEditPhoto(call)
+    }
+
+    fun editURIPhoto(call: PluginCall) {
+        currentCall = call
+        callEditURIPhoto(call)
     }
 
     // ----------------------------------------------------
@@ -213,6 +220,25 @@ class IonCameraFlow(
         val imageBase64 = call.getString("image")
         if (imageBase64 == null) return
         editManager?.editImage(plugin.activity, imageBase64, editLauncher)
+    }
+
+    private fun callEditURIPhoto(call: PluginCall) {
+
+        val photoPath = call.getString("uri")
+        val saveToGallery = call.getBoolean("saveToGallery") ?: false
+        val includeMetadata = call.getBoolean("includeMetadata") ?: false
+        if (photoPath == null) return
+
+        editParameters = IONEditParameters(
+            editURI = photoPath,
+            fromUri = true,
+            saveToGallery = saveToGallery,
+            includeMetadata = includeMetadata
+        )
+
+        editManager?.editURIPicture(plugin.activity, photoPath, editLauncher) {
+            sendError(IONError.EDIT_IMAGE_ERROR)
+        }
     }
 
 
@@ -328,7 +354,7 @@ class IonCameraFlow(
         val ret = JSObject()
         ret.put("format", "jpeg")
         ret.put("exif", exif.toJson())
-        ret.put("path", uri.toString())
+        ret.put("path", mediaResult.uri)
         ret.put("webPath", FileUtils.getPortablePath(plugin.context, plugin.bridge.localUrl, uri))
         ret.put("saved", mediaResult.saved)
         currentCall?.resolve(ret)

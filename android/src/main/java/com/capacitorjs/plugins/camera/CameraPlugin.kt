@@ -98,7 +98,7 @@ class CameraPlugin : Plugin() {
 
     @PluginMethod
     fun editURIPhoto(call: PluginCall) {
-        ionFlow.editPhoto(call)
+        ionFlow.editURIPhoto(call)
     }
 
     @PluginMethod
