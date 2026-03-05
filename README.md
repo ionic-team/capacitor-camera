@@ -297,16 +297,16 @@ Allows the user to pick multiple pictures from the photo gallery.
 ### editPhoto(...)
 
 ```typescript
-editPhoto(photo: string) => Promise<string>
+editPhoto(options: EditPhotoOptions) => Promise<EditPhotoResult>
 ```
 
 Returns a string (base64) representing the photo that was edited
 
-| Param       | Type                |
-| ----------- | ------------------- |
-| **`photo`** | <code>string</code> |
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#editphotooptions">EditPhotoOptions</a></code> |
 
-**Returns:** <code>Promise&lt;string&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#editphotoresult">EditPhotoResult</a>&gt;</code>
 
 **Since:** 2.0.0
 
@@ -316,14 +316,14 @@ Returns a string (base64) representing the photo that was edited
 ### editURIPhoto(...)
 
 ```typescript
-editURIPhoto(options: EditPhotoOptions) => Promise<MediaResult>
+editURIPhoto(options: EditURIPhotoOptions) => Promise<MediaResult>
 ```
 
 Returns a <a href="#mediaresult">MediaResult</a> object with info about the photo that was edited
 
-| Param         | Type                                                          |
-| ------------- | ------------------------------------------------------------- |
-| **`options`** | <code><a href="#editphotooptions">EditPhotoOptions</a></code> |
+| Param         | Type                                                                |
+| ------------- | ------------------------------------------------------------------- |
+| **`options`** | <code><a href="#edituriphotooptions">EditURIPhotoOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#mediaresult">MediaResult</a>&gt;</code>
 
@@ -450,7 +450,22 @@ Returns a <a href="#mediaresult">MediaResult</a> object with info about the phot
 | **`allowEdit`**              | <code>boolean</code>                            |
 
 
+#### EditPhotoResult
+
+| Prop               | Type                |
+| ------------------ | ------------------- |
+| **`format`**       | <code>string</code> |
+| **`base64String`** | <code>string</code> |
+
+
 #### EditPhotoOptions
+
+| Prop         | Type                |
+| ------------ | ------------------- |
+| **`base64`** | <code>string</code> |
+
+
+#### EditURIPhotoOptions
 
 | Prop                  | Type                 |
 | --------------------- | -------------------- |

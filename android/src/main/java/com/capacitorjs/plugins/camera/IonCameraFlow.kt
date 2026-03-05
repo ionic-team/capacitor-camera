@@ -90,7 +90,9 @@ class IonCameraFlow(
         editManager = EditManager(
             plugin.getAppId(),
             ".fileprovider",
+            OSCAMRExifHelper(),
             OSCAMRFileHelper(),
+            OSCAMRMediaHelper(),
             OSCAMRImageHelper()
         )
 
@@ -279,7 +281,7 @@ class IonCameraFlow(
             saveToGallery = false,
             includeMetadata = false
         )
-        val imageBase64 = call.getString("image")
+        val imageBase64 = call.data.getString("base64")
         if (imageBase64 == null) return
         manager.editImage(plugin.activity, imageBase64, editLauncher)
     }
@@ -459,9 +461,10 @@ class IonCameraFlow(
         }
     }
 
-    private fun handleBase64Result(image: String) {
+    private fun handlePhotoBase64Result(image: String) {
         val ret = JSObject()
         ret.put("format", "jpeg")
+
         val settings = cameraSettings ?: run {
             sendError(IONError.INVALID_ARGUMENT_ERROR)
             return
@@ -481,9 +484,19 @@ class IonCameraFlow(
                 return
             }
         }
+
         currentCall?.resolve(ret)
         currentCall = null
     }
+
+    private fun handleEditBase64Result(image: String) {
+        val ret = JSObject()
+        ret.put("format", "jpeg")
+        ret.put("base64String", image)
+        currentCall?.resolve(ret)
+        currentCall = null
+    }
+
 
     private fun handleMediaResult(mediaResult: IONMediaResult) {
         val file = File(mediaResult.uri)
@@ -568,7 +581,7 @@ class IonCameraFlow(
             plugin.activity,
             ionParams,
             { image ->
-                handleBase64Result(image)
+                handlePhotoBase64Result(image)
             },
             { mediaResult ->
                 handleMediaResult(mediaResult)
@@ -650,7 +663,7 @@ class IonCameraFlow(
             result.data,
             editParameters,
             { image ->
-                handleBase64Result(image)
+                handleEditBase64Result(image)
             },
             { mediaResult ->
                 handleMediaResult(mediaResult)

@@ -81,14 +81,14 @@ export interface CameraPlugin {
    * 
    * @since 2.0.0
    */
-  editPhoto(photo: string): Promise<string>;
+  editPhoto(options: EditPhotoOptions): Promise<EditPhotoResult>;
 
   /**
    * Returns a MediaResult object with info about the photo that was edited
    * 
    * @since 2.0.0
    */
-  editURIPhoto(options: EditPhotoOptions): Promise<MediaResult>;
+  editURIPhoto(options: EditURIPhotoOptions): Promise<MediaResult>;
 }
 
 export interface RecordVideoOptions {
@@ -103,10 +103,25 @@ export interface GalleryOptions {
   allowEdit: boolean;
 }
 
+export interface EditURIPhotoOptions {
+  uri?: string;
+  saveToGallery?: boolean;
+  includeMetadata?: boolean;
+}
+
+export interface EditPhotoOptions {
+  base64?: string;
+}
+
 export interface EditPhotoOptions {
   uri?: string;
   saveToGallery?: boolean;
   includeMetadata?: boolean;
+}
+
+export interface EditPhotoResult {
+  format: string;
+  base64String: string;
 }
 
 export interface MediaResults {
