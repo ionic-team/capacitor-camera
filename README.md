@@ -111,6 +111,7 @@ const takePicture = async () => {
 * [`takePhoto(...)`](#takephoto)
 * [`recordVideo(...)`](#recordvideo)
 * [`playVideo(...)`](#playvideo)
+* [`chooseFromGallery(...)`](#choosefromgallery)
 * [`editPhoto(...)`](#editphoto)
 * [`editURIPhoto(...)`](#edituriphoto)
 * [Interfaces](#interfaces)
@@ -274,6 +275,25 @@ playVideo(options: { videoURI: string; }) => Promise<void>
 --------------------
 
 
+### chooseFromGallery(...)
+
+```typescript
+chooseFromGallery(options: GalleryOptions) => Promise<MediaResults>
+```
+
+Allows the user to pick multiple pictures from the photo gallery.
+
+| Param         | Type                                                      |
+| ------------- | --------------------------------------------------------- |
+| **`options`** | <code><a href="#galleryoptions">GalleryOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#mediaresults">MediaResults</a>&gt;</code>
+
+**Since:** 1.2.0
+
+--------------------
+
+
 ### editPhoto(...)
 
 ```typescript
@@ -413,6 +433,23 @@ Returns a <a href="#mediaresult">MediaResult</a> object with info about the phot
 | **`includeMetadata`** | <code>boolean</code> |
 
 
+#### MediaResults
+
+| Prop         | Type                       |
+| ------------ | -------------------------- |
+| **`photos`** | <code>MediaResult[]</code> |
+
+
+#### GalleryOptions
+
+| Prop                         | Type                                            |
+| ---------------------------- | ----------------------------------------------- |
+| **`mediaType`**              | <code><a href="#mediatype">MediaType</a></code> |
+| **`allowMultipleSelection`** | <code>boolean</code>                            |
+| **`includeMetadata`**        | <code>boolean</code>                            |
+| **`allowEdit`**              | <code>boolean</code>                            |
+
+
 #### EditPhotoOptions
 
 | Prop                  | Type                 |
@@ -467,5 +504,14 @@ Returns a <a href="#mediaresult">MediaResult</a> object with info about the phot
 | ----------- | -------------------- |
 | **`Rear`**  | <code>'REAR'</code>  |
 | **`Front`** | <code>'FRONT'</code> |
+
+
+#### MediaType
+
+| Members       | Value          |
+| ------------- | -------------- |
+| **`picture`** | <code>0</code> |
+| **`video`**   | <code>1</code> |
+| **`all`**     | <code>2</code> |
 
 </docgen-api>

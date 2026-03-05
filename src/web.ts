@@ -11,6 +11,8 @@ import type {
   RecordVideoOptions,
   EditPhotoOptions,
   MediaResult,
+  MediaResults,
+  GalleryOptions
 } from './definitions';
 
 export class CameraWeb extends WebPlugin implements CameraPlugin {
@@ -20,6 +22,10 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
 
   async playVideo(_options: { videoURI: string }): Promise<void> {
     throw this.unimplemented('playVideo is not implemented on Web.');
+  }
+
+  async chooseFromGallery(_options: GalleryOptions): Promise<MediaResults> {
+    throw this.unimplemented('chooseFromGallery is not implemented on web.');
   }
 
   async editPhoto(_photo: string): Promise<string> {

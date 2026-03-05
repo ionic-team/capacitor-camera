@@ -19,7 +19,7 @@ import com.getcapacitor.annotation.CapacitorPlugin
 import com.getcapacitor.annotation.Permission
 import com.getcapacitor.annotation.PermissionCallback
 import org.json.JSONException
-
+import io.ionic.libs.ioncameralib.model.IONMediaType
 /**
  * The Camera plugin makes it easy to take a photo or have the user select a photo
  * from their albums.
@@ -61,7 +61,8 @@ class CameraPlugin : Plugin() {
 
     private lateinit var legacyFlow: LegacyCameraFlow
     private lateinit var ionFlow: IonCameraFlow
-
+    private var videoSettings = VideoSettings()
+    private var gallerySettings = GallerySettings()
 
     override fun load() {
         super.load()
@@ -78,17 +79,25 @@ class CameraPlugin : Plugin() {
 
     @PluginMethod
     fun takePhoto(call: PluginCall) {
-        ionFlow.takePhoto(call)
+        val settings = getSettings(call)
+        ionFlow.takePhoto(call, settings)
     }
 
     @PluginMethod
     fun recordVideo(call: PluginCall) {
-        ionFlow.recordVideo(call)
+        videoSettings = getVideoSettings(call)
+        ionFlow.recordVideo(call, videoSettings)
     }
 
     @PluginMethod
     fun playVideo(call: PluginCall) {
         ionFlow.playVideo(call)
+    }
+
+    @PluginMethod
+    fun chooseFromGallery(call: PluginCall) {
+        gallerySettings = getGallerySettings(call)
+        ionFlow.chooseFromGallery(call, gallerySettings)
     }
 
     @PluginMethod
@@ -246,6 +255,15 @@ class CameraPlugin : Plugin() {
          settings.saveToGallery = call.getBoolean("saveToGallery") ?: false
          settings.includeMetadata = call.getBoolean("includeMetadata") ?: false
          return settings
+    }
+
+    fun getGallerySettings(call: PluginCall): GallerySettings {
+        val settings = GallerySettings()
+        settings.mediaType = IONMediaType.fromValue(call.getInt("mediaType") ?: 0)
+        settings.allowMultipleSelection = call.getBoolean("allowMultipleSelection") ?: false
+        settings.includeMetadata = call.getBoolean("includeMetadata") ?: false
+        settings.allowEdit = call.getBoolean("allowEdit") ?: false
+        return settings
     }
 
     private fun getResultType(resultType: String?): CameraResultType? {
