@@ -19,10 +19,10 @@ import com.getcapacitor.JSObject
 import com.getcapacitor.Logger
 import com.getcapacitor.PermissionState
 import com.getcapacitor.PluginCall
-import io.ionic.libs.ioncameralib.helper.OSCAMRExifHelper
-import io.ionic.libs.ioncameralib.helper.OSCAMRFileHelper
-import io.ionic.libs.ioncameralib.helper.OSCAMRImageHelper
-import io.ionic.libs.ioncameralib.helper.OSCAMRMediaHelper
+import io.ionic.libs.ioncameralib.helper.IONExifHelper
+import io.ionic.libs.ioncameralib.helper.IONFileHelper
+import io.ionic.libs.ioncameralib.helper.IONImageHelper
+import io.ionic.libs.ioncameralib.helper.IONMediaHelper
 import io.ionic.libs.ioncameralib.manager.CameraManager
 import io.ionic.libs.ioncameralib.manager.GalleryManager
 import io.ionic.libs.ioncameralib.manager.EditManager
@@ -69,31 +69,31 @@ class IonCameraFlow(
         cameraManager = CameraManager(
             plugin.getAppId(),
             ".fileprovider",
-            OSCAMRExifHelper(),
-            OSCAMRFileHelper(),
-            OSCAMRMediaHelper(),
-            OSCAMRImageHelper()
+            IONExifHelper(),
+            IONFileHelper(),
+            IONMediaHelper(),
+            IONImageHelper()
         )
 
         videoManager = VideoManager(
             ".fileprovider",
-            OSCAMRFileHelper(),
+            IONFileHelper(),
         )
 
         galleryManager = GalleryManager(
-            OSCAMRExifHelper(),
-            OSCAMRFileHelper(),
-            OSCAMRMediaHelper(),
-            OSCAMRImageHelper()
+            IONExifHelper(),
+            IONFileHelper(),
+            IONMediaHelper(),
+            IONImageHelper()
         )
 
         editManager = EditManager(
             plugin.getAppId(),
             ".fileprovider",
-            OSCAMRExifHelper(),
-            OSCAMRFileHelper(),
-            OSCAMRMediaHelper(),
-            OSCAMRImageHelper()
+            IONExifHelper(),
+            IONFileHelper(),
+            IONMediaHelper(),
+            IONImageHelper()
         )
 
         cameraManager?.deleteVideoFilesFromCache(plugin.activity)
