@@ -231,7 +231,7 @@ Request camera and photo album permissions
 ### takePhoto(...)
 
 ```typescript
-takePhoto(options: ImageOptions) => Promise<Photo>
+takePhoto(options: ImageOptions) => Promise<MediaResult>
 ```
 
 Prompt the user to take a photo with the camera.
@@ -240,7 +240,7 @@ Prompt the user to take a photo with the camera.
 | ------------- | ----------------------------------------------------- |
 | **`options`** | <code><a href="#imageoptions">ImageOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#photo">Photo</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#mediaresult">MediaResult</a>&gt;</code>
 
 **Since:** 2.0.0
 

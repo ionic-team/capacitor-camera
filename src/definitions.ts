@@ -63,7 +63,7 @@ export interface CameraPlugin {
    *
    * @since 2.0.0
    */
-  takePhoto(options: ImageOptions): Promise<Photo>;
+  takePhoto(options: ImageOptions): Promise<MediaResult>;
 
   recordVideo(options: RecordVideoOptions): Promise<MediaResult>;
 

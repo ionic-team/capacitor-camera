@@ -516,7 +516,6 @@ class IonCameraFlow(
         ret.put("saved", mediaResult.saved)
         currentCall?.resolve(ret)
         currentCall = null
-
     }
 
     private fun handleVideoMediaResult(mediaResult: IONMediaResult) {
@@ -685,7 +684,7 @@ class IonCameraFlow(
             allowEdit = allowEditing,
             correctOrientation = shouldCorrectOrientation,
             saveToPhotoAlbum = saveToGallery,
-            includeMetadata = true, // Keep true
+            includeMetadata = false, //TODO this value should come from settings
             latestVersion = useLatestVersion
         )
     }
