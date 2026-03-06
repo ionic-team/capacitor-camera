@@ -265,12 +265,12 @@ recordVideo(options: RecordVideoOptions) => Promise<MediaResult>
 ### playVideo(...)
 
 ```typescript
-playVideo(options: { videoURI: string; }) => Promise<void>
+playVideo(options: PlayVideoOptions) => Promise<void>
 ```
 
-| Param         | Type                               |
-| ------------- | ---------------------------------- |
-| **`options`** | <code>{ videoURI: string; }</code> |
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#playvideooptions">PlayVideoOptions</a></code> |
 
 --------------------
 
@@ -431,6 +431,13 @@ Returns a <a href="#mediaresult">MediaResult</a> object with info about the phot
 | --------------------- | -------------------- |
 | **`saveToGallery`**   | <code>boolean</code> |
 | **`includeMetadata`** | <code>boolean</code> |
+
+
+#### PlayVideoOptions
+
+| Prop           | Type                |
+| -------------- | ------------------- |
+| **`videoURI`** | <code>string</code> |
 
 
 #### MediaResults

@@ -67,7 +67,7 @@ export interface CameraPlugin {
 
   recordVideo(options: RecordVideoOptions): Promise<MediaResult>;
 
-  playVideo(options: { videoURI: string }): Promise<void>;
+  playVideo(options: PlayVideoOptions): Promise<void>;
 
   /**
    * Allows the user to pick multiple pictures from the photo gallery.
@@ -94,6 +94,10 @@ export interface CameraPlugin {
 export interface RecordVideoOptions {
   saveToGallery?: boolean;
   includeMetadata?: boolean;
+}
+
+export interface PlayVideoOptions {
+  videoURI: string;
 }
 
 export interface GalleryOptions {
