@@ -691,7 +691,8 @@ class IonCameraFlow(
             allowEdit = allowEditing,
             correctOrientation = shouldCorrectOrientation,
             saveToPhotoAlbum = saveToGallery,
-            includeMetadata = false, //TODO this value should come from settings
+            //TODO this value should come from settings, possibly from new interface TakePhotoOptions
+            includeMetadata = false,
             latestVersion = useLatestVersion
         )
     }
