@@ -38,13 +38,13 @@ const Home: React.FC = () => {
         </IonCard>
         <IonCard>
           <IonCardContent>
-            <IonButton expand="block" routerLink="/permissions">
+            <IonButton expand="block" routerLink="/permissions" style={{ marginBottom: "16px" }}>
               Permissions
             </IonButton>
-            <IonButton expand="block" routerLink="/camera">
+            <IonButton expand="block" routerLink="/camera" style={{ marginBottom: "16px" }}>
               Take Picture
             </IonButton>
-            <IonButton expand="block" routerLink="/gallery">
+            <IonButton expand="block" routerLink="/gallery" style={{ marginBottom: "16px" }}>
               Gallery
             </IonButton>
           </IonCardContent>
