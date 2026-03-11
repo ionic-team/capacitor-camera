@@ -57,6 +57,82 @@ export interface CameraPlugin {
    * @since 1.0.0
    */
   requestPermissions(permissions?: CameraPluginPermissions): Promise<PermissionStatus>;
+
+  /**
+   * Prompt the user to take a photo with the camera.
+   *
+   * @since 2.0.0
+   */
+  takePhoto(options: ImageOptions): Promise<MediaResult>;
+
+  recordVideo(options: RecordVideoOptions): Promise<MediaResult>;
+
+  playVideo(options: PlayVideoOptions): Promise<void>;
+
+  /**
+   * Allows the user to pick multiple pictures from the photo gallery.
+   *
+   * @since 1.2.0
+   */
+  chooseFromGallery(options: GalleryOptions): Promise<MediaResults>;
+
+  /**
+   * Returns a string (base64) representing the photo that was edited
+   * 
+   * @since 2.0.0
+   */
+  editPhoto(options: EditPhotoOptions): Promise<EditPhotoResult>;
+
+  /**
+   * Returns a MediaResult object with info about the photo that was edited
+   * 
+   * @since 2.0.0
+   */
+  editURIPhoto(options: EditURIPhotoOptions): Promise<MediaResult>;
+}
+
+export interface RecordVideoOptions {
+  saveToGallery?: boolean;
+  includeMetadata?: boolean;
+}
+
+export interface PlayVideoOptions {
+  videoURI: string;
+}
+
+export interface GalleryOptions {
+  mediaType: MediaType;
+  allowMultipleSelection: boolean;
+  includeMetadata: boolean;
+  allowEdit: boolean;
+}
+
+export interface EditURIPhotoOptions {
+  uri?: string;
+  saveToGallery?: boolean;
+  includeMetadata?: boolean;
+}
+
+export interface EditPhotoOptions {
+  base64?: string;
+}
+
+export interface EditPhotoResult {
+  format: string;
+  base64String: string;
+}
+
+export interface MediaResults {
+  photos: MediaResult[];
+}
+
+export interface MediaResult {
+  path: string;
+  webPath: string;
+  duration?: number;
+  size: number;
+  format: string;
+  saved: boolean;
 }
 
 export interface ImageOptions {
@@ -347,6 +423,12 @@ export enum CameraResultType {
   Uri = 'uri',
   Base64 = 'base64',
   DataUrl = 'dataUrl',
+}
+
+export enum MediaType {
+  picture = 0,
+  video = 1,
+  all = 2,
 }
 
 /**

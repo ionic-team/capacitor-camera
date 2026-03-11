@@ -8,9 +8,42 @@ import type {
   ImageOptions,
   PermissionStatus,
   Photo,
+  RecordVideoOptions,
+  EditPhotoOptions,
+  PlayVideoOptions,
+  EditURIPhotoOptions,
+  EditPhotoResult,
+  MediaResult,
+  MediaResults,
+  GalleryOptions
 } from './definitions';
 
 export class CameraWeb extends WebPlugin implements CameraPlugin {
+
+  async takePhoto(_options: ImageOptions): Promise<MediaResult> {
+    throw this.unimplemented('takePhoto is not implemented on Web.');
+  }
+
+  async recordVideo(_options: RecordVideoOptions): Promise<MediaResult> {
+    throw this.unimplemented('recordVideo is not implemented on Web.');
+  }
+
+  async playVideo(_options: PlayVideoOptions): Promise<void> {
+    throw this.unimplemented('playVideo is not implemented on Web.');
+  }
+
+  async chooseFromGallery(_options: GalleryOptions): Promise<MediaResults> {
+    throw this.unimplemented('chooseFromGallery is not implemented on web.');
+  }
+
+  async editPhoto(_options: EditPhotoOptions): Promise<EditPhotoResult> {
+    throw this.unimplemented('editPhoto is not implemented on Web.');
+  }
+
+  async editURIPhoto(_options: EditURIPhotoOptions): Promise<MediaResult> {
+    throw this.unimplemented('editURIPhoto is not implemented on Web.');
+  }
+
   async getPhoto(options: ImageOptions): Promise<Photo> {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise<Photo>(async (resolve, reject) => {
@@ -23,7 +56,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
           document.body.appendChild(actionSheet);
         }
         actionSheet.header = options.promptLabelHeader || 'Photo';
-        actionSheet.cancelable = true;
+        actionSheet.cancelable = false;
         actionSheet.options = [
           { title: options.promptLabelPhoto || 'From Photos' },
           { title: options.promptLabelPicture || 'Take Picture' },
@@ -35,9 +68,6 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
           } else {
             this.cameraExperience(options, resolve, reject);
           }
-        });
-        actionSheet.addEventListener('onCanceled', async () => {
-          reject(new CapacitorException('User cancelled photos app'));
         });
       } else {
         this.cameraExperience(options, resolve, reject);
