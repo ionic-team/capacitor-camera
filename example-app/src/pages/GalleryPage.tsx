@@ -20,7 +20,7 @@ import {
   GalleryPhoto,
 } from "@capacitor/camera";
 import PhotoWithMetadata from "../components/camera/PhotoWithMetadata";
-import PhotoGrid from "../components/camera/PhotoGrid";
+import PhotosCarousel from "../components/camera/PhotosCarousel";
 import {
   GetPhotoConfigurable,
   PickImagesConfigurable,
@@ -144,7 +144,7 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
             )}
           {this.state.multiplePhotos !== null &&
             this.state.multiplePhotos.length > 0 && (
-              <PhotoGrid photos={this.state.multiplePhotos} />
+              <PhotosCarousel photos={this.state.multiplePhotos} />
             )}
         </IonContent>
       </IonPage>
