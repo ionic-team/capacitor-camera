@@ -117,12 +117,6 @@ export interface EditPhotoOptions {
   base64?: string;
 }
 
-export interface EditPhotoOptions {
-  uri?: string;
-  saveToGallery?: boolean;
-  includeMetadata?: boolean;
-}
-
 export interface EditPhotoResult {
   format: string;
   base64String: string;
