@@ -16,6 +16,7 @@
     "@capacitor/camera": "file:../",
     "@capacitor/core": "^8.0.0",
     "@capacitor/ios": "^8.0.0",
+    "@ionic/pwa-elements": "^3.4.0",
     "@ionic/react": "^8.5.0",
     "@ionic/react-router": "^8.5.0",
     "@types/react-router": "^5.1.20",

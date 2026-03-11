@@ -25,6 +25,11 @@ import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
+
+// enable PWA elements
+defineCustomElements(window);
+
 /**
  * Ionic Dark Mode
  * -----------------------------------------------------
