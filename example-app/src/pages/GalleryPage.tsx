@@ -9,6 +9,10 @@ import {
   IonCardContent,
   IonCard,
   IonButton,
+  IonAccordion,
+  IonAccordionGroup,
+  IonItem,
+  IonLabel,
 } from "@ionic/react";
 import React from "react";
 import {
@@ -109,29 +113,50 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
           </IonToolbar>
         </IonHeader>
         <IonContent>
+          {/* Placeholder for future new methods */}
           <IonCard>
             <IonCardContent>
-              <IonButton expand="block" onClick={() => this.choosePicture()}>
-                Choose Picture
-              </IonButton>
-              <IonButton expand="block" onClick={() => this.pickPhotos()}>
-                Pick Photos
-              </IonButton>
-              <IonButton expand="block" onClick={() => this.pickPhotos(3)}>
-                Pick 3 Photos
-              </IonButton>
-              <IonButton
-                expand="block"
-                onClick={() => this.pickLimitedLibraryPhotos()}
-              >
-                pickLimitedLibraryPhotos
-              </IonButton>
-              <IonButton
-                expand="block"
-                onClick={() => this.getLimitedLibraryPhotos()}
-              >
-                getLimitedLibraryPhotos
-              </IonButton>
+              {/* New methods will be added here */}
+            </IonCardContent>
+          </IonCard>
+          <IonCard>
+            <IonCardContent>
+              <IonAccordionGroup>
+                <IonAccordion value="old-methods">
+                  <IonItem slot="header">
+                    <IonLabel><b>Old methods</b></IonLabel>
+                  </IonItem>
+                  <div slot="content" style={{ padding: "16px 0" }}>
+                    <IonButton
+                      expand="block"
+                      onClick={() => this.choosePicture()}
+                    >
+                      Choose Picture
+                    </IonButton>
+                    <IonButton expand="block" onClick={() => this.pickPhotos()}>
+                      Pick Photos
+                    </IonButton>
+                    <IonButton
+                      expand="block"
+                      onClick={() => this.pickPhotos(3)}
+                    >
+                      Pick 3 Photos
+                    </IonButton>
+                    <IonButton
+                      expand="block"
+                      onClick={() => this.pickLimitedLibraryPhotos()}
+                    >
+                      pickLimitedLibraryPhotos
+                    </IonButton>
+                    <IonButton
+                      expand="block"
+                      onClick={() => this.getLimitedLibraryPhotos()}
+                    >
+                      getLimitedLibraryPhotos
+                    </IonButton>
+                  </div>
+                </IonAccordion>
+              </IonAccordionGroup>
             </IonCardContent>
           </IonCard>
           {this.state.singlePhoto !== null &&

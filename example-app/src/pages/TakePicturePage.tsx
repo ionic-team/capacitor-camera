@@ -9,6 +9,10 @@ import {
   IonCardContent,
   IonCard,
   IonButton,
+  IonAccordion,
+  IonAccordionGroup,
+  IonItem,
+  IonLabel,
 } from "@ionic/react";
 import React from "react";
 import {
@@ -66,32 +70,49 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
           </IonToolbar>
         </IonHeader>
         <IonContent>
+          {/* Placeholder for future new methods */}
           <IonCard>
             <IonCardContent>
-              <IonButton
-                expand="block"
-                onClick={() => this.addPhoto(CameraSource.Camera)}
-              >
-                Take Picture
-              </IonButton>
-              <IonButton
-                expand="block"
-                onClick={() => this.addPhoto(CameraSource.Camera, true)}
-              >
-                Take Picture and Save
-              </IonButton>
-              <IonButton
-                expand="block"
-                onClick={() => this.addPhoto(CameraSource.Camera, false, true)}
-              >
-                Take Picture and Edit
-              </IonButton>
-              <IonButton
-                expand="block"
-                onClick={() => this.addPhoto(CameraSource.Prompt)}
-              >
-                Prompt
-              </IonButton>
+              {/* New methods will be added here */}
+            </IonCardContent>
+          </IonCard>
+          <IonCard>
+            <IonCardContent>
+              <IonAccordionGroup>
+                <IonAccordion value="old-methods">
+                  <IonItem slot="header">
+                    <IonLabel><b>Old methods</b></IonLabel>
+                  </IonItem>
+                  <div slot="content" style={{ padding: "16px 0" }}>
+                    <IonButton
+                      expand="block"
+                      onClick={() => this.addPhoto(CameraSource.Camera)}
+                    >
+                      Take Picture
+                    </IonButton>
+                    <IonButton
+                      expand="block"
+                      onClick={() => this.addPhoto(CameraSource.Camera, true)}
+                    >
+                      Take Picture and Save
+                    </IonButton>
+                    <IonButton
+                      expand="block"
+                      onClick={() =>
+                        this.addPhoto(CameraSource.Camera, false, true)
+                      }
+                    >
+                      Take Picture and Edit
+                    </IonButton>
+                    <IonButton
+                      expand="block"
+                      onClick={() => this.addPhoto(CameraSource.Prompt)}
+                    >
+                      Prompt
+                    </IonButton>
+                  </div>
+                </IonAccordion>
+              </IonAccordionGroup>
             </IonCardContent>
           </IonCard>
           {this.state.filePath !== null && (
