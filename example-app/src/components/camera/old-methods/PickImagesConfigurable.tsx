@@ -106,7 +106,7 @@ class PickImagesConfigurable extends React.Component<
                   color: "var(--ion-color-medium)",
                 }}
               >
-                Configure
+                Expand to call pickImages with configurable options
               </IonLabel>
             </IonItem>
             <div slot="content" style={{ padding: "16px" }}>

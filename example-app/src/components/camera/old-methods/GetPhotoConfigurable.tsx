@@ -134,7 +134,7 @@ class GetPhotoConfigurable extends React.Component<
                   color: "var(--ion-color-medium)",
                 }}
               >
-                Configure
+                Expand to call getPhoto with configurable options
               </IonLabel>
             </IonItem>
             <div slot="content" style={{ padding: "16px" }}>
