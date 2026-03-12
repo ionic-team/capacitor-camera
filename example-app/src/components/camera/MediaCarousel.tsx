@@ -12,6 +12,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 interface IMediaCarouselProps {
+  // TODO change this type to allow including future MediaResult in ChooseFromGallery
   media: GalleryPhoto[];
 }
 
@@ -22,9 +23,17 @@ const MediaCarousel: React.FC<IMediaCarouselProps> = ({ media }) => {
     setCurrentIndex(swiper.activeIndex + 1);
   };
 
-  const isVideo = (format: string): boolean => {
+  const isVideo = (format: string | undefined, filePath: string): boolean => {
     const videoFormats = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'm4v', 'flv'];
-    return videoFormats.includes(format.toLowerCase());
+
+    // Check format first if available
+    if (format) {
+      return videoFormats.includes(format.toLowerCase());
+    }
+
+    // Fall back to checking file extension from path
+    const extension = filePath.split('.').pop()?.toLowerCase();
+    return extension ? videoFormats.includes(extension) : false;
   };
 
   return (
@@ -49,7 +58,7 @@ const MediaCarousel: React.FC<IMediaCarouselProps> = ({ media }) => {
 
           return (
             <SwiperSlide key={index}>
-              {isVideo(item.format) ? (
+              {isVideo(item.format, filePath) ? (
                 <VideoWithMetadata filePath={filePath} metadata={metadata} />
               ) : (
                 <PhotoWithMetadata filePath={filePath} metadata={metadata} />

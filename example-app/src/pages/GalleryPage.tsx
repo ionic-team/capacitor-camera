@@ -22,6 +22,7 @@ import {
 } from "@capacitor/camera";
 import PhotoWithMetadata from "../components/camera/PhotoWithMetadata";
 import MediaCarousel from "../components/camera/MediaCarousel";
+import ChooseFromGalleryConfigurable from "../components/camera/ChooseFromGalleryConfigurable";
 import {
   GetPhotoConfigurable,
   PickImagesConfigurable,
@@ -105,6 +106,10 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
           {/* Placeholder for future new methods */}
           <IonCard>
             <IonCardContent>
+              <ChooseFromGalleryConfigurable
+                onMediaResult={this.handlePhotosResult}
+              />
+
               {/* Parameter-less methods */}
               <div style={{ marginTop: "16px" }}>
                 <IonButton
