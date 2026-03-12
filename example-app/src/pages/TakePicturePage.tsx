@@ -1,4 +1,5 @@
 import {
+  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
@@ -16,6 +17,7 @@ import {
 import React from "react";
 import { CameraSource } from "@capacitor/camera";
 import PhotoWithMetadata from "../components/camera/PhotoWithMetadata";
+import TakePictureConfigurable from "../components/camera/TakePictureConfigurable";
 import { GetPhotoConfigurable } from "../components/camera/old-methods";
 
 interface ITakePicturePageState {
@@ -31,6 +33,26 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
       metadata: null,
     };
   }
+
+  handleTakePhotoResult = (result: {
+    path: string;
+    webPath: string;
+    duration?: number;
+    size: number;
+    format: string;
+    saved: boolean;
+  }): void => {
+    const metadata = {
+      size: result.size,
+      format: result.format,
+      saved: result.saved,
+    };
+
+    this.setState({
+      filePath: result.path ?? result.webPath,
+      metadata: JSON.stringify(metadata, null, 2),
+    });
+  };
 
   handlePhotoResult = (result: {
     path?: string;
@@ -62,10 +84,11 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
           </IonToolbar>
         </IonHeader>
         <IonContent>
-          {/* Placeholder for future new methods */}
           <IonCard>
             <IonCardContent>
-              {/* New methods will be added here */}
+              <TakePictureConfigurable
+                onPhotoResult={this.handleTakePhotoResult}
+              />
             </IonCardContent>
           </IonCard>
           <IonCard>
