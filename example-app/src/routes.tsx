@@ -7,8 +7,8 @@ import GalleryPage from "./pages/GalleryPage";
 export interface Page {
   readonly url: string;
   readonly title: string;
-  readonly icon: JSX.Element;
-  readonly component: typeof React.Component | React.FC;
+  readonly icon: React.ReactElement;
+  readonly component: React.ComponentType<any>;
 }
 
 export const routes: Page[] = [
