@@ -66,12 +66,7 @@ class GetPhotoConfigurable extends React.Component<
   executeDefault = async (): Promise<void> => {
     try {
       const options: ImageOptions = {
-        quality: 100,
         resultType: CameraResultType.Uri,
-        source: this.props.defaultSource ?? CameraSource.Prompt,
-        saveToGallery: false,
-        allowEditing: false,
-        webUseInput: this.props.defaultWebUseInput ?? false,
       };
       const photo = await Camera.getPhoto(options);
       this.props.onPhotoResult({

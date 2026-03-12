@@ -52,11 +52,7 @@ class PickImagesConfigurable extends React.Component<
 
   executeDefault = async (): Promise<void> => {
     try {
-      const options: GalleryImageOptions = {
-        quality: 100,
-        limit: 0,
-      };
-      const photosResult = await Camera.pickImages(options);
+      const photosResult = await Camera.pickImages({});
       console.log("photos result", photosResult);
       this.props.onPhotosResult(photosResult.photos);
     } catch (e) {

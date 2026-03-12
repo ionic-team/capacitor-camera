@@ -54,10 +54,7 @@ class RecordVideoConfigurable extends React.Component<
 
   executeDefault = async (): Promise<void> => {
     try {
-      const result = await Camera.recordVideo({
-        saveToGallery: false,
-        includeMetadata: true,
-      });
+      const result = await Camera.recordVideo({});
       this.props.onVideoResult(result);
     } catch (e) {
       alert(`Failed to record video with error:\n'${e}'`);
