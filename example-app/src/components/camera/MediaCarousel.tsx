@@ -3,6 +3,7 @@ import { GalleryPhoto } from "@capacitor/camera";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import PhotoWithMetadata from "./PhotoWithMetadata";
+import VideoWithMetadata from "./VideoWithMetadata";
 import type { Swiper as SwiperType } from "swiper";
 
 // Import Swiper styles
@@ -10,21 +11,26 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-interface IPhotosCarouselProps {
-  photos: GalleryPhoto[];
+interface IMediaCarouselProps {
+  media: GalleryPhoto[];
 }
 
-const PhotosCarousel: React.FC<IPhotosCarouselProps> = ({ photos }) => {
+const MediaCarousel: React.FC<IMediaCarouselProps> = ({ media }) => {
   const [currentIndex, setCurrentIndex] = useState(1);
 
   const handleSlideChange = (swiper: SwiperType) => {
     setCurrentIndex(swiper.activeIndex + 1);
   };
 
+  const isVideo = (format: string): boolean => {
+    const videoFormats = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'm4v', 'flv'];
+    return videoFormats.includes(format.toLowerCase());
+  };
+
   return (
     <div>
       <div style={{ textAlign: "center", padding: "8px", fontWeight: "bold" }}>
-        Photo {currentIndex}/{photos.length}
+        Media {currentIndex}/{media.length}
       </div>
       <Swiper
         modules={[Navigation, Pagination]}
@@ -35,15 +41,19 @@ const PhotosCarousel: React.FC<IPhotosCarouselProps> = ({ photos }) => {
         style={{ width: "100%", height: "auto" }}
         onSlideChange={handleSlideChange}
       >
-        {photos.map((photo, index) => {
-          const filePath = photo.path ?? photo.webPath;
-          const metadata = photo.exif
-            ? JSON.stringify(photo.exif, null, 2)
+        {media.map((item, index) => {
+          const filePath = item.path ?? item.webPath;
+          const metadata = item.exif
+            ? JSON.stringify(item.exif, null, 2)
             : null;
 
           return (
             <SwiperSlide key={index}>
-              <PhotoWithMetadata filePath={filePath} metadata={metadata} />
+              {isVideo(item.format) ? (
+                <VideoWithMetadata filePath={filePath} metadata={metadata} />
+              ) : (
+                <PhotoWithMetadata filePath={filePath} metadata={metadata} />
+              )}
             </SwiperSlide>
           );
         })}
@@ -52,4 +62,4 @@ const PhotosCarousel: React.FC<IPhotosCarouselProps> = ({ photos }) => {
   );
 };
 
-export default PhotosCarousel;
+export default MediaCarousel;
