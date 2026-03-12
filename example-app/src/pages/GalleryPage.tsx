@@ -83,6 +83,13 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
     }
   };
 
+  clearMedia = (): void => {
+    this.setState({
+      singlePhoto: null,
+      multiplePhotos: null,
+    });
+  };
+
   render() {
     return (
       <IonPage>
@@ -137,6 +144,19 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
               </IonAccordionGroup>
             </IonCardContent>
           </IonCard>
+          {(this.state.singlePhoto !== null ||
+            (this.state.multiplePhotos !== null &&
+              this.state.multiplePhotos.length > 0)) && (
+            <IonButton
+              expand="block"
+              color="danger"
+              fill="outline"
+              onClick={this.clearMedia}
+              style={{ margin: "0 16px 16px 16px" }}
+            >
+              Clear Media
+            </IonButton>
+          )}
           {this.state.singlePhoto !== null &&
             this.state.singlePhoto.filePath !== null && (
               <PhotoWithMetadata

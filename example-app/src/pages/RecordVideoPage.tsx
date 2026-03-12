@@ -60,6 +60,13 @@ class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
     }
   };
 
+  clearVideo = (): void => {
+    this.setState({
+      filePath: null,
+      metadata: null,
+    });
+  };
+
   render() {
     return (
       <IonPage>
@@ -86,6 +93,15 @@ class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
                   </IonButton>
                 </IonCardContent>
               </IonCard>
+              <IonButton
+                expand="block"
+                color="danger"
+                fill="outline"
+                onClick={this.clearVideo}
+                style={{ margin: "0 16px 16px 16px" }}
+              >
+                Clear Video
+              </IonButton>
               <VideoWithMetadata
                 filePath={this.state.filePath}
                 metadata={this.state.metadata}

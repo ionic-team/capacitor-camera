@@ -43,6 +43,13 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
     });
   };
 
+  clearPhoto = (): void => {
+    this.setState({
+      filePath: null,
+      metadata: null,
+    });
+  };
+
   render() {
     return (
       <IonPage>
@@ -79,10 +86,21 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
             </IonCardContent>
           </IonCard>
           {this.state.filePath !== null && (
-            <PhotoWithMetadata
-              filePath={this.state.filePath}
-              metadata={this.state.metadata}
-            />
+            <>
+              <IonButton
+                expand="block"
+                color="danger"
+                fill="outline"
+                onClick={this.clearPhoto}
+                style={{ margin: "0 16px 16px 16px" }}
+              >
+                Clear Photo
+              </IonButton>
+              <PhotoWithMetadata
+                filePath={this.state.filePath}
+                metadata={this.state.metadata}
+              />
+            </>
           )}
         </IonContent>
       </IonPage>
