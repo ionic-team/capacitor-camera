@@ -12,6 +12,7 @@ import {
   IonAccordionGroup,
   IonItem,
   IonLabel,
+  IonButton,
 } from "@ionic/react";
 import React from "react";
 import {
@@ -24,7 +25,6 @@ import PhotosCarousel from "../components/camera/PhotosCarousel";
 import {
   GetPhotoConfigurable,
   PickImagesConfigurable,
-  SimpleCameraButton,
 } from "../components/camera/old-methods";
 
 interface IGalleryPageState {
@@ -121,14 +121,18 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
 
                     {/* Parameter-less methods */}
                     <div style={{ marginTop: "16px" }}>
-                      <SimpleCameraButton
-                        label="pickLimitedLibraryPhotos"
+                      <IonButton
+                        expand="block"
                         onClick={this.pickLimitedLibraryPhotos}
-                      />
-                      <SimpleCameraButton
-                        label="getLimitedLibraryPhotos"
+                      >
+                        pickLimitedLibraryPhotos
+                      </IonButton>
+                      <IonButton
+                        expand="block"
                         onClick={this.getLimitedLibraryPhotos}
-                      />
+                      >
+                        getLimitedLibraryPhotos
+                      </IonButton>
                     </div>
                   </div>
                 </IonAccordion>
