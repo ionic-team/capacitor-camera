@@ -68,7 +68,7 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
   pickLimitedLibraryPhotos = async (): Promise<void> => {
     try {
       const res = await Camera.pickLimitedLibraryPhotos();
-      console.log("res", res);
+      this.handlePhotosResult(res.photos);
     } catch (e) {
       alert(`Failed to pick limited library photos with error:\n'${e}'`);
     }
@@ -77,7 +77,7 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
   getLimitedLibraryPhotos = async (): Promise<void> => {
     try {
       const res = await Camera.getLimitedLibraryPhotos();
-      console.log("res", res);
+      this.handlePhotosResult(res.photos);
     } catch (e) {
       alert(`Failed to get limited library photos with error:\n'${e}'`);
     }
@@ -98,7 +98,21 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
           {/* Placeholder for future new methods */}
           <IonCard>
             <IonCardContent>
-              {/* New methods will be added here */}
+              {/* Parameter-less methods */}
+              <div style={{ marginTop: "16px" }}>
+                <IonButton
+                  expand="block"
+                  onClick={this.pickLimitedLibraryPhotos}
+                >
+                  (iOS only) pickLimitedLibraryPhotos
+                </IonButton>
+                <IonButton
+                  expand="block"
+                  onClick={this.getLimitedLibraryPhotos}
+                >
+                  (iOS only) getLimitedLibraryPhotos
+                </IonButton>
+              </div>
             </IonCardContent>
           </IonCard>
           <IonCard>
@@ -118,22 +132,6 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
                     <PickImagesConfigurable
                       onPhotosResult={this.handlePhotosResult}
                     />
-
-                    {/* Parameter-less methods */}
-                    <div style={{ marginTop: "16px" }}>
-                      <IonButton
-                        expand="block"
-                        onClick={this.pickLimitedLibraryPhotos}
-                      >
-                        pickLimitedLibraryPhotos
-                      </IonButton>
-                      <IonButton
-                        expand="block"
-                        onClick={this.getLimitedLibraryPhotos}
-                      >
-                        getLimitedLibraryPhotos
-                      </IonButton>
-                    </div>
                   </div>
                 </IonAccordion>
               </IonAccordionGroup>
