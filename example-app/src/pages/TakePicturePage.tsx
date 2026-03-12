@@ -1,0 +1,134 @@
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonMenuButton,
+  IonTitle,
+  IonToolbar,
+  IonCardContent,
+  IonCard,
+  IonAccordion,
+  IonAccordionGroup,
+  IonItem,
+  IonLabel,
+} from "@ionic/react";
+import React from "react";
+import { CameraSource } from "@capacitor/camera";
+import PhotoWithMetadata from "../components/camera/PhotoWithMetadata";
+import TakePictureConfigurable from "../components/camera/TakePictureConfigurable";
+import { GetPhotoConfigurable } from "../components/camera/old-methods";
+
+interface ITakePicturePageState {
+  filePath: string | null;
+  metadata: string | null;
+}
+
+class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
+  constructor(props: {}) {
+    super(props);
+    this.state = {
+      filePath: null,
+      metadata: null,
+    };
+  }
+
+  handleTakePhotoResult = (result: {
+    path: string;
+    webPath: string;
+    duration?: number;
+    size: number;
+    format: string;
+    saved: boolean;
+  }): void => {
+    const metadata = {
+      size: result.size,
+      format: result.format,
+      saved: result.saved,
+    };
+
+    this.setState({
+      filePath: result.path ?? result.webPath,
+      metadata: JSON.stringify(metadata, null, 2),
+    });
+  };
+
+  handlePhotoResult = (result: {
+    path?: string;
+    webPath?: string;
+    exif?: any;
+  }): void => {
+    this.setState({
+      filePath: result.path ?? result.webPath ?? null,
+      metadata: JSON.stringify(result.exif, null, 2),
+    });
+  };
+
+  clearPhoto = (): void => {
+    this.setState({
+      filePath: null,
+      metadata: null,
+    });
+  };
+
+  render() {
+    return (
+      <IonPage>
+        <IonHeader>
+          <IonToolbar>
+            <IonButtons slot="start">
+              <IonMenuButton />
+            </IonButtons>
+            <IonTitle>Take Picture</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent>
+          <IonCard>
+            <IonCardContent>
+              <TakePictureConfigurable
+                onPhotoResult={this.handleTakePhotoResult}
+              />
+            </IonCardContent>
+          </IonCard>
+          <IonCard>
+            <IonCardContent>
+              <IonAccordionGroup>
+                <IonAccordion value="old-methods">
+                  <IonItem slot="header">
+                    <IonLabel><b>Old methods</b></IonLabel>
+                  </IonItem>
+                  <div slot="content" style={{ padding: "16px 0" }}>
+                    <GetPhotoConfigurable
+                      defaultSource={CameraSource.Prompt}
+                      onPhotoResult={this.handlePhotoResult}
+                    />
+                  </div>
+                </IonAccordion>
+              </IonAccordionGroup>
+            </IonCardContent>
+          </IonCard>
+          {this.state.filePath !== null && (
+            <>
+              <IonButton
+                expand="block"
+                color="danger"
+                fill="outline"
+                onClick={this.clearPhoto}
+                style={{ margin: "0 16px 16px 16px" }}
+              >
+                Clear Photo
+              </IonButton>
+              <PhotoWithMetadata
+                filePath={this.state.filePath}
+                metadata={this.state.metadata}
+              />
+            </>
+          )}
+        </IonContent>
+      </IonPage>
+    );
+  }
+}
+
+export default TakePicturePage;
