@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import PermissionsPage from "./pages/PermissionsPage";
 import TakePicturePage from "./pages/TakePicturePage";
 import GalleryPage from "./pages/GalleryPage";
+import RecordVideoPage from "./pages/RecordVideoPage";
 
 export interface Page {
   readonly url: string;
@@ -51,5 +52,15 @@ export const routes: Page[] = [
       </span>
     ),
     component: GalleryPage,
+  },
+  {
+    url: "/video",
+    title: "Record Video",
+    icon: (
+      <span role="img" aria-label="video">
+        🎥
+      </span>
+    ),
+    component: RecordVideoPage,
   },
 ];

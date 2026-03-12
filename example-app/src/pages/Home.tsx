@@ -47,6 +47,9 @@ const Home: React.FC = () => {
             <IonButton expand="block" routerLink="/gallery" style={{ marginBottom: "16px" }}>
               Gallery
             </IonButton>
+            <IonButton expand="block" routerLink="/video" style={{ marginBottom: "16px" }}>
+              Record Video
+            </IonButton>
           </IonCardContent>
         </IonCard>
       </IonContent>
