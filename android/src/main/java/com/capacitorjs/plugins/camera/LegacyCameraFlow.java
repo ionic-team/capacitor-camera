@@ -245,6 +245,14 @@ public class LegacyCameraFlow {
 
     private ActivityResultContract<PickVisualMediaRequest, List<Uri>> getContractForCall(final PluginCall call) {
         int limit = call.getInt("limit", 0);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            int maxLimit = MediaStore.getPickImagesMaxLimit();
+            if (limit > maxLimit) {
+                limit = maxLimit;
+            }
+        }
+        
         if (limit > 1) {
             return new ActivityResultContracts.PickMultipleVisualMedia(limit);
         } else {
