@@ -15,14 +15,24 @@ import {
   IonLabel,
 } from "@ionic/react";
 import React from "react";
-import { CameraSource } from "@capacitor/camera";
+import { Camera, CameraSource } from "@capacitor/camera";
 import PhotoWithMetadata from "../components/camera/PhotoWithMetadata";
 import TakePictureConfigurable from "../components/camera/TakePictureConfigurable";
 import { GetPhotoConfigurable } from "../components/camera/old-methods";
 
+interface MediaResult {
+  path: string;
+  webPath: string;
+  duration?: number;
+  size: number;
+  format: string;
+  saved: boolean;
+}
+
 interface ITakePicturePageState {
   filePath: string | null;
   metadata: string | null;
+  editedPhoto: MediaResult | null;
 }
 
 class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
@@ -31,6 +41,7 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
     this.state = {
       filePath: null,
       metadata: null,
+      editedPhoto: null,
     };
   }
 
@@ -69,7 +80,21 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
     this.setState({
       filePath: null,
       metadata: null,
+      editedPhoto: null,
     });
+  };
+
+  handleEditPhoto = async (filePath: string): Promise<void> => {
+    try {
+      const result = await Camera.editURIPhoto({
+        uri: filePath,
+        saveToGallery: false,
+        includeMetadata: true,
+      });
+      this.setState({ editedPhoto: result });
+    } catch (e) {
+      alert(`Failed to edit photo with error:\n'${e}'`);
+    }
   };
 
   render() {
@@ -122,6 +147,26 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
               <PhotoWithMetadata
                 filePath={this.state.filePath}
                 metadata={this.state.metadata}
+                onEdit={this.handleEditPhoto}
+              />
+            </>
+          )}
+          {this.state.editedPhoto !== null && (
+            <>
+              <div style={{ padding: "0 16px", marginTop: "16px" }}>
+                <h3>Edited Photo</h3>
+              </div>
+              <PhotoWithMetadata
+                filePath={this.state.editedPhoto.path}
+                metadata={JSON.stringify(
+                  {
+                    size: this.state.editedPhoto.size,
+                    format: this.state.editedPhoto.format,
+                    saved: this.state.editedPhoto.saved,
+                  },
+                  null,
+                  2
+                )}
               />
             </>
           )}

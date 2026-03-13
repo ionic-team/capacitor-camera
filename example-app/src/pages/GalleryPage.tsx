@@ -28,12 +28,22 @@ import {
   PickImagesConfigurable,
 } from "../components/camera/old-methods";
 
+interface MediaResult {
+  path: string;
+  webPath: string;
+  duration?: number;
+  size: number;
+  format: string;
+  saved: boolean;
+}
+
 interface IGalleryPageState {
   singlePhoto: {
     filePath: string | null;
     metadata: string | null;
   } | null;
   multiplePhotos: GalleryPhoto[] | null;
+  editedPhoto: MediaResult | null;
 }
 
 class GalleryPage extends React.Component<{}, IGalleryPageState> {
@@ -42,6 +52,7 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
     this.state = {
       singlePhoto: null,
       multiplePhotos: null,
+      editedPhoto: null,
     };
   }
 
@@ -88,7 +99,21 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
     this.setState({
       singlePhoto: null,
       multiplePhotos: null,
+      editedPhoto: null,
     });
+  };
+
+  handleEditPhoto = async (filePath: string): Promise<void> => {
+    try {
+      const result = await Camera.editURIPhoto({
+        uri: filePath,
+        saveToGallery: false,
+        includeMetadata: true,
+      });
+      this.setState({ editedPhoto: result });
+    } catch (e) {
+      alert(`Failed to edit photo with error:\n'${e}'`);
+    }
   };
 
   render() {
@@ -167,12 +192,35 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
               <PhotoWithMetadata
                 filePath={this.state.singlePhoto.filePath}
                 metadata={this.state.singlePhoto.metadata}
+                onEdit={this.handleEditPhoto}
               />
             )}
           {this.state.multiplePhotos !== null &&
             this.state.multiplePhotos.length > 0 && (
-              <MediaCarousel media={this.state.multiplePhotos} />
+              <MediaCarousel
+                media={this.state.multiplePhotos}
+                onEditPhoto={this.handleEditPhoto}
+              />
             )}
+          {this.state.editedPhoto !== null && (
+            <>
+              <div style={{ padding: "0 16px", marginTop: "16px" }}>
+                <h3>Edited Photo</h3>
+              </div>
+              <PhotoWithMetadata
+                filePath={this.state.editedPhoto.path}
+                metadata={JSON.stringify(
+                  {
+                    size: this.state.editedPhoto.size,
+                    format: this.state.editedPhoto.format,
+                    saved: this.state.editedPhoto.saved,
+                  },
+                  null,
+                  2
+                )}
+              />
+            </>
+          )}
         </IonContent>
       </IonPage>
     );

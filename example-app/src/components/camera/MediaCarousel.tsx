@@ -14,9 +14,10 @@ import "swiper/css/pagination";
 interface IMediaCarouselProps {
   // TODO change this type to allow including future MediaResult in ChooseFromGallery
   media: GalleryPhoto[];
+  onEditPhoto?: (filePath: string) => void;
 }
 
-const MediaCarousel: React.FC<IMediaCarouselProps> = ({ media }) => {
+const MediaCarousel: React.FC<IMediaCarouselProps> = ({ media, onEditPhoto }) => {
   const [currentIndex, setCurrentIndex] = useState(1);
 
   const handleSlideChange = (swiper: SwiperType) => {
@@ -61,7 +62,11 @@ const MediaCarousel: React.FC<IMediaCarouselProps> = ({ media }) => {
               {isVideo(item.format, filePath) ? (
                 <VideoWithMetadata filePath={filePath} metadata={metadata} />
               ) : (
-                <PhotoWithMetadata filePath={filePath} metadata={metadata} />
+                <PhotoWithMetadata
+                  filePath={filePath}
+                  metadata={metadata}
+                  onEdit={onEditPhoto}
+                />
               )}
             </SwiperSlide>
           );
