@@ -1,0 +1,45 @@
+name: "Continuous Integrations"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
+      - next
+      - development
+      - '*.x'
+
+jobs:
+  setup:
+    uses: ./.github/workflows/reusable_setup.yml
+
+  lint:
+    needs: 'setup'
+    uses: ./.github/workflows/reusable_lint.yml
+
+  build:
+    needs: 'setup'
+    uses: ./.github/workflows/reusable_build.yml
+
+  verify-plugin-android:
+    needs: ['setup', 'lint', 'build']
+    runs-on: 'macos-15'
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: 'Setup Tools'
+        uses: ./.github/actions/setup-tools
+      - name: 'Verify Android'
+        run: npm run verify:android
+
+  verify-plugin-ios:
+    needs: ['setup', 'lint', 'build']
+    runs-on: 'macos-15'
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: 'Setup Tools'
+        uses: ./.github/actions/setup-tools
+      - name: 'Verify iOS'
+        run: npm run verify:ios
