@@ -1,0 +1,7 @@
+{
+  "name": "CAP-CAMR-SAMPLE",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
