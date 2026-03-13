@@ -8,15 +8,12 @@ import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import com.getcapacitor.FileUtils
 import com.getcapacitor.JSObject
-import com.getcapacitor.Logger
 import com.getcapacitor.PermissionState
 import com.getcapacitor.PluginCall
 import io.ionic.libs.ioncameralib.helper.IONExifHelper
@@ -265,6 +262,7 @@ class IonCameraFlow(
             plugin.activity,
             settings.mediaType,
             settings.allowMultipleSelection,
+            settings.limit,
             galleryLauncher
         )
     }

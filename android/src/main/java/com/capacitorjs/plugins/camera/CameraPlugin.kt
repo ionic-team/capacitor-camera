@@ -263,6 +263,8 @@ class CameraPlugin : Plugin() {
         settings.allowMultipleSelection = call.getBoolean("allowMultipleSelection") ?: false
         settings.includeMetadata = call.getBoolean("includeMetadata") ?: false
         settings.allowEdit = call.getBoolean("allowEdit") ?: false
+        settings.limit = call.getInt("limit") ?: 0
+        settings.editInApp = call.getBoolean("editInApp") ?: true
         return settings
     }
 
