@@ -4,6 +4,7 @@ import PermissionsPage from "./pages/PermissionsPage";
 import TakePicturePage from "./pages/TakePicturePage";
 import GalleryPage from "./pages/GalleryPage";
 import RecordVideoPage from "./pages/RecordVideoPage";
+import EditPhotoPage from "./pages/EditPhotoPage";
 
 export interface Page {
   readonly url: string;
@@ -62,5 +63,15 @@ export const routes: Page[] = [
       </span>
     ),
     component: RecordVideoPage,
+  },
+  {
+    url: "/edit",
+    title: "Edit Photo",
+    icon: (
+      <span role="img" aria-label="edit">
+        ✏️
+      </span>
+    ),
+    component: EditPhotoPage,
   },
 ];
