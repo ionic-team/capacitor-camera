@@ -8,29 +8,32 @@ import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import com.getcapacitor.FileUtils
 import com.getcapacitor.JSObject
-import com.getcapacitor.Logger
 import com.getcapacitor.PermissionState
 import com.getcapacitor.PluginCall
-import io.ionic.libs.ioncameralib.helper.OSCAMRExifHelper
-import io.ionic.libs.ioncameralib.helper.OSCAMRFileHelper
-import io.ionic.libs.ioncameralib.helper.OSCAMRImageHelper
-import io.ionic.libs.ioncameralib.helper.OSCAMRMediaHelper
+import io.ionic.libs.ioncameralib.helper.IONExifHelper
+import io.ionic.libs.ioncameralib.helper.IONFileHelper
+import io.ionic.libs.ioncameralib.helper.IONImageHelper
+import io.ionic.libs.ioncameralib.helper.IONMediaHelper
 import io.ionic.libs.ioncameralib.manager.CameraManager
+import io.ionic.libs.ioncameralib.manager.GalleryManager
+import io.ionic.libs.ioncameralib.manager.EditManager
 import io.ionic.libs.ioncameralib.manager.VideoManager
 import io.ionic.libs.ioncameralib.model.IONCameraParameters
+import io.ionic.libs.ioncameralib.model.IONEditParameters
 import io.ionic.libs.ioncameralib.model.IONError
 import io.ionic.libs.ioncameralib.model.IONMediaResult
+import io.ionic.libs.ioncameralib.model.IONMediaType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONArray
+import com.getcapacitor.JSArray
 import java.io.File
 
 
@@ -40,42 +43,67 @@ class IonCameraFlow(
     private var isFirstRequest = true
     private var cameraManager: CameraManager? = null
     private var videoManager: VideoManager? = null
+    private var editManager: EditManager? = null
+    private var galleryManager: GalleryManager? = null
     private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
-    private lateinit var cropLauncher: ActivityResultLauncher<Intent>
-
+    private lateinit var cameraCropLauncher: ActivityResultLauncher<Intent>
+    private lateinit var galleryCropLauncher: ActivityResultLauncher<Intent>
+    private lateinit var galleryLauncher: ActivityResultLauncher<Intent>
     private lateinit var videoLauncher: ActivityResultLauncher<Intent>
+    private lateinit var editLauncher: ActivityResultLauncher<Intent>
 
     private var currentCall: PluginCall? = null
-    private var settings = CameraSettings()
-    private var videoSettings = VideoSettings()
+    private var cameraSettings : CameraSettings? = null
+    private var videoSettings : VideoSettings? = null
+    private var gallerySettings : GallerySettings? = null
+
+    private var editParameters = IONEditParameters(
+        editURI = "", fromUri = false, saveToGallery = false, includeMetadata = false
+    )
 
     fun load() {
         setupLaunchers()
         cameraManager = CameraManager(
             plugin.getAppId(),
             ".fileprovider",
-            OSCAMRExifHelper(),
-            OSCAMRFileHelper(),
-            OSCAMRMediaHelper(),
-            OSCAMRImageHelper()
+            IONExifHelper(),
+            IONFileHelper(),
+            IONMediaHelper(),
+            IONImageHelper()
         )
 
         videoManager = VideoManager(
             ".fileprovider",
-            OSCAMRFileHelper(),
+            IONFileHelper(),
+        )
+
+        galleryManager = GalleryManager(
+            IONExifHelper(),
+            IONFileHelper(),
+            IONMediaHelper(),
+            IONImageHelper()
+        )
+
+        editManager = EditManager(
+            plugin.getAppId(),
+            ".fileprovider",
+            IONExifHelper(),
+            IONFileHelper(),
+            IONMediaHelper(),
+            IONImageHelper()
         )
 
         cameraManager?.deleteVideoFilesFromCache(plugin.activity)
     }
 
-    fun takePhoto(call: PluginCall) {
-        settings = plugin.getSettings(call)
+    fun takePhoto(call: PluginCall, settings: CameraSettings) {
+        cameraSettings = settings
         currentCall = call
-        doShow(call)
+        showCamera(call)
     }
 
-    fun recordVideo(call: PluginCall) {
-        videoSettings = plugin.getVideoSettings(call)
+    fun recordVideo(call: PluginCall, settings: VideoSettings) {
+        videoSettings = settings
         currentCall = call
         openRecordVideo(call)
     }
@@ -83,6 +111,22 @@ class IonCameraFlow(
     fun playVideo(call: PluginCall) {
         currentCall = call
         openPlayVideo(call)
+    }
+
+    fun chooseFromGallery(call: PluginCall, settings: GallerySettings) {
+        gallerySettings = settings
+        currentCall = call
+        openGallery(call)
+    }
+
+    fun editPhoto(call: PluginCall) {
+        currentCall = call
+        callEditPhoto(call)
+    }
+
+    fun editURIPhoto(call: PluginCall) {
+        currentCall = call
+        callEditURIPhoto(call)
     }
 
     // ----------------------------------------------------
@@ -95,10 +139,10 @@ class IonCameraFlow(
             handleCameraResult(result)
         }
 
-        cropLauncher = plugin.activity.registerForActivityResult(
+        cameraCropLauncher = plugin.activity.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
-            handleCropResult(result)
+            handleCameraCropResult(result)
         }
 
         videoLauncher = plugin.activity.registerForActivityResult(
@@ -107,14 +151,24 @@ class IonCameraFlow(
             handleVideoResult(result)
         }
 
-    }
-
-    private fun doShow(call: PluginCall) {
-        when (settings.source) {
-            CameraSource.CAMERA -> showCamera(call)
-            //  CameraSource.PHOTOS -> showPhotos(call)
-            else -> Log.d("CAMERA_DEBUG", "PROMPT ")//showPrompt(call)
+        galleryLauncher = plugin.activity.registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            handleGalleryResult(result)
         }
+
+        galleryCropLauncher = plugin.activity.registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            handleGalleryCropResult(result)
+        }
+
+        editLauncher = plugin.activity.registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            handleEditResult(result)
+        }
+
     }
 
     private fun showCamera(call: PluginCall) {
@@ -128,6 +182,11 @@ class IonCameraFlow(
     }
 
     fun openCamera(call: PluginCall) {
+
+        val settings = cameraSettings ?: run {
+            sendError(IONError.INVALID_ARGUMENT_ERROR)
+            return
+        }
         if (checkCameraPermissions(call, settings.saveToGallery)) {
             try {
                 val manager = cameraManager ?: run {
@@ -143,7 +202,12 @@ class IonCameraFlow(
     }
 
     fun openRecordVideo(call: PluginCall) {
-        if (checkCameraPermissions(call, videoSettings.saveToGallery)) {
+        val settings = videoSettings ?: run {
+            sendError(IONError.INVALID_ARGUMENT_ERROR)
+            return
+        }
+
+        if (checkCameraPermissions(call, settings.saveToGallery)) {
             try {
                 val manager = cameraManager ?: run {
                     sendError(IONError.CONTEXT_ERROR)
@@ -152,7 +216,7 @@ class IonCameraFlow(
                 currentCall = call
                 manager.recordVideo(
                     plugin.getActivity(),
-                    videoSettings.saveToGallery,
+                    settings.saveToGallery,
                     videoLauncher
                 ) {
                     sendError(it)
@@ -165,9 +229,14 @@ class IonCameraFlow(
 
     private fun openPlayVideo(call: PluginCall) {
         try {
+            val manager = videoManager ?: run {
+                sendError(IONError.CONTEXT_ERROR)
+                return
+            }
+
             val videoUri = call.getString("videoURI")
                 ?: return sendError(IONError.PLAY_VIDEO_GENERAL_ERROR)
-            videoManager?.playVideo(plugin.activity, videoUri, {
+            manager.playVideo(plugin.activity, videoUri, {
                 call.resolve()
             }, {
                 sendError(it)
@@ -178,13 +247,78 @@ class IonCameraFlow(
         }
     }
 
+    private fun openGallery(call: PluginCall) {
+        val manager = galleryManager ?: run {
+            sendError(IONError.CONTEXT_ERROR)
+            return
+        }
+
+        val settings = gallerySettings ?: run {
+            sendError(IONError.INVALID_ARGUMENT_ERROR)
+            return
+        }
+
+        manager.chooseFromGallery(
+            plugin.activity,
+            settings.mediaType,
+            settings.allowMultipleSelection,
+            settings.limit,
+            galleryLauncher
+        )
+    }
+
+    private fun callEditPhoto(call: PluginCall) {
+        val manager = editManager ?: run {
+            sendError(IONError.CONTEXT_ERROR)
+            return
+        }
+
+        editParameters = IONEditParameters(
+            "",
+            fromUri = false,
+            saveToGallery = false,
+            includeMetadata = false
+        )
+        val imageBase64 = call.data.getString("base64")
+        if (imageBase64 == null) return
+        manager.editImage(plugin.activity, imageBase64, editLauncher)
+    }
+
+    private fun callEditURIPhoto(call: PluginCall) {
+        val manager = editManager ?: run {
+            sendError(IONError.CONTEXT_ERROR)
+            return
+        }
+
+        val photoPath = call.getString("uri")
+        val saveToGallery = call.getBoolean("saveToGallery") ?: false
+        val includeMetadata = call.getBoolean("includeMetadata") ?: false
+        if (photoPath == null) return
+
+        editParameters = IONEditParameters(
+            editURI = photoPath,
+            fromUri = true,
+            saveToGallery = saveToGallery,
+            includeMetadata = includeMetadata
+        )
+
+        manager.editURIPicture(plugin.activity, photoPath, editLauncher) {
+            sendError(IONError.EDIT_IMAGE_ERROR)
+        }
+    }
+
+
     private fun handleCameraResult(result: ActivityResult) {
         when (result.resultCode) {
             Activity.RESULT_OK -> {
+                   val settings = cameraSettings ?: run {
+                    sendError(IONError.INVALID_ARGUMENT_ERROR)
+                    return
+                }
                 if (settings.allowEditing) {
                     editPhoto()
                 } else {
-                    processResult()
+                    processResult(result)
                 }
             }
 
@@ -212,8 +346,92 @@ class IonCameraFlow(
         }
     }
 
+    private fun handleGalleryResult(result: ActivityResult) {
+        when (result.resultCode) {
+            Activity.RESULT_OK -> {
+
+                val editor = editManager ?: run {
+                    sendError(IONError.CONTEXT_ERROR)
+                    return
+                }
+
+                val manager = galleryManager ?: run {
+                    sendError(IONError.CONTEXT_ERROR)
+                    return
+                }
+
+                val settings = gallerySettings ?: run {
+                    sendError(IONError.INVALID_ARGUMENT_ERROR)
+                    return
+                }
+
+                val uris = manager.extractUris(result.data)
+
+                if (uris.isEmpty()) {
+                    sendError(IONError.GENERIC_CHOOSE_MULTIMEDIA_ERROR)
+                    return
+                }
+
+                if (settings.allowEdit && uris.size == 1 && settings.mediaType == IONMediaType.PICTURE) {
+                    editor.openCropActivity(
+                        plugin.activity,
+                        uris.first(),
+                        galleryCropLauncher
+                    )
+                } else {
+                    processResultFromGallery(result)
+                }
+            }
+
+            Activity.RESULT_CANCELED -> {
+                sendError(IONError.CHOOSE_MULTIMEDIA_CANCELLED_ERROR)
+            }
+
+            else -> sendError(IONError.GENERIC_CHOOSE_MULTIMEDIA_ERROR)
+        }
+    }
+
+    private fun handleGalleryCropResult(result: ActivityResult) {
+        when (result.resultCode) {
+            Activity.RESULT_OK -> {
+                val manager = galleryManager ?: run {
+                    sendError(IONError.CONTEXT_ERROR)
+                    return
+                }
+
+                val settings = gallerySettings ?: run {
+                    sendError(IONError.INVALID_ARGUMENT_ERROR)
+                    return
+                }
+
+                CoroutineScope(Dispatchers.Default).launch {
+                    manager.onChooseFromGalleryEditResult(
+                        plugin.activity,
+                        result.resultCode,
+                        result.data,
+                        settings.includeMetadata,
+                        {
+                            handleGalleryMediaResults(it)
+                        },
+                        { sendError(it) })
+                }
+            }
+
+            Activity.RESULT_CANCELED -> sendError(IONError.EDIT_OPERATION_CANCELLED_ERROR)
+            else -> sendError(IONError.EDIT_IMAGE_ERROR)
+        }
+    }
+
+    private fun handleEditResult(result: ActivityResult) {
+        when (result.resultCode) {
+            Activity.RESULT_OK -> processResultFromEdit(result)
+            Activity.RESULT_CANCELED -> sendError(IONError.EDIT_OPERATION_CANCELLED_ERROR)
+            else -> sendError(IONError.EDIT_IMAGE_ERROR)
+        }
+    }
+
     private fun editPhoto() {
-        val manager = cameraManager ?: run {
+        val editor = editManager ?: run {
             sendError(IONError.CONTEXT_ERROR)
             return
         }
@@ -222,7 +440,7 @@ class IonCameraFlow(
         val tmpFile = FileProvider.getUriForFile(
             plugin.activity,
             "$appId.fileprovider",
-            manager.createCaptureFile(
+            editor.createCaptureFile(
                 plugin.activity,
                 CameraPlugin.ENCODING_TYPE,
                 plugin.activity.getSharedPreferences(
@@ -232,24 +450,29 @@ class IonCameraFlow(
             )
         )
 
-        manager.openCropActivity(
+        editor.openCropActivity(
             plugin.activity,
             tmpFile,
-            cropLauncher
+            cameraCropLauncher
         )
     }
 
-    private fun handleCropResult(result: ActivityResult) {
+    private fun handleCameraCropResult(result: ActivityResult) {
         when (result.resultCode) {
-            Activity.RESULT_OK -> processResult()
+            Activity.RESULT_OK -> processResult(result)
             Activity.RESULT_CANCELED -> sendError(IONError.EDIT_OPERATION_CANCELLED_ERROR)
             else -> sendError(IONError.EDIT_IMAGE_ERROR)
         }
     }
 
-    private fun handleBase64Result(image: String) {
+    private fun handlePhotoBase64Result(image: String) {
         val ret = JSObject()
         ret.put("format", "jpeg")
+
+        val settings = cameraSettings ?: run {
+            sendError(IONError.INVALID_ARGUMENT_ERROR)
+            return
+        }
 
         when (settings.resultType) {
             CameraResultType.BASE64 -> {
@@ -265,9 +488,19 @@ class IonCameraFlow(
                 return
             }
         }
+
         currentCall?.resolve(ret)
         currentCall = null
     }
+
+    private fun handleEditBase64Result(image: String) {
+        val ret = JSObject()
+        ret.put("format", "jpeg")
+        ret.put("base64String", image)
+        currentCall?.resolve(ret)
+        currentCall = null
+    }
+
 
     private fun handleMediaResult(mediaResult: IONMediaResult) {
         val file = File(mediaResult.uri)
@@ -282,12 +515,11 @@ class IonCameraFlow(
         val ret = JSObject()
         ret.put("format", "jpeg")
         ret.put("exif", exif.toJson())
-        ret.put("path", uri.toString())
+        ret.put("path", mediaResult.uri)
         ret.put("webPath", FileUtils.getPortablePath(plugin.context, plugin.bridge.localUrl, uri))
         ret.put("saved", mediaResult.saved)
         currentCall?.resolve(ret)
         currentCall = null
-
     }
 
     private fun handleVideoMediaResult(mediaResult: IONMediaResult) {
@@ -308,14 +540,52 @@ class IonCameraFlow(
         currentCall = null
     }
 
-    private fun processResult() {
-        val manager = cameraManager ?: return
+    private fun handleGalleryMediaResults(results: List<IONMediaResult>) {
+        val photos = JSArray()
+        results.forEach { mediaResult ->
+            val file = File(mediaResult.uri)
+            val uri = Uri.fromFile(file)
+
+            val obj = JSObject()
+            obj.put("path", mediaResult.uri)
+            obj.put(
+                "webPath",
+                FileUtils.getPortablePath(plugin.context, plugin.bridge.localUrl, uri)
+            )
+            obj.put("saved", mediaResult.saved)
+
+            mediaResult.metadata?.let {
+                obj.put("duration", it.duration)
+                obj.put("size", it.size)
+                obj.put("format", it.format)
+            }
+
+            photos.put(obj)
+        }
+
+        val ret = JSObject()
+        ret.put("photos", photos)
+        currentCall?.resolve(ret)
+        currentCall = null
+    }
+
+    private fun processResult(result: ActivityResult) {
+        val manager = cameraManager ?: run {
+            sendError(IONError.CONTEXT_ERROR)
+            return
+        }
+
+        val settings = cameraSettings ?: run {
+            sendError(IONError.INVALID_ARGUMENT_ERROR)
+            return
+        }
         val ionParams = settings.toIonParameters()
         manager.processResultFromCamera(
             plugin.activity,
+            result.data,
             ionParams,
             { image ->
-                handleBase64Result(image)
+                handlePhotoBase64Result(image)
             },
             { mediaResult ->
                 handleMediaResult(mediaResult)
@@ -327,6 +597,10 @@ class IonCameraFlow(
     }
 
     private fun processResultFromVideo(result: ActivityResult) {
+        val manager = cameraManager ?: run {
+            sendError(IONError.CONTEXT_ERROR)
+            return
+        }
         var uri = result.data?.data
         if (uri == null) {
             val fromPreferences =
@@ -338,13 +612,17 @@ class IonCameraFlow(
             sendError(IONError.CAPTURE_VIDEO_ERROR)
             return
         }
+        val settings = videoSettings ?: run {
+            sendError(IONError.INVALID_ARGUMENT_ERROR)
+            return
+        }
 
         CoroutineScope(Dispatchers.Default).launch {
-            cameraManager?.processResultFromVideo(
+            manager.processResultFromVideo(
                 plugin.activity,
                 uri,
-                videoSettings.saveToGallery,
-                videoSettings.includeMetadata,
+                settings.saveToGallery,
+                settings.includeMetadata,
                 { mediaResult ->
                     handleVideoMediaResult(mediaResult)
                 },
@@ -352,6 +630,52 @@ class IonCameraFlow(
                     sendError(IONError.CAPTURE_VIDEO_ERROR)
                 })
         }
+    }
+
+    private fun processResultFromGallery(result: ActivityResult) {
+        val manager = galleryManager ?: run {
+            sendError(IONError.CONTEXT_ERROR)
+            return
+        }
+
+        val settings = gallerySettings ?: run {
+            sendError(IONError.INVALID_ARGUMENT_ERROR)
+            return
+        }
+
+        CoroutineScope(Dispatchers.Default).launch {
+            manager.onChooseFromGalleryResult(
+                plugin.activity,
+                result.resultCode,
+                result.data,
+                settings.includeMetadata,
+                {
+                    handleGalleryMediaResults(it)
+                },
+                { sendError(it) })
+        }
+    }
+
+    private fun processResultFromEdit(result: ActivityResult) {
+        val manager = editManager ?: run {
+            sendError(IONError.CONTEXT_ERROR)
+            return
+        }
+
+        manager.processResultFromEdit(
+            plugin.activity,
+            result.data,
+            editParameters,
+            { image ->
+                handleEditBase64Result(image)
+            },
+            { mediaResult ->
+                handleMediaResult(mediaResult)
+            },
+            { error ->
+                sendError(error)
+            }
+        )
     }
 
     private fun CameraSettings.toIonParameters(): IONCameraParameters {
@@ -365,7 +689,8 @@ class IonCameraFlow(
             allowEdit = allowEditing,
             correctOrientation = shouldCorrectOrientation,
             saveToPhotoAlbum = saveToGallery,
-            includeMetadata = true, // Keep true
+            //TODO this value should come from settings, possibly from new interface TakePhotoOptions
+            includeMetadata = false,
             latestVersion = useLatestVersion
         )
     }
@@ -423,9 +748,7 @@ class IonCameraFlow(
         when (call.getMethodName()) {
             "takePhoto" -> openCamera(call)
             "recordVideo" -> openRecordVideo(call)
-            "pickImages" -> {
-                // openPhotos(call)
-            }
+            "pickImages" -> openGallery(call)
             else -> sendError(IONError.CONTEXT_ERROR)
         }
     }
