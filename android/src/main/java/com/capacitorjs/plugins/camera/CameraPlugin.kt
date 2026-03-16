@@ -19,7 +19,7 @@ import com.getcapacitor.annotation.CapacitorPlugin
 import com.getcapacitor.annotation.Permission
 import com.getcapacitor.annotation.PermissionCallback
 import org.json.JSONException
-import io.ionic.libs.ioncameralib.model.IONMediaType
+import io.ionic.libs.ioncameralib.model.IONCAMRMediaType
 /**
  * The Camera plugin makes it easy to take a photo or have the user select a photo
  * from their albums.
@@ -259,7 +259,7 @@ class CameraPlugin : Plugin() {
 
     fun getGallerySettings(call: PluginCall): GallerySettings {
         val settings = GallerySettings()
-        settings.mediaType = IONMediaType.fromValue(call.getInt("mediaType") ?: 0)
+        settings.mediaType = IONCAMRMediaType.fromValue(call.getInt("mediaType") ?: 0)
         settings.allowMultipleSelection = call.getBoolean("allowMultipleSelection") ?: false
         settings.includeMetadata = call.getBoolean("includeMetadata") ?: false
         settings.allowEdit = call.getBoolean("allowEdit") ?: false

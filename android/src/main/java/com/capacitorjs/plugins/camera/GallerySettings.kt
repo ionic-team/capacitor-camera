@@ -1,9 +1,9 @@
 package com.capacitorjs.plugins.camera
 
-import io.ionic.libs.ioncameralib.model.IONMediaType
+import io.ionic.libs.ioncameralib.model.IONCAMRMediaType
 
 class GallerySettings {
-    var mediaType: IONMediaType = IONMediaType.ALL
+    var mediaType: IONCAMRMediaType = IONCAMRMediaType.ALL
     var allowMultipleSelection: Boolean = false
     var limit : Int = 0
     var includeMetadata: Boolean = false
