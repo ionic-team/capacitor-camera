@@ -15,32 +15,46 @@ export interface CameraPluginPermissions {
 
 export interface CameraPlugin {
   /**
-   * Prompt the user to take a photo with the camera.
+   * Open the device's camera and allow the user to take a photo.
    *
    * @since 8.1.0
    */
   takePhoto(options: ImageOptions): Promise<MediaResult>;
 
+  /**
+   * Open the device's camera and allow the user to record a video.
+   * Not available on Web.
+   * 
+   * @since 8.1.0
+   */
   recordVideo(options: RecordVideoOptions): Promise<MediaResult>;
 
+  /**
+   * Open a native video player.
+   * Not available on Web.
+   * 
+   * @since 8.1.0
+   */
   playVideo(options: PlayVideoOptions): Promise<void>;
 
   /**
-   * Allows the user to pick multiple pictures from the photo gallery.
+   * Allow users to choose pictures, videos, or both, directly from their gallery.
    *
    * @since 8.1.0
    */
   chooseFromGallery(options: GalleryOptions): Promise<MediaResults>;
 
   /**
-   * Returns a string (base64) representing the photo that was edited
+   * Open an in-app screen to edit a given photo using the provided base64 string.
+   * Not available on Web.
    *
    * @since 8.1.0
    */
   editPhoto(options: EditPhotoOptions): Promise<EditPhotoResult>;
 
   /**
-   * Returns a MediaResult object with info about the photo that was edited
+   * Open an in-app screen to edit a photo using the provided URI.
+   * Not available on Web.
    *
    * @since 8.1.0
    */
@@ -80,6 +94,7 @@ export interface CameraPlugin {
    * with the camera.
    *
    * @since 1.0.0
+   * @deprecated Use `takePhoto` for a camera photo, or `chooseFromGallery` to select from the gallery. For creating a prompt for the user to select which source, use `@capacitor/action-sheet` or any UI component of your choosing. Refer to the Camera API documentation for more information on migrating.
    */
   getPhoto(options: ImageOptions): Promise<Photo>;
 
@@ -87,6 +102,7 @@ export interface CameraPlugin {
    * Allows the user to pick multiple pictures from the photo gallery.
    *
    * @since 1.2.0
+   * @deprecated Use `chooseFromGallery` instead. Refer to the Camera API documentation for more information on migrating.
    */
   pickImages(options: GalleryImageOptions): Promise<GalleryPhotos>;
 }
