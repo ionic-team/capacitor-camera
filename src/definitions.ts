@@ -102,9 +102,16 @@ export interface PlayVideoOptions {
 
 export interface GalleryOptions {
   mediaType: MediaType;
-  allowMultipleSelection: boolean;
-  includeMetadata: boolean;
-  allowEdit: boolean;
+  allowMultipleSelection?: boolean;
+  limit?: number;
+  includeMetadata?: boolean;
+  allowEdit?: boolean;
+  editInApp?: boolean;
+  presentationStyle?: 'fullscreen' | 'popover';
+  quality?: number;
+  width?: number;
+  height?: number;
+  correctOrientation?: boolean;
 }
 
 export interface EditURIPhotoOptions {
@@ -129,6 +136,7 @@ export interface MediaResults {
 export interface MediaResult {
   path: string;
   webPath: string;
+  exif?: any;
   duration?: number;
   size: number;
   format: string;

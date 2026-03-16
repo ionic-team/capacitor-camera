@@ -419,6 +419,7 @@ Returns a <a href="#mediaresult">MediaResult</a> object with info about the phot
 | -------------- | -------------------- |
 | **`path`**     | <code>string</code>  |
 | **`webPath`**  | <code>string</code>  |
+| **`exif`**     | <code>any</code>     |
 | **`duration`** | <code>number</code>  |
 | **`size`**     | <code>number</code>  |
 | **`format`**   | <code>string</code>  |
@@ -453,8 +454,11 @@ Returns a <a href="#mediaresult">MediaResult</a> object with info about the phot
 | ---------------------------- | ----------------------------------------------- |
 | **`mediaType`**              | <code><a href="#mediatype">MediaType</a></code> |
 | **`allowMultipleSelection`** | <code>boolean</code>                            |
+| **`limit`**                  | <code>number</code>                             |
 | **`includeMetadata`**        | <code>boolean</code>                            |
 | **`allowEdit`**              | <code>boolean</code>                            |
+| **`editInApp`**              | <code>boolean</code>                            |
+| **`presentationStyle`**      | <code>'fullscreen' \| 'popover'</code>          |
 
 
 #### EditPhotoResult
