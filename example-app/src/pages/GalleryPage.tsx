@@ -221,6 +221,7 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
               />
             </>
           )}
+          <div style={{ height: '80px' }} />
         </IonContent>
       </IonPage>
     );

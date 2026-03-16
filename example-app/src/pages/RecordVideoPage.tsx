@@ -108,6 +108,7 @@ class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
               />
             </>
           )}
+          <div style={{ height: '80px' }} />
         </IonContent>
       </IonPage>
     );

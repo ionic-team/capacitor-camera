@@ -42,6 +42,7 @@ const EditPhotoPage: React.FC = () => {
         <TestImageSelector onImageSelected={handleImageSelected} />
         <EditPhotoConfigurable selectedImage={selectedImage} />
         <EditURIPhotoConfigurable selectedImage={selectedImage} />
+        <div style={{ height: '80px' }} />
       </IonContent>
     </IonPage>
   );

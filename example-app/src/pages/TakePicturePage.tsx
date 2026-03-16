@@ -170,6 +170,7 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
               />
             </>
           )}
+          <div style={{ height: '80px' }} />
         </IonContent>
       </IonPage>
     );
