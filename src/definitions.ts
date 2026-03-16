@@ -78,14 +78,14 @@ export interface CameraPlugin {
 
   /**
    * Returns a string (base64) representing the photo that was edited
-   * 
+   *
    * @since 2.0.0
    */
   editPhoto(options: EditPhotoOptions): Promise<EditPhotoResult>;
 
   /**
    * Returns a MediaResult object with info about the photo that was edited
-   * 
+   *
    * @since 2.0.0
    */
   editURIPhoto(options: EditURIPhotoOptions): Promise<MediaResult>;

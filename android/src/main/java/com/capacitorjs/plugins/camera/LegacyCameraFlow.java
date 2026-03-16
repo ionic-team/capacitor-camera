@@ -1,6 +1,5 @@
 package com.capacitorjs.plugins.camera;
 
-
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
@@ -123,17 +122,17 @@ public class LegacyCameraFlow {
         final CameraBottomSheetDialogFragment fragment = new CameraBottomSheetDialogFragment();
         fragment.setTitle(call.getString("promptLabelHeader", "Photo"));
         fragment.setOptions(
-                options,
-                (index) -> {
-                    if (index == 0) {
-                        settings.setSource(CameraSource.PHOTOS);
-                        openPhotos(call);
-                    } else if (index == 1) {
-                        settings.setSource(CameraSource.CAMERA);
-                        openCamera(call);
-                    }
-                },
-                () -> call.reject(USER_CANCELLED)
+            options,
+            (index) -> {
+                if (index == 0) {
+                    settings.setSource(CameraSource.PHOTOS);
+                    openPhotos(call);
+                } else if (index == 1) {
+                    settings.setSource(CameraSource.CAMERA);
+                    openCamera(call);
+                }
+            },
+            () -> call.reject(USER_CANCELLED)
         );
         fragment.show(plugin.getActivity().getSupportFragmentManager(), "capacitorModalsActionSheet");
     }
@@ -229,8 +228,8 @@ public class LegacyCameraFlow {
     }
 
     private <I, O> ActivityResultLauncher<I> registerActivityResultLauncher(
-            ActivityResultContract<I, O> contract,
-            ActivityResultCallback<O> callback
+        ActivityResultContract<I, O> contract,
+        ActivityResultCallback<O> callback
     ) {
         String key = "cap_activity_rq#" + mNextLocalRequestCode.getAndIncrement();
         if (plugin.getBridge().getFragment() != null) {
@@ -252,7 +251,7 @@ public class LegacyCameraFlow {
                 limit = maxLimit;
             }
         }
-        
+
         if (limit > 1) {
             return new ActivityResultContracts.PickMultipleVisualMedia(limit);
         } else {
@@ -291,7 +290,7 @@ public class LegacyCameraFlow {
                     pickMultipleMedia.unregister();
                 });
                 pickMultipleMedia.launch(
-                        new PickVisualMediaRequest.Builder().setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build()
+                    new PickVisualMediaRequest.Builder().setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build()
                 );
             } else {
                 pickMedia = registerActivityResultLauncher(new ActivityResultContracts.PickVisualMedia(), (uri) -> {
@@ -304,7 +303,7 @@ public class LegacyCameraFlow {
                     pickMedia.unregister();
                 });
                 pickMedia.launch(
-                        new PickVisualMediaRequest.Builder().setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build()
+                    new PickVisualMediaRequest.Builder().setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build()
                 );
             }
         } catch (ActivityNotFoundException ex) {
@@ -548,10 +547,10 @@ public class LegacyCameraFlow {
                     }
                 } else {
                     String inserted = MediaStore.Images.Media.insertImage(
-                            plugin.getContext().getContentResolver(),
-                            fileToSavePath,
-                            fileToSave.getName(),
-                            ""
+                        plugin.getContext().getContentResolver(),
+                        fileToSavePath,
+                        fileToSave.getName(),
+                        ""
                     );
 
                     if (inserted == null) {
@@ -699,7 +698,11 @@ public class LegacyCameraFlow {
     private Intent createEditIntent(Uri origPhotoUri) {
         try {
             File editFile = new File(origPhotoUri.getPath());
-            Uri editUri = FileProvider.getUriForFile(plugin.getActivity(), plugin.getContext().getPackageName() + ".fileprovider", editFile);
+            Uri editUri = FileProvider.getUriForFile(
+                plugin.getActivity(),
+                plugin.getContext().getPackageName() + ".fileprovider",
+                editFile
+            );
             Intent editIntent = new Intent(Intent.ACTION_EDIT);
             editIntent.setDataAndType(editUri, "image/*");
             imageEditedFileSavePath = editFile.getAbsolutePath();
@@ -710,9 +713,10 @@ public class LegacyCameraFlow {
             List<ResolveInfo> resInfoList;
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                resInfoList = plugin.getContext()
-                        .getPackageManager()
-                        .queryIntentActivities(editIntent, PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY));
+                resInfoList = plugin
+                    .getContext()
+                    .getPackageManager()
+                    .queryIntentActivities(editIntent, PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY));
             } else {
                 resInfoList = legacyQueryIntentActivities(editIntent);
             }
@@ -753,5 +757,4 @@ public class LegacyCameraFlow {
             pickMultipleMedia.unregister();
         }
     }
-
 }
