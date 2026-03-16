@@ -107,6 +107,109 @@ export interface CameraPlugin {
   pickImages(options: GalleryImageOptions): Promise<GalleryPhotos>;
 }
 
+export interface TakePhotoOptions {
+  /**
+   * The quality of image to return as JPEG, from 0-100.
+   * Not available on Web.
+   *
+   * @default 100
+   * @since 8.1.0
+   */
+  quality?: number;
+
+  /**
+   * The desired maximum width of the saved image. The aspect ratio is respected.
+   * Note: This option is only supported on Android and iOS.
+   *
+   * @since 1.0.0
+   */
+  width?: number;
+
+  /**
+   * The desired maximum height of the saved image. The aspect ratio is respected.
+   * Note: This option is only supported on Android and iOS.
+   *
+   * @since 8.1.0
+   */
+  height?: number;
+
+  /**
+   * Whether to automatically rotate the image "up" to correct for orientation
+   * in portrait mode.
+   * Note: This option is only supported on Android and iOS
+   * @default: true
+   *
+   * @since 8.1.0
+   */
+  correctOrientation?: boolean;
+
+  /**
+   * Whether to save the photo to the gallery.
+   * Note: This option is only supported on Android and iOS.
+   * @default: false
+   *
+   * @since 1.0.0
+   */
+
+  saveToGallery?: boolean;
+  
+  /**
+   * iOS and Web only: The camera direction.
+   * @default: CameraDirection.Rear
+   *
+   * @since 8.1.0
+   */
+  cameraDirection?: CameraDirection;
+
+  /**
+   * Whether to allow the user to crop or make small edits.
+   * Note: This option is only supported on Android and iOS.
+   *
+   * @since 8.1.0
+   */
+  allowEdit?: boolean;
+
+  /**
+   * If `true`, will use an in-app editor for photo edition.
+   * If `false`, will open a separate (platform-specific) native app to handle photo edition, falling back to the in-app editor if none is available.
+   * Only applicable with `allowEdit` set to true.
+   * Note: This option is only supported on Android and iOS.
+   * 
+   * @default true
+   * @since 8.1.0
+   */
+  editInApp?: boolean;
+
+  /**
+   * iOS only: The presentation style of the Camera.
+   * @default: 'fullscreen'
+   *
+   * @since 8.1.0
+   */
+  presentationStyle?: 'fullscreen' | 'popover';
+
+  /**
+   * Web only: Whether to use the PWA Element experience or file input. The
+   * default is to use PWA Elements if installed and fall back to file input.
+   * To always use file input, set this to `true`.
+   *
+   * Learn more about PWA Elements: https://capacitorjs.com/docs/web/pwa-elements
+   *
+   * @since 8.1.0
+   */
+  webUseInput?: boolean;
+
+  /**
+   * Whether or not MediaResult should include its metadata.
+   * If an error occurs when obtaining the metadata, it will return empty.
+   * Note: This option is only supported on Android and iOS.
+   * @default false
+   * 
+   * @since 8.1.0
+   */
+  includeMetadata?: boolean;
+}
+
 export interface RecordVideoOptions {
   saveToGallery?: boolean;
   includeMetadata?: boolean;
@@ -162,13 +265,14 @@ export interface MediaResult {
 export interface ImageOptions {
   /**
    * The quality of image to return as JPEG, from 0-100
-   * Note: This option is only supported on Android and iOS
+   * Note: This option is only supported on Android and iOS.
    *
    * @since 1.0.0
    */
   quality?: number;
   /**
    * Whether to allow the user to crop or make small edits (platform specific).
+   * Note: This option is only supported on Android and iOS.
    * On iOS it's only supported for CameraSource.Camera, but not for CameraSource.Photos.
    *
    * @since 1.0.0
@@ -183,6 +287,7 @@ export interface ImageOptions {
   /**
    * Whether to save the photo to the gallery.
    * If the photo was picked from the gallery, it will only be saved if edited.
+   * Note: This option is only supported on Android and iOS.
    * @default: false
    *
    * @since 1.0.0
@@ -190,19 +295,22 @@ export interface ImageOptions {
   saveToGallery?: boolean;
   /**
    * The desired maximum width of the saved image. The aspect ratio is respected.
+   * Note: This option is only supported on Android and iOS.
    *
    * @since 1.0.0
    */
   width?: number;
   /**
    * The desired maximum height of the saved image. The aspect ratio is respected.
+   * Note: This option is only supported on Android and iOS.
    *
    * @since 1.0.0
    */
   height?: number;
   /**
    * Whether to automatically rotate the image "up" to correct for orientation
-   * in portrait mode
+   * in portrait mode.
+   * Note: This option is only supported on Android and iOS.
    * @default: true
    *
    * @since 1.0.0
