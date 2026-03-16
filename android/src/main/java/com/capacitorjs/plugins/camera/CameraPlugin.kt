@@ -250,22 +250,22 @@ class CameraPlugin : Plugin() {
         return settings
     }
 
-     fun getVideoSettings(call: PluginCall): VideoSettings {
-         val settings = VideoSettings()
-         settings.saveToGallery = call.getBoolean("saveToGallery") ?: false
-         settings.includeMetadata = call.getBoolean("includeMetadata") ?: false
-         return settings
+    fun getVideoSettings(call: PluginCall): VideoSettings {
+        return VideoSettings(
+            saveToGallery = call.getBoolean("saveToGallery") ?: false,
+            includeMetadata = call.getBoolean("includeMetadata") ?: false
+        )
     }
 
     fun getGallerySettings(call: PluginCall): GallerySettings {
-        val settings = GallerySettings()
-        settings.mediaType = IONCAMRMediaType.fromValue(call.getInt("mediaType") ?: 0)
-        settings.allowMultipleSelection = call.getBoolean("allowMultipleSelection") ?: false
-        settings.includeMetadata = call.getBoolean("includeMetadata") ?: false
-        settings.allowEdit = call.getBoolean("allowEdit") ?: false
-        settings.limit = call.getInt("limit") ?: 0
-        settings.editInApp = call.getBoolean("editInApp") ?: true
-        return settings
+        return GallerySettings(
+            mediaType = IONCAMRMediaType.fromValue((call.getInt("mediaType") ?: 0)),
+            allowMultipleSelection = call.getBoolean("allowMultipleSelection") ?: false,
+            includeMetadata = call.getBoolean("includeMetadata") ?: false,
+            allowEdit = call.getBoolean("allowEdit") ?: false,
+            limit = call.getInt("limit") ?: 0,
+            editInApp = call.getBoolean("editInApp") ?: true
+        )
     }
 
     private fun getResultType(resultType: String?): CameraResultType? {
