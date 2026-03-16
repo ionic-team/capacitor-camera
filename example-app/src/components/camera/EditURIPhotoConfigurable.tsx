@@ -13,6 +13,7 @@ import { Camera } from "@capacitor/camera";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Capacitor } from "@capacitor/core";
 import { TestImage } from "./TestImageData";
+import { MediaHistoryService } from "../../services/MediaHistoryService";
 
 interface MediaResult {
   path: string;
@@ -139,6 +140,16 @@ class EditURIPhotoConfigurable extends React.Component<
         includeMetadata: this.state.config.includeMetadata,
       });
       this.setState({ editedPhoto: result });
+
+      MediaHistoryService.addMedia({
+        mediaType: "photo",
+        method: "editURIPhoto",
+        path: result.path,
+        webPath: result.webPath,
+        format: result.format,
+        size: result.size,
+        saved: result.saved,
+      });
     } catch (e) {
       alert(`Failed to edit photo with error:\n'${e}'`);
     }

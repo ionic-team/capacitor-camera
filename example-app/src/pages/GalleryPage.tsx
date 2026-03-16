@@ -27,6 +27,7 @@ import {
   GetPhotoConfigurable,
   PickImagesConfigurable,
 } from "../components/camera/old-methods";
+import { MediaHistoryService } from "../services/MediaHistoryService";
 
 interface MediaResult {
   path: string;
@@ -68,12 +69,31 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
       },
       multiplePhotos: null,
     });
+
+    if (result.path || result.webPath) {
+      MediaHistoryService.addMedia({
+        mediaType: "photo",
+        method: "getPhoto",
+        path: result.path || "",
+        webPath: result.webPath || "",
+      });
+    }
   };
 
   handlePhotosResult = (photos: GalleryPhoto[]): void => {
     this.setState({
       singlePhoto: null,
       multiplePhotos: photos,
+    });
+
+    photos.forEach((photo) => {
+      MediaHistoryService.addMedia({
+        mediaType: "photo",
+        method: "chooseFromGallery",
+        path: photo.path || "",
+        webPath: photo.webPath,
+        format: photo.format,
+      });
     });
   };
 
@@ -111,6 +131,16 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
         includeMetadata: true,
       });
       this.setState({ editedPhoto: result });
+
+      MediaHistoryService.addMedia({
+        mediaType: "photo",
+        method: "editURIPhoto",
+        path: result.path,
+        webPath: result.webPath,
+        format: result.format,
+        size: result.size,
+        saved: result.saved,
+      });
     } catch (e) {
       alert(`Failed to edit photo with error:\n'${e}'`);
     }

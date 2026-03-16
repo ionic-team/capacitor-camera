@@ -14,6 +14,7 @@ import React from "react";
 import { Camera } from "@capacitor/camera";
 import VideoWithMetadata from "../components/camera/VideoWithMetadata";
 import RecordVideoConfigurable from "../components/camera/RecordVideoConfigurable";
+import { MediaHistoryService } from "../services/MediaHistoryService";
 
 interface IRecordVideoPageState {
   filePath: string | null;
@@ -47,6 +48,17 @@ class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
     this.setState({
       filePath: result.path ?? result.webPath,
       metadata: JSON.stringify(metadata, null, 2),
+    });
+
+    MediaHistoryService.addMedia({
+      mediaType: "video",
+      method: "recordVideo",
+      path: result.path,
+      webPath: result.webPath,
+      format: result.format,
+      size: result.size,
+      duration: result.duration,
+      saved: result.saved,
     });
   };
 

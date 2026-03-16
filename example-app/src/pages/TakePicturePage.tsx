@@ -19,6 +19,7 @@ import { Camera, CameraSource } from "@capacitor/camera";
 import PhotoWithMetadata from "../components/camera/PhotoWithMetadata";
 import TakePictureConfigurable from "../components/camera/TakePictureConfigurable";
 import { GetPhotoConfigurable } from "../components/camera/old-methods";
+import { MediaHistoryService } from "../services/MediaHistoryService";
 
 interface MediaResult {
   path: string;
@@ -63,6 +64,16 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
       filePath: result.path ?? result.webPath,
       metadata: JSON.stringify(metadata, null, 2),
     });
+
+    MediaHistoryService.addMedia({
+      mediaType: "photo",
+      method: "takePhoto",
+      path: result.path,
+      webPath: result.webPath,
+      format: result.format,
+      size: result.size,
+      saved: result.saved,
+    });
   };
 
   handlePhotoResult = (result: {
@@ -74,6 +85,15 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
       filePath: result.path ?? result.webPath ?? null,
       metadata: JSON.stringify(result.exif, null, 2),
     });
+
+    if (result.path || result.webPath) {
+      MediaHistoryService.addMedia({
+        mediaType: "photo",
+        method: "getPhoto",
+        path: result.path || "",
+        webPath: result.webPath || "",
+      });
+    }
   };
 
   clearPhoto = (): void => {
@@ -92,6 +112,16 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
         includeMetadata: true,
       });
       this.setState({ editedPhoto: result });
+
+      MediaHistoryService.addMedia({
+        mediaType: "photo",
+        method: "editURIPhoto",
+        path: result.path,
+        webPath: result.webPath,
+        format: result.format,
+        size: result.size,
+        saved: result.saved,
+      });
     } catch (e) {
       alert(`Failed to edit photo with error:\n'${e}'`);
     }

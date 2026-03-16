@@ -53,6 +53,9 @@ const Home: React.FC = () => {
             <IonButton expand="block" routerLink="/edit" style={{ marginBottom: "16px" }}>
               Edit Photo
             </IonButton>
+            <IonButton expand="block" routerLink="/history" style={{ marginBottom: "16px" }}>
+              Media History
+            </IonButton>
           </IonCardContent>
         </IonCard>
       </IonContent>

@@ -5,6 +5,7 @@ import TakePicturePage from "./pages/TakePicturePage";
 import GalleryPage from "./pages/GalleryPage";
 import RecordVideoPage from "./pages/RecordVideoPage";
 import EditPhotoPage from "./pages/EditPhotoPage";
+import MediaHistoryPage from "./pages/MediaHistoryPage";
 
 export interface Page {
   readonly url: string;
@@ -73,5 +74,15 @@ export const routes: Page[] = [
       </span>
     ),
     component: EditPhotoPage,
+  },
+  {
+    url: "/history",
+    title: "Media History",
+    icon: (
+      <span role="img" aria-label="history">
+        📋
+      </span>
+    ),
+    component: MediaHistoryPage,
   },
 ];
