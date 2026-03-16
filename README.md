@@ -102,18 +102,18 @@ const takePicture = async () => {
 
 <docgen-index>
 
-* [`getPhoto(...)`](#getphoto)
-* [`pickImages(...)`](#pickimages)
-* [`pickLimitedLibraryPhotos()`](#picklimitedlibraryphotos)
-* [`getLimitedLibraryPhotos()`](#getlimitedlibraryphotos)
-* [`checkPermissions()`](#checkpermissions)
-* [`requestPermissions(...)`](#requestpermissions)
 * [`takePhoto(...)`](#takephoto)
 * [`recordVideo(...)`](#recordvideo)
 * [`playVideo(...)`](#playvideo)
 * [`chooseFromGallery(...)`](#choosefromgallery)
 * [`editPhoto(...)`](#editphoto)
 * [`editURIPhoto(...)`](#edituriphoto)
+* [`pickLimitedLibraryPhotos()`](#picklimitedlibraryphotos)
+* [`getLimitedLibraryPhotos()`](#getlimitedlibraryphotos)
+* [`checkPermissions()`](#checkpermissions)
+* [`requestPermissions(...)`](#requestpermissions)
+* [`getPhoto(...)`](#getphoto)
+* [`pickImages(...)`](#pickimages)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 * [Enums](#enums)
@@ -123,41 +123,118 @@ const takePicture = async () => {
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### getPhoto(...)
+### takePhoto(...)
 
 ```typescript
-getPhoto(options: ImageOptions) => Promise<Photo>
+takePhoto(options: ImageOptions) => Promise<MediaResult>
 ```
 
-Prompt the user to pick a photo from an album, or take a new photo
-with the camera.
+Open the device's camera and allow the user to take a photo.
 
 | Param         | Type                                                  |
 | ------------- | ----------------------------------------------------- |
 | **`options`** | <code><a href="#imageoptions">ImageOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#photo">Photo</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#mediaresult">MediaResult</a>&gt;</code>
 
-**Since:** 1.0.0
+**Since:** 8.1.0
 
 --------------------
 
 
-### pickImages(...)
+### recordVideo(...)
 
 ```typescript
-pickImages(options: GalleryImageOptions) => Promise<GalleryPhotos>
+recordVideo(options: RecordVideoOptions) => Promise<MediaResult>
 ```
 
-Allows the user to pick multiple pictures from the photo gallery.
+Open the device's camera and allow the user to record a video.
+Not available on Web.
+
+| Param         | Type                                                              |
+| ------------- | ----------------------------------------------------------------- |
+| **`options`** | <code><a href="#recordvideooptions">RecordVideoOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#mediaresult">MediaResult</a>&gt;</code>
+
+**Since:** 8.1.0
+
+--------------------
+
+
+### playVideo(...)
+
+```typescript
+playVideo(options: PlayVideoOptions) => Promise<void>
+```
+
+Open a native video player.
+Not available on Web.
+
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#playvideooptions">PlayVideoOptions</a></code> |
+
+**Since:** 8.1.0
+
+--------------------
+
+
+### chooseFromGallery(...)
+
+```typescript
+chooseFromGallery(options: GalleryOptions) => Promise<MediaResults>
+```
+
+Allow users to choose pictures, videos, or both, directly from their gallery.
+
+| Param         | Type                                                      |
+| ------------- | --------------------------------------------------------- |
+| **`options`** | <code><a href="#galleryoptions">GalleryOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#mediaresults">MediaResults</a>&gt;</code>
+
+**Since:** 8.1.0
+
+--------------------
+
+
+### editPhoto(...)
+
+```typescript
+editPhoto(options: EditPhotoOptions) => Promise<EditPhotoResult>
+```
+
+Open an in-app screen to edit a given photo using the provided base64 string.
+Not available on Web.
+
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#editphotooptions">EditPhotoOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#editphotoresult">EditPhotoResult</a>&gt;</code>
+
+**Since:** 8.1.0
+
+--------------------
+
+
+### editURIPhoto(...)
+
+```typescript
+editURIPhoto(options: EditURIPhotoOptions) => Promise<MediaResult>
+```
+
+Open an in-app screen to edit a photo using the provided URI.
+Not available on Web.
 
 | Param         | Type                                                                |
 | ------------- | ------------------------------------------------------------------- |
-| **`options`** | <code><a href="#galleryimageoptions">GalleryImageOptions</a></code> |
+| **`options`** | <code><a href="#edituriphotooptions">EditURIPhotoOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#galleryphotos">GalleryPhotos</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#mediaresult">MediaResult</a>&gt;</code>
 
-**Since:** 1.2.0
+**Since:** 8.1.0
 
 --------------------
 
@@ -228,106 +305,41 @@ Request camera and photo album permissions
 --------------------
 
 
-### takePhoto(...)
+### getPhoto(...)
 
 ```typescript
-takePhoto(options: ImageOptions) => Promise<MediaResult>
+getPhoto(options: ImageOptions) => Promise<Photo>
 ```
 
-Prompt the user to take a photo with the camera.
+Prompt the user to pick a photo from an album, or take a new photo
+with the camera.
 
 | Param         | Type                                                  |
 | ------------- | ----------------------------------------------------- |
 | **`options`** | <code><a href="#imageoptions">ImageOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#mediaresult">MediaResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#photo">Photo</a>&gt;</code>
 
-**Since:** 2.0.0
-
---------------------
-
-
-### recordVideo(...)
-
-```typescript
-recordVideo(options: RecordVideoOptions) => Promise<MediaResult>
-```
-
-| Param         | Type                                                              |
-| ------------- | ----------------------------------------------------------------- |
-| **`options`** | <code><a href="#recordvideooptions">RecordVideoOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#mediaresult">MediaResult</a>&gt;</code>
+**Since:** 1.0.0
 
 --------------------
 
 
-### playVideo(...)
+### pickImages(...)
 
 ```typescript
-playVideo(options: PlayVideoOptions) => Promise<void>
-```
-
-| Param         | Type                                                          |
-| ------------- | ------------------------------------------------------------- |
-| **`options`** | <code><a href="#playvideooptions">PlayVideoOptions</a></code> |
-
---------------------
-
-
-### chooseFromGallery(...)
-
-```typescript
-chooseFromGallery(options: GalleryOptions) => Promise<MediaResults>
+pickImages(options: GalleryImageOptions) => Promise<GalleryPhotos>
 ```
 
 Allows the user to pick multiple pictures from the photo gallery.
 
-| Param         | Type                                                      |
-| ------------- | --------------------------------------------------------- |
-| **`options`** | <code><a href="#galleryoptions">GalleryOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#mediaresults">MediaResults</a>&gt;</code>
-
-**Since:** 1.2.0
-
---------------------
-
-
-### editPhoto(...)
-
-```typescript
-editPhoto(options: EditPhotoOptions) => Promise<EditPhotoResult>
-```
-
-Returns a string (base64) representing the photo that was edited
-
-| Param         | Type                                                          |
-| ------------- | ------------------------------------------------------------- |
-| **`options`** | <code><a href="#editphotooptions">EditPhotoOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#editphotoresult">EditPhotoResult</a>&gt;</code>
-
-**Since:** 2.0.0
-
---------------------
-
-
-### editURIPhoto(...)
-
-```typescript
-editURIPhoto(options: EditURIPhotoOptions) => Promise<MediaResult>
-```
-
-Returns a <a href="#mediaresult">MediaResult</a> object with info about the photo that was edited
-
 | Param         | Type                                                                |
 | ------------- | ------------------------------------------------------------------- |
-| **`options`** | <code><a href="#edituriphotooptions">EditURIPhotoOptions</a></code> |
+| **`options`** | <code><a href="#galleryimageoptions">GalleryImageOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#mediaresult">MediaResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#galleryphotos">GalleryPhotos</a>&gt;</code>
 
-**Since:** 2.0.0
+**Since:** 1.2.0
 
 --------------------
 
@@ -335,17 +347,17 @@ Returns a <a href="#mediaresult">MediaResult</a> object with info about the phot
 ### Interfaces
 
 
-#### Photo
+#### MediaResult
 
-| Prop               | Type                 | Description                                                                                                                                                                                                                                                              | Since |
-| ------------------ | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----- |
-| **`base64String`** | <code>string</code>  | The base64 encoded string representation of the image, if using <a href="#cameraresulttype">CameraResultType.Base64</a>.                                                                                                                                                 | 1.0.0 |
-| **`dataUrl`**      | <code>string</code>  | The url starting with 'data:image/jpeg;base64,' and the base64 encoded string representation of the image, if using <a href="#cameraresulttype">CameraResultType.DataUrl</a>. Note: On web, the file format could change depending on the browser.                       | 1.0.0 |
-| **`path`**         | <code>string</code>  | If using <a href="#cameraresulttype">CameraResultType.Uri</a>, the path will contain a full, platform-specific file URL that can be read later using the Filesystem API.                                                                                                 | 1.0.0 |
-| **`webPath`**      | <code>string</code>  | webPath returns a path that can be used to set the src attribute of an image for efficient loading and rendering.                                                                                                                                                        | 1.0.0 |
-| **`exif`**         | <code>any</code>     | Exif data, if any, retrieved from the image                                                                                                                                                                                                                              | 1.0.0 |
-| **`format`**       | <code>string</code>  | The format of the image, ex: jpeg, png, gif. iOS and Android only support jpeg. Web supports jpeg, png and gif, but the exact availability may vary depending on the browser. gif is only supported if `webUseInput` is set to `true` or if `source` is set to `Photos`. | 1.0.0 |
-| **`saved`**        | <code>boolean</code> | Whether if the image was saved to the gallery or not. On Android and iOS, saving to the gallery can fail if the user didn't grant the required permissions. On Web there is no gallery, so always returns false.                                                         | 1.1.0 |
+| Prop           | Type                 |
+| -------------- | -------------------- |
+| **`path`**     | <code>string</code>  |
+| **`webPath`**  | <code>string</code>  |
+| **`exif`**     | <code>any</code>     |
+| **`duration`** | <code>number</code>  |
+| **`size`**     | <code>number</code>  |
+| **`format`**   | <code>string</code>  |
+| **`saved`**    | <code>boolean</code> |
 
 
 #### ImageOptions
@@ -367,63 +379,6 @@ Returns a <a href="#mediaresult">MediaResult</a> object with info about the phot
 | **`promptLabelCancel`**  | <code>string</code>                                           | Text value to use when displaying the prompt. iOS only: The label of the 'cancel' button.                                                                                                                                                                                  | <code>: 'Cancel'</code>             | 1.0.0 |
 | **`promptLabelPhoto`**   | <code>string</code>                                           | Text value to use when displaying the prompt. The label of the button to select a saved image.                                                                                                                                                                             | <code>: 'From Photos'</code>        | 1.0.0 |
 | **`promptLabelPicture`** | <code>string</code>                                           | Text value to use when displaying the prompt. The label of the button to open the camera.                                                                                                                                                                                  | <code>: 'Take Picture'</code>       | 1.0.0 |
-
-
-#### GalleryPhotos
-
-| Prop         | Type                        | Description                     | Since |
-| ------------ | --------------------------- | ------------------------------- | ----- |
-| **`photos`** | <code>GalleryPhoto[]</code> | Array of all the picked photos. | 1.2.0 |
-
-
-#### GalleryPhoto
-
-| Prop          | Type                | Description                                                                                                       | Since |
-| ------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------- | ----- |
-| **`path`**    | <code>string</code> | Full, platform-specific file URL that can be read later using the Filesystem API.                                 | 1.2.0 |
-| **`webPath`** | <code>string</code> | webPath returns a path that can be used to set the src attribute of an image for efficient loading and rendering. | 1.2.0 |
-| **`exif`**    | <code>any</code>    | Exif data, if any, retrieved from the image                                                                       | 1.2.0 |
-| **`format`**  | <code>string</code> | The format of the image, ex: jpeg, png, gif. iOS and Android only support jpeg. Web supports jpeg, png and gif.   | 1.2.0 |
-
-
-#### GalleryImageOptions
-
-| Prop                     | Type                                   | Description                                                                                                             | Default                     | Since |
-| ------------------------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | --------------------------- | ----- |
-| **`quality`**            | <code>number</code>                    | The quality of image to return as JPEG, from 0-100 Note: This option is only supported on Android and iOS.              |                             | 1.2.0 |
-| **`width`**              | <code>number</code>                    | The desired maximum width of the saved image. The aspect ratio is respected.                                            |                             | 1.2.0 |
-| **`height`**             | <code>number</code>                    | The desired maximum height of the saved image. The aspect ratio is respected.                                           |                             | 1.2.0 |
-| **`correctOrientation`** | <code>boolean</code>                   | Whether to automatically rotate the image "up" to correct for orientation in portrait mode                              | <code>: true</code>         | 1.2.0 |
-| **`presentationStyle`**  | <code>'fullscreen' \| 'popover'</code> | iOS only: The presentation style of the Camera.                                                                         | <code>: 'fullscreen'</code> | 1.2.0 |
-| **`limit`**              | <code>number</code>                    | Maximum number of pictures the user will be able to choose. Note: This option is only supported on Android 13+ and iOS. | <code>0 (unlimited)</code>  | 1.2.0 |
-
-
-#### PermissionStatus
-
-| Prop         | Type                                                                    |
-| ------------ | ----------------------------------------------------------------------- |
-| **`camera`** | <code><a href="#camerapermissionstate">CameraPermissionState</a></code> |
-| **`photos`** | <code><a href="#camerapermissionstate">CameraPermissionState</a></code> |
-
-
-#### CameraPluginPermissions
-
-| Prop              | Type                                |
-| ----------------- | ----------------------------------- |
-| **`permissions`** | <code>CameraPermissionType[]</code> |
-
-
-#### MediaResult
-
-| Prop           | Type                 |
-| -------------- | -------------------- |
-| **`path`**     | <code>string</code>  |
-| **`webPath`**  | <code>string</code>  |
-| **`exif`**     | <code>any</code>     |
-| **`duration`** | <code>number</code>  |
-| **`size`**     | <code>number</code>  |
-| **`format`**   | <code>string</code>  |
-| **`saved`**    | <code>boolean</code> |
 
 
 #### RecordVideoOptions
@@ -487,6 +442,63 @@ Returns a <a href="#mediaresult">MediaResult</a> object with info about the phot
 | **`uri`**             | <code>string</code>  |
 | **`saveToGallery`**   | <code>boolean</code> |
 | **`includeMetadata`** | <code>boolean</code> |
+
+
+#### GalleryPhotos
+
+| Prop         | Type                        | Description                     | Since |
+| ------------ | --------------------------- | ------------------------------- | ----- |
+| **`photos`** | <code>GalleryPhoto[]</code> | Array of all the picked photos. | 1.2.0 |
+
+
+#### GalleryPhoto
+
+| Prop          | Type                | Description                                                                                                       | Since |
+| ------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------- | ----- |
+| **`path`**    | <code>string</code> | Full, platform-specific file URL that can be read later using the Filesystem API.                                 | 1.2.0 |
+| **`webPath`** | <code>string</code> | webPath returns a path that can be used to set the src attribute of an image for efficient loading and rendering. | 1.2.0 |
+| **`exif`**    | <code>any</code>    | Exif data, if any, retrieved from the image                                                                       | 1.2.0 |
+| **`format`**  | <code>string</code> | The format of the image, ex: jpeg, png, gif. iOS and Android only support jpeg. Web supports jpeg, png and gif.   | 1.2.0 |
+
+
+#### PermissionStatus
+
+| Prop         | Type                                                                    |
+| ------------ | ----------------------------------------------------------------------- |
+| **`camera`** | <code><a href="#camerapermissionstate">CameraPermissionState</a></code> |
+| **`photos`** | <code><a href="#camerapermissionstate">CameraPermissionState</a></code> |
+
+
+#### CameraPluginPermissions
+
+| Prop              | Type                                |
+| ----------------- | ----------------------------------- |
+| **`permissions`** | <code>CameraPermissionType[]</code> |
+
+
+#### Photo
+
+| Prop               | Type                 | Description                                                                                                                                                                                                                                                              | Since |
+| ------------------ | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----- |
+| **`base64String`** | <code>string</code>  | The base64 encoded string representation of the image, if using <a href="#cameraresulttype">CameraResultType.Base64</a>.                                                                                                                                                 | 1.0.0 |
+| **`dataUrl`**      | <code>string</code>  | The url starting with 'data:image/jpeg;base64,' and the base64 encoded string representation of the image, if using <a href="#cameraresulttype">CameraResultType.DataUrl</a>. Note: On web, the file format could change depending on the browser.                       | 1.0.0 |
+| **`path`**         | <code>string</code>  | If using <a href="#cameraresulttype">CameraResultType.Uri</a>, the path will contain a full, platform-specific file URL that can be read later using the Filesystem API.                                                                                                 | 1.0.0 |
+| **`webPath`**      | <code>string</code>  | webPath returns a path that can be used to set the src attribute of an image for efficient loading and rendering.                                                                                                                                                        | 1.0.0 |
+| **`exif`**         | <code>any</code>     | Exif data, if any, retrieved from the image                                                                                                                                                                                                                              | 1.0.0 |
+| **`format`**       | <code>string</code>  | The format of the image, ex: jpeg, png, gif. iOS and Android only support jpeg. Web supports jpeg, png and gif, but the exact availability may vary depending on the browser. gif is only supported if `webUseInput` is set to `true` or if `source` is set to `Photos`. | 1.0.0 |
+| **`saved`**        | <code>boolean</code> | Whether if the image was saved to the gallery or not. On Android and iOS, saving to the gallery can fail if the user didn't grant the required permissions. On Web there is no gallery, so always returns false.                                                         | 1.1.0 |
+
+
+#### GalleryImageOptions
+
+| Prop                     | Type                                   | Description                                                                                                             | Default                     | Since |
+| ------------------------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | --------------------------- | ----- |
+| **`quality`**            | <code>number</code>                    | The quality of image to return as JPEG, from 0-100 Note: This option is only supported on Android and iOS.              |                             | 1.2.0 |
+| **`width`**              | <code>number</code>                    | The desired maximum width of the saved image. The aspect ratio is respected.                                            |                             | 1.2.0 |
+| **`height`**             | <code>number</code>                    | The desired maximum height of the saved image. The aspect ratio is respected.                                           |                             | 1.2.0 |
+| **`correctOrientation`** | <code>boolean</code>                   | Whether to automatically rotate the image "up" to correct for orientation in portrait mode                              | <code>: true</code>         | 1.2.0 |
+| **`presentationStyle`**  | <code>'fullscreen' \| 'popover'</code> | iOS only: The presentation style of the Camera.                                                                         | <code>: 'fullscreen'</code> | 1.2.0 |
+| **`limit`**              | <code>number</code>                    | Maximum number of pictures the user will be able to choose. Note: This option is only supported on Android 13+ and iOS. | <code>0 (unlimited)</code>  | 1.2.0 |
 
 
 ### Type Aliases
