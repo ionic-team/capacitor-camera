@@ -15,19 +15,36 @@ export interface CameraPluginPermissions {
 
 export interface CameraPlugin {
   /**
-   * Prompt the user to pick a photo from an album, or take a new photo
-   * with the camera.
+   * Prompt the user to take a photo with the camera.
    *
-   * @since 1.0.0
+   * @since 8.1.0
    */
-  getPhoto(options: ImageOptions): Promise<Photo>;
+  takePhoto(options: ImageOptions): Promise<MediaResult>;
+
+  recordVideo(options: RecordVideoOptions): Promise<MediaResult>;
+
+  playVideo(options: PlayVideoOptions): Promise<void>;
 
   /**
    * Allows the user to pick multiple pictures from the photo gallery.
    *
-   * @since 1.2.0
+   * @since 8.1.0
    */
-  pickImages(options: GalleryImageOptions): Promise<GalleryPhotos>;
+  chooseFromGallery(options: GalleryOptions): Promise<MediaResults>;
+
+  /**
+   * Returns a string (base64) representing the photo that was edited
+   *
+   * @since 8.1.0
+   */
+  editPhoto(options: EditPhotoOptions): Promise<EditPhotoResult>;
+
+  /**
+   * Returns a MediaResult object with info about the photo that was edited
+   *
+   * @since 8.1.0
+   */
+  editURIPhoto(options: EditURIPhotoOptions): Promise<MediaResult>;
 
   /**
    * Allows the user to update their limited photo library selection.
@@ -59,36 +76,19 @@ export interface CameraPlugin {
   requestPermissions(permissions?: CameraPluginPermissions): Promise<PermissionStatus>;
 
   /**
-   * Prompt the user to take a photo with the camera.
+   * Prompt the user to pick a photo from an album, or take a new photo
+   * with the camera.
    *
-   * @since 2.0.0
+   * @since 1.0.0
    */
-  takePhoto(options: ImageOptions): Promise<MediaResult>;
-
-  recordVideo(options: RecordVideoOptions): Promise<MediaResult>;
-
-  playVideo(options: PlayVideoOptions): Promise<void>;
+  getPhoto(options: ImageOptions): Promise<Photo>;
 
   /**
    * Allows the user to pick multiple pictures from the photo gallery.
    *
    * @since 1.2.0
    */
-  chooseFromGallery(options: GalleryOptions): Promise<MediaResults>;
-
-  /**
-   * Returns a string (base64) representing the photo that was edited
-   *
-   * @since 2.0.0
-   */
-  editPhoto(options: EditPhotoOptions): Promise<EditPhotoResult>;
-
-  /**
-   * Returns a MediaResult object with info about the photo that was edited
-   *
-   * @since 2.0.0
-   */
-  editURIPhoto(options: EditURIPhotoOptions): Promise<MediaResult>;
+  pickImages(options: GalleryImageOptions): Promise<GalleryPhotos>;
 }
 
 export interface RecordVideoOptions {
