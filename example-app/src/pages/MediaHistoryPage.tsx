@@ -19,6 +19,7 @@ import {
   MediaHistoryService,
   MediaHistoryItem,
 } from "../services/MediaHistoryService";
+import { FileViewer } from "@capacitor/file-viewer";
 
 const MediaHistoryPage: React.FC = () => {
   const [history, setHistory] = useState<MediaHistoryItem[]>([]);
@@ -30,6 +31,14 @@ const MediaHistoryPage: React.FC = () => {
   const loadHistory = (): void => {
     const history = MediaHistoryService.getAllMedia();
     setHistory(history);
+  };
+
+  const openFile = async (item: MediaHistoryItem): Promise<void> => {
+    try {
+      await FileViewer.openDocumentFromLocalPath({ path: item.path });
+    } catch (e) {
+      alert(`Failed to open file with error:\n'${e}'`);
+    }
   };
 
   const formatDate = (timestamp: number): string => {
@@ -119,7 +128,12 @@ const MediaHistoryPage: React.FC = () => {
             <IonCardContent>
               <IonList>
                 {history.map((item) => (
-                  <IonItem key={item.id} lines="full">
+                  <IonItem
+                    key={item.id}
+                    lines="full"
+                    button={true}
+                    onClick={() => openFile(item)}
+                  >
                     <IonLabel>
                       <div
                         style={{
