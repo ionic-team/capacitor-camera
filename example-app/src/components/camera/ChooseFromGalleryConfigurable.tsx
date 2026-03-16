@@ -74,7 +74,9 @@ class ChooseFromGalleryConfigurable extends React.Component<
 
       this.props.onMediaResult(galleryPhotos);
     } catch (e) {
-      alert(`Failed to choose from gallery with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to choose from gallery with error:\n${errorMessage}`);
     }
   };
 
@@ -99,7 +101,9 @@ class ChooseFromGalleryConfigurable extends React.Component<
 
       this.props.onMediaResult(galleryPhotos);
     } catch (e) {
-      alert(`Failed to choose from gallery with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to choose from gallery with error:\n${errorMessage}`);
     }
   };
 

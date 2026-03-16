@@ -68,7 +68,9 @@ class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
     try {
       await Camera.playVideo({ videoURI: this.state.filePath });
     } catch (e) {
-      alert(`Failed to play video with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to play video with error:\n${errorMessage}`);
     }
   };
 

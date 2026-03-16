@@ -86,7 +86,9 @@ class EditPhotoConfigurable extends React.Component<
         reader.readAsDataURL(blob);
       }
     } catch (e) {
-      alert(`Failed to load image with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to load image with error:\n${errorMessage}`);
       this.setState({ isLoading: false });
     }
   };
@@ -103,7 +105,9 @@ class EditPhotoConfigurable extends React.Component<
       });
       this.setState({ editedResult: result });
     } catch (e) {
-      alert(`Failed to edit photo with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to edit photo with error:\n${errorMessage}`);
     }
   };
 

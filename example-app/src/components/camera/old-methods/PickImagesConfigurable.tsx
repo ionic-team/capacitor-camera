@@ -56,7 +56,9 @@ class PickImagesConfigurable extends React.Component<
       console.log("photos result", photosResult);
       this.props.onPhotosResult(photosResult.photos);
     } catch (e) {
-      alert(`Failed to pick images with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to pick images with error:\n${errorMessage}`);
     }
   };
 
@@ -75,7 +77,9 @@ class PickImagesConfigurable extends React.Component<
       console.log("photos result", photosResult);
       this.props.onPhotosResult(photosResult.photos);
     } catch (e) {
-      alert(`Failed to pick images with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to pick images with error:\n${errorMessage}`);
     }
   };
 

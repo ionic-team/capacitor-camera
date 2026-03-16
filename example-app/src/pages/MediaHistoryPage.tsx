@@ -37,7 +37,9 @@ const MediaHistoryPage: React.FC = () => {
     try {
       await FileViewer.openDocumentFromLocalPath({ path: item.path });
     } catch (e) {
-      alert(`Failed to open file with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to open file with error:\n${errorMessage}`);
     }
   };
 

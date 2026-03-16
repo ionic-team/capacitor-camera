@@ -75,7 +75,9 @@ class GetPhotoConfigurable extends React.Component<
         exif: photo.exif,
       });
     } catch (e) {
-      alert(`Failed to get picture with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to get picture with error:\n${errorMessage}`);
     }
   };
 
@@ -106,7 +108,9 @@ class GetPhotoConfigurable extends React.Component<
         exif: photo.exif,
       });
     } catch (e) {
-      alert(`Failed to get picture with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to get picture with error:\n${errorMessage}`);
     }
   };
 

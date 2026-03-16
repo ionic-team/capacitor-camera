@@ -102,7 +102,9 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
       const res = await Camera.pickLimitedLibraryPhotos();
       this.handlePhotosResult(res.photos);
     } catch (e) {
-      alert(`Failed to pick limited library photos with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to pick limited library photos with error:\n${errorMessage}`);
     }
   };
 
@@ -111,7 +113,9 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
       const res = await Camera.getLimitedLibraryPhotos();
       this.handlePhotosResult(res.photos);
     } catch (e) {
-      alert(`Failed to get limited library photos with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to get limited library photos with error:\n${errorMessage}`);
     }
   };
 
@@ -142,7 +146,9 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
         saved: result.saved,
       });
     } catch (e) {
-      alert(`Failed to edit photo with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to edit photo with error:\n${errorMessage}`);
     }
   };
 

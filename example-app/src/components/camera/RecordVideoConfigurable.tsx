@@ -57,7 +57,9 @@ class RecordVideoConfigurable extends React.Component<
       const result = await Camera.recordVideo({});
       this.props.onVideoResult(result);
     } catch (e) {
-      alert(`Failed to record video with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to record video with error:\n${errorMessage}`);
     }
   };
 
@@ -70,7 +72,9 @@ class RecordVideoConfigurable extends React.Component<
       });
       this.props.onVideoResult(result);
     } catch (e) {
-      alert(`Failed to record video with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to record video with error:\n${errorMessage}`);
     }
   };
 

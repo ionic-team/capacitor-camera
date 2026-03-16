@@ -47,7 +47,9 @@ class PermissionsPage extends React.Component<{}, IPermissionsPageState> {
         photosPermission: permissionStates.photos,
       });
     } catch (e) {
-      alert(`Failed to check permissions with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to check permissions with error:\n${errorMessage}`);
     }
   };
 
@@ -61,7 +63,9 @@ class PermissionsPage extends React.Component<{}, IPermissionsPageState> {
         photosPermission: permissionStates.photos,
       });
     } catch (e) {
-      alert(`Failed to request permissions with error:\n'${e}'`);
+      const error = e as any;
+      const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
+      alert(`Failed to request permissions with error:\n${errorMessage}`);
     }
   };
 
