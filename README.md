@@ -459,6 +459,10 @@ Returns a <a href="#mediaresult">MediaResult</a> object with info about the phot
 | **`allowEdit`**              | <code>boolean</code>                            |
 | **`editInApp`**              | <code>boolean</code>                            |
 | **`presentationStyle`**      | <code>'fullscreen' \| 'popover'</code>          |
+| **`quality`**                | <code>number</code>                             |
+| **`width`**                  | <code>number</code>                             |
+| **`height`**                 | <code>number</code>                             |
+| **`correctOrientation`**     | <code>boolean</code>                            |
 
 
 #### EditPhotoResult

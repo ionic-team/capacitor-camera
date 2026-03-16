@@ -57,9 +57,10 @@ class ChooseFromGalleryConfigurable extends React.Component<
     try {
       const result = await Camera.chooseFromGallery({
         mediaType: MediaType.all,
-        allowMultipleSelection: false,
+        allowMultipleSelection: true,
         includeMetadata: false,
         allowEdit: false,
+        limit: 2
       });
       console.log("chooseFromGallery result", result);
 
