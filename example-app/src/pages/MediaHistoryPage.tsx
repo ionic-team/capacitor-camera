@@ -111,6 +111,7 @@ const MediaHistoryPage: React.FC = () => {
               performed using the Camera plugin. History is stored in
               localStorage and persists across sessions.
             </p>
+            <p>Click a media item to open them.</p>
           </IonCardContent>
         </IonCard>
 
