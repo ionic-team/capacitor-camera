@@ -144,6 +144,15 @@ export interface TakePhotoOptions {
   correctOrientation?: boolean;
 
   /**
+   * The encoding type for the captured photo - JPEG or PNG.
+   * Note: This option is only supported on Android and iOS.
+   * @default EncodingType.JPEG
+   * 
+   * @since 8.1.0
+   */
+  encodingType?: EncodingType;
+
+  /**
    * Whether to save the photo to the gallery.
    * Note: This option is only supported on Android and iOS.
    * @default: false
@@ -561,6 +570,11 @@ export enum MediaType {
   picture = 0,
   video = 1,
   all = 2,
+}
+
+export enum EncodingType {
+  JPEG = 0,
+  PNG = 1,
 }
 
 /**
