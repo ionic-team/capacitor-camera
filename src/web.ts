@@ -9,16 +9,38 @@ import type {
   PermissionStatus,
   Photo,
   RecordVideoOptions,
+  EditPhotoOptions,
+  PlayVideoOptions,
+  EditURIPhotoOptions,
+  EditPhotoResult,
   MediaResult,
+  MediaResults,
+  GalleryOptions,
 } from './definitions';
 
 export class CameraWeb extends WebPlugin implements CameraPlugin {
-  async recordVideo(_options: RecordVideoOptions): Promise<MediaResult> {
-    throw this.unimplemented('recordVideo is not implemented on web.');
+  async takePhoto(_options: ImageOptions): Promise<MediaResult> {
+    throw this.unimplemented('takePhoto is not implemented on Web.');
   }
 
-  async playVideo(_options: { videoURI: string }): Promise<void> {
-    throw this.unimplemented('playVideo is not implemented on web.');
+  async recordVideo(_options: RecordVideoOptions): Promise<MediaResult> {
+    throw this.unimplemented('recordVideo is not implemented on Web.');
+  }
+
+  async playVideo(_options: PlayVideoOptions): Promise<void> {
+    throw this.unimplemented('playVideo is not implemented on Web.');
+  }
+
+  async chooseFromGallery(_options: GalleryOptions): Promise<MediaResults> {
+    throw this.unimplemented('chooseFromGallery is not implemented on web.');
+  }
+
+  async editPhoto(_options: EditPhotoOptions): Promise<EditPhotoResult> {
+    throw this.unimplemented('editPhoto is not implemented on Web.');
+  }
+
+  async editURIPhoto(_options: EditURIPhotoOptions): Promise<MediaResult> {
+    throw this.unimplemented('editURIPhoto is not implemented on Web.');
   }
 
   async getPhoto(options: ImageOptions): Promise<Photo> {
@@ -45,40 +67,6 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
           } else {
             this.cameraExperience(options, resolve, reject);
           }
-        });
-      } else {
-        this.cameraExperience(options, resolve, reject);
-      }
-    });
-  }
-
-  async takePhoto(options: ImageOptions): Promise<Photo> {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise<Photo>(async (resolve, reject) => {
-      if (options.webUseInput || options.source === CameraSource.Photos) {
-        this.fileInputExperience(options, resolve, reject);
-      } else if (options.source === CameraSource.Prompt) {
-        let actionSheet: any = document.querySelector('pwa-action-sheet');
-        if (!actionSheet) {
-          actionSheet = document.createElement('pwa-action-sheet');
-          document.body.appendChild(actionSheet);
-        }
-        actionSheet.header = options.promptLabelHeader || 'Photo';
-        actionSheet.cancelable = true;
-        actionSheet.options = [
-          { title: options.promptLabelPhoto || 'From Photos' },
-          { title: options.promptLabelPicture || 'Take Picture' },
-        ];
-        actionSheet.addEventListener('onSelection', async (e: any) => {
-          const selection = e.detail;
-          if (selection === 0) {
-            this.fileInputExperience(options, resolve, reject);
-          } else {
-            this.cameraExperience(options, resolve, reject);
-          }
-        });
-        actionSheet.addEventListener('onCanceled', async () => {
-          reject(new CapacitorException('User cancelled photos app'));
         });
       } else {
         this.cameraExperience(options, resolve, reject);

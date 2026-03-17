@@ -19,7 +19,7 @@ import com.getcapacitor.annotation.CapacitorPlugin
 import com.getcapacitor.annotation.Permission
 import com.getcapacitor.annotation.PermissionCallback
 import org.json.JSONException
-
+import io.ionic.libs.ioncameralib.model.IONCAMRMediaType
 /**
  * The Camera plugin makes it easy to take a photo or have the user select a photo
  * from their albums.
@@ -61,7 +61,8 @@ class CameraPlugin : Plugin() {
 
     private lateinit var legacyFlow: LegacyCameraFlow
     private lateinit var ionFlow: IonCameraFlow
-
+    private var videoSettings = VideoSettings()
+    private var gallerySettings = GallerySettings()
 
     override fun load() {
         super.load()
@@ -78,17 +79,35 @@ class CameraPlugin : Plugin() {
 
     @PluginMethod
     fun takePhoto(call: PluginCall) {
-        ionFlow.takePhoto(call)
+        val settings = getSettings(call)
+        ionFlow.takePhoto(call, settings)
     }
 
     @PluginMethod
     fun recordVideo(call: PluginCall) {
-        ionFlow.recordVideo(call)
+        videoSettings = getVideoSettings(call)
+        ionFlow.recordVideo(call, videoSettings)
     }
 
     @PluginMethod
     fun playVideo(call: PluginCall) {
         ionFlow.playVideo(call)
+    }
+
+    @PluginMethod
+    fun chooseFromGallery(call: PluginCall) {
+        gallerySettings = getGallerySettings(call)
+        ionFlow.chooseFromGallery(call, gallerySettings)
+    }
+
+    @PluginMethod
+    fun editPhoto(call: PluginCall) {
+        ionFlow.editPhoto(call)
+    }
+
+    @PluginMethod
+    fun editURIPhoto(call: PluginCall) {
+        ionFlow.editURIPhoto(call)
     }
 
     @PluginMethod
@@ -231,11 +250,22 @@ class CameraPlugin : Plugin() {
         return settings
     }
 
-     fun getVideoSettings(call: PluginCall): VideoSettings {
-         val settings = VideoSettings()
-         settings.saveToGallery = call.getBoolean("saveToGallery") ?: false
-         settings.includeMetadata = call.getBoolean("includeMetadata") ?: false
-         return settings
+    fun getVideoSettings(call: PluginCall): VideoSettings {
+        return VideoSettings(
+            saveToGallery = call.getBoolean("saveToGallery") ?: false,
+            includeMetadata = call.getBoolean("includeMetadata") ?: false
+        )
+    }
+
+    fun getGallerySettings(call: PluginCall): GallerySettings {
+        return GallerySettings(
+            mediaType = IONCAMRMediaType.fromValue((call.getInt("mediaType") ?: 0)),
+            allowMultipleSelection = call.getBoolean("allowMultipleSelection") ?: false,
+            includeMetadata = call.getBoolean("includeMetadata") ?: false,
+            allowEdit = call.getBoolean("allowEdit") ?: false,
+            limit = call.getInt("limit") ?: 0,
+            editInApp = call.getBoolean("editInApp") ?: true
+        )
     }
 
     private fun getResultType(resultType: String?): CameraResultType? {
