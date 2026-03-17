@@ -24,7 +24,7 @@ export interface CameraPlugin {
   /**
    * Open the device's camera and allow the user to record a video.
    * Not available on Web.
-   * 
+   *
    * @since 8.1.0
    */
   recordVideo(options: RecordVideoOptions): Promise<MediaResult>;
@@ -32,7 +32,7 @@ export interface CameraPlugin {
   /**
    * Open a native video player.
    * Not available on Web.
-   * 
+   *
    * @since 8.1.0
    */
   playVideo(options: PlayVideoOptions): Promise<void>;
@@ -148,7 +148,7 @@ export interface TakePhotoOptions {
    * The encoding type for the captured photo - JPEG or PNG.
    * Note: This option is only supported on Android and iOS.
    * @default EncodingType.JPEG
-   * 
+   *
    * @since 8.1.0
    */
   encodingType?: EncodingType;
@@ -161,7 +161,7 @@ export interface TakePhotoOptions {
    * @since 8.1.0
    */
   saveToGallery?: boolean;
-  
+
   /**
    * iOS and Web only: The camera direction.
    * @default CameraDirection.Rear
@@ -183,7 +183,7 @@ export interface TakePhotoOptions {
    * If `false`, will open a separate (platform-specific) native app to handle photo edition, falling back to the in-app editor if none is available.
    * Only applicable with `allowEdit` set to true.
    * Note: This option is only supported on Android and iOS.
-   * 
+   *
    * @default true
    * @since 8.1.0
    */
@@ -213,7 +213,7 @@ export interface TakePhotoOptions {
    * If an error occurs when obtaining the metadata, it will return empty.
    * Note: This option is only supported on Android and iOS.
    * @default false
-   * 
+   *
    * @since 8.1.0
    */
   includeMetadata?: boolean;
@@ -232,7 +232,7 @@ export interface RecordVideoOptions {
    * Whether or not MediaResult should include its metadata.
    * If an error occurs when obtaining the metadata, it will return empty.
    * @default false
-   * 
+   *
    * @since 8.1.0
    */
   includeMetadata?: boolean;
@@ -242,7 +242,7 @@ export interface RecordVideoOptions {
    * If you plan to use the returned `MediaResult#URI` across app launches, you may want to set to true.
    * Otherwise, you can set to false.
    * @default true
-   * 
+   *
    * @since 8.1.0
    */
   isPersistent?: boolean;
@@ -252,7 +252,7 @@ export interface PlayVideoOptions {
   /**
    * The URI of the video to play.
    * You may use the `MediaResult#URI` returned from `recordVideo` or `chooseFromGallery` directly.
-   * 
+   *
    * @since 8.1.0
    */
   videoURI: string;
@@ -270,11 +270,11 @@ export interface ChooseFromGalleryOptions {
   /**
    * Whether or not to allow selecting multiple media files from the gallery.
    * @default false
-   * 
+   *
    * @since 8.1.0
    */
   allowMultipleSelection?: boolean;
-  
+
   /**
    * The maximum number of media files that the user can choose.
    * Only applicable if `allowMultipleSelection` is `true`.
@@ -291,7 +291,7 @@ export interface ChooseFromGalleryOptions {
    * If an error occurs when obtaining the metadata, it will return empty.
    * Note: This option is only supported on Android and iOS.
    * @default false
-   * 
+   *
    * @since 8.1.0
    */
   includeMetadata?: boolean;
@@ -310,7 +310,7 @@ export interface ChooseFromGalleryOptions {
    * If `false`, will open a separate (platform-specific) native app to handle photo edition, falling back to the in-app editor if none is available.
    * Only applicable with `allowEdit` set to true.
    * Note: This option is only supported on Android and iOS.
-   * 
+   *
    * @default true
    * @since 8.1.0
    */
@@ -372,13 +372,13 @@ export interface ChooseFromGalleryOptions {
    *
    * @since 8.1.0
    */
-  webUseInput?: boolean
+  webUseInput?: boolean;
 }
 
 export interface EditURIPhotoOptions {
   /**
    * The URI that contains the photo to edit.
-   * 
+   *
    * @since 8.1.0
    */
   uri: string;
@@ -397,7 +397,7 @@ export interface EditURIPhotoOptions {
    * If an error occurs when obtaining the metadata, it will return empty.
    * Note: This option is only supported on Android and iOS.
    * @default false
-   * 
+   *
    * @since 8.1.0
    */
   includeMetadata?: boolean;
@@ -406,7 +406,7 @@ export interface EditURIPhotoOptions {
 export interface EditPhotoOptions {
   /**
    * The base64 encoded image to edit.
-   * 
+   *
    * @since 8.1.0
    */
   inputImage: string;
@@ -415,7 +415,7 @@ export interface EditPhotoOptions {
 export interface EditPhotoResult {
   /**
    * The edited image, base64 encoded.
-   * 
+   *
    * @since 8.1.0
    */
   outputImage: string;
