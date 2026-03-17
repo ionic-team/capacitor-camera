@@ -12,35 +12,30 @@ import {
 import React from "react";
 import {
   Camera,
-  ImageOptions,
-  CameraResultType,
+  TakePhotoOptions,
+  MediaResult,
+  EncodingType,
   CameraDirection,
 } from "@capacitor/camera";
 
 interface TakePictureConfig {
   quality: number;
-  allowEditing: boolean;
-  resultType: CameraResultType;
+  allowEdit: boolean;
+  encodingType: EncodingType;
   saveToGallery: boolean;
   width: number | undefined;
   height: number | undefined;
   correctOrientation: boolean;
-  direction: CameraDirection;
+  cameraDirection: CameraDirection;
   presentationStyle: 'fullscreen' | 'popover';
-}
-
-interface PhotoResult {
-  path: string;
-  webPath: string;
-  duration?: number;
-  size: number;
-  format: string;
-  saved: boolean;
+  editInApp: boolean;
+  includeMetadata: boolean;
+  webUseInput: boolean;
 }
 
 interface TakePictureConfigurableProps {
   buttonLabel?: string;
-  onPhotoResult: (result: PhotoResult) => void;
+  onPhotoResult: (result: MediaResult) => void;
 }
 
 interface TakePictureConfigurableState {
@@ -56,14 +51,17 @@ class TakePictureConfigurable extends React.Component<
     this.state = {
       config: {
         quality: 100,
-        allowEditing: false,
-        resultType: CameraResultType.Uri, // TODO confirm if we want this in the new API?
+        allowEdit: false,
+        encodingType: EncodingType.JPEG,
         saveToGallery: false,
         width: undefined,
         height: undefined,
         correctOrientation: true,
-        direction: CameraDirection.Rear,
+        cameraDirection: CameraDirection.Rear,
         presentationStyle: 'fullscreen',
+        editInApp: true,
+        includeMetadata: false,
+        webUseInput: false,
       },
     };
   }
@@ -76,9 +74,7 @@ class TakePictureConfigurable extends React.Component<
 
   executeDefault = async (): Promise<void> => {
     try {
-      const options: ImageOptions = {
-        resultType: CameraResultType.Uri,
-      };
+      const options: TakePhotoOptions = {};
       const result = await Camera.takePhoto(options);
       this.props.onPhotoResult(result);
     } catch (e) {
@@ -91,16 +87,19 @@ class TakePictureConfigurable extends React.Component<
   executeWithConfig = async (): Promise<void> => {
     try {
       const config = this.state.config;
-      const options: ImageOptions = {
+      const options: TakePhotoOptions = {
         quality: config.quality,
-        allowEditing: config.allowEditing,
-        resultType: config.resultType,
+        allowEdit: config.allowEdit,
+        encodingType: config.encodingType,
         saveToGallery: config.saveToGallery,
         width: config.width,
         height: config.height,
         correctOrientation: config.correctOrientation,
-        direction: config.direction,
+        cameraDirection: config.cameraDirection,
         presentationStyle: config.presentationStyle,
+        editInApp: config.editInApp,
+        includeMetadata: config.includeMetadata,
+        webUseInput: config.webUseInput,
       };
       const result = await Camera.takePhoto(options);
       this.props.onPhotoResult(result);
@@ -149,32 +148,29 @@ class TakePictureConfigurable extends React.Component<
               </IonItem>
 
               <IonItem>
-                <IonLabel position="stacked">Result Type</IonLabel>
+                <IonLabel position="stacked">Encoding Type</IonLabel>
                 <IonSelect
-                  value={config.resultType}
+                  value={config.encodingType}
                   onIonChange={(e) =>
-                    this.updateConfig("resultType", e.detail.value)
+                    this.updateConfig("encodingType", e.detail.value)
                   }
                 >
-                  <IonSelectOption value={CameraResultType.Uri}>
-                    Uri
+                  <IonSelectOption value={EncodingType.JPEG}>
+                    JPEG
                   </IonSelectOption>
-                  <IonSelectOption value={CameraResultType.Base64}>
-                    Base64
-                  </IonSelectOption>
-                  <IonSelectOption value={CameraResultType.DataUrl}>
-                    DataUrl
+                  <IonSelectOption value={EncodingType.PNG}>
+                    PNG
                   </IonSelectOption>
                 </IonSelect>
               </IonItem>
 
               {/* Platform-specific */}
               <IonItem>
-                <IonLabel position="stacked">Direction (iOS)</IonLabel>
+                <IonLabel position="stacked">Camera Direction (iOS/Web)</IonLabel>
                 <IonSelect
-                  value={config.direction}
+                  value={config.cameraDirection}
                   onIonChange={(e) =>
-                    this.updateConfig("direction", e.detail.value)
+                    this.updateConfig("cameraDirection", e.detail.value)
                   }
                 >
                   <IonSelectOption value={CameraDirection.Rear}>
@@ -236,11 +232,41 @@ class TakePictureConfigurable extends React.Component<
 
               {/* Boolean toggles */}
               <IonItem>
-                <IonLabel>Allow Editing</IonLabel>
+                <IonLabel>Allow Edit</IonLabel>
                 <IonToggle
-                  checked={config.allowEditing}
+                  checked={config.allowEdit}
                   onIonChange={(e) =>
-                    this.updateConfig("allowEditing", e.detail.checked)
+                    this.updateConfig("allowEdit", e.detail.checked)
+                  }
+                />
+              </IonItem>
+
+              <IonItem>
+                <IonLabel>Edit In App</IonLabel>
+                <IonToggle
+                  checked={config.editInApp}
+                  onIonChange={(e) =>
+                    this.updateConfig("editInApp", e.detail.checked)
+                  }
+                />
+              </IonItem>
+
+              <IonItem>
+                <IonLabel>Include Metadata</IonLabel>
+                <IonToggle
+                  checked={config.includeMetadata}
+                  onIonChange={(e) =>
+                    this.updateConfig("includeMetadata", e.detail.checked)
+                  }
+                />
+              </IonItem>
+
+              <IonItem>
+                <IonLabel>Web Use Input</IonLabel>
+                <IonToggle
+                  checked={config.webUseInput}
+                  onIonChange={(e) =>
+                    this.updateConfig("webUseInput", e.detail.checked)
                   }
                 />
               </IonItem>

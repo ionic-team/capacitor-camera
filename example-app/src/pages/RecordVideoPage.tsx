@@ -11,14 +11,14 @@ import {
   IonButton,
 } from "@ionic/react";
 import React from "react";
-import { Camera } from "@capacitor/camera";
+import { Camera, MediaResult, MediaMetadata } from "@capacitor/camera";
 import VideoWithMetadata from "../components/camera/VideoWithMetadata";
 import RecordVideoConfigurable from "../components/camera/RecordVideoConfigurable";
 import { MediaHistoryService } from "../services/MediaHistoryService";
 
 interface IRecordVideoPageState {
   filePath: string | null;
-  metadata: string | null;
+  metadata: MediaMetadata | string | null;
 }
 
 class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
@@ -30,35 +30,23 @@ class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
     };
   }
 
-  handleVideoResult = (result: {
-    path: string;
-    webPath: string;
-    duration?: number;
-    size: number;
-    format: string;
-    saved: boolean;
-  }): void => {
-    const metadata = {
-      duration: result.duration,
-      size: result.size,
-      format: result.format,
-      saved: result.saved,
-    };
-
+  handleVideoResult = (result: MediaResult): void => {
     this.setState({
-      filePath: result.path ?? result.webPath,
-      metadata: JSON.stringify(metadata, null, 2),
+      filePath: result.uri ?? result.webPath ?? '',
+      metadata: result.metadata ?? null,
     });
 
     MediaHistoryService.addMedia({
       mediaType: "video",
       method: "recordVideo",
-      path: result.path,
+      uri: result.uri,
       webPath: result.webPath,
-      format: result.format,
-      size: result.size,
-      duration: result.duration,
+      thumbnail: result.thumbnail,
+      format: result.metadata?.format,
+      size: result.metadata?.size,
+      duration: result.metadata?.duration,
       saved: result.saved,
+      metadata: result.metadata,
     });
   };
 

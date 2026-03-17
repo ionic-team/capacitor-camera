@@ -15,24 +15,15 @@ import {
   IonLabel,
 } from "@ionic/react";
 import React from "react";
-import { Camera, CameraSource } from "@capacitor/camera";
+import { Camera, CameraSource, MediaResult, MediaMetadata } from "@capacitor/camera";
 import PhotoWithMetadata from "../components/camera/PhotoWithMetadata";
 import TakePictureConfigurable from "../components/camera/TakePictureConfigurable";
 import { GetPhotoConfigurable } from "../components/camera/old-methods";
 import { MediaHistoryService } from "../services/MediaHistoryService";
 
-interface MediaResult {
-  path: string;
-  webPath: string;
-  duration?: number;
-  size: number;
-  format: string;
-  saved: boolean;
-}
-
 interface ITakePicturePageState {
   filePath: string | null;
-  metadata: string | null;
+  metadata: MediaMetadata | string | null;
   editedPhoto: MediaResult | null;
 }
 
@@ -46,33 +37,22 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
     };
   }
 
-  handleTakePhotoResult = (result: {
-    path: string;
-    webPath: string;
-    duration?: number;
-    size: number;
-    format: string;
-    saved: boolean;
-  }): void => {
-    const metadata = {
-      size: result.size,
-      format: result.format,
-      saved: result.saved,
-    };
-
+  handleTakePhotoResult = (result: MediaResult): void => {
     this.setState({
-      filePath: result.path ?? result.webPath,
-      metadata: JSON.stringify(metadata, null, 2),
+      filePath: result.uri ?? result.webPath ?? '',
+      metadata: result.metadata ?? null,
     });
 
     MediaHistoryService.addMedia({
       mediaType: "photo",
       method: "takePhoto",
-      path: result.path,
+      uri: result.uri,
       webPath: result.webPath,
-      format: result.format,
-      size: result.size,
+      thumbnail: result.thumbnail,
+      format: result.metadata?.format,
+      size: result.metadata?.size,
       saved: result.saved,
+      metadata: result.metadata,
     });
   };
 
@@ -116,11 +96,13 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
       MediaHistoryService.addMedia({
         mediaType: "photo",
         method: "editURIPhoto",
-        path: result.path,
+        uri: result.uri,
         webPath: result.webPath,
-        format: result.format,
-        size: result.size,
+        thumbnail: result.thumbnail,
+        format: result.metadata?.format,
+        size: result.metadata?.size,
         saved: result.saved,
+        metadata: result.metadata,
       });
     } catch (e) {
       const error = e as any;
@@ -189,16 +171,8 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
                 <h3>Edited Photo</h3>
               </div>
               <PhotoWithMetadata
-                filePath={this.state.editedPhoto.path}
-                metadata={JSON.stringify(
-                  {
-                    size: this.state.editedPhoto.size,
-                    format: this.state.editedPhoto.format,
-                    saved: this.state.editedPhoto.saved,
-                  },
-                  null,
-                  2
-                )}
+                filePath={this.state.editedPhoto.uri ?? this.state.editedPhoto.webPath ?? ''}
+                metadata={this.state.editedPhoto.metadata ?? null}
               />
             </>
           )}

@@ -9,20 +9,11 @@ import {
   IonToggle,
 } from "@ionic/react";
 import React from "react";
-import { Camera } from "@capacitor/camera";
+import { Camera, MediaResult } from "@capacitor/camera";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Capacitor } from "@capacitor/core";
 import { TestImage } from "./TestImageData";
 import { MediaHistoryService } from "../../services/MediaHistoryService";
-
-interface MediaResult {
-  path: string;
-  webPath: string;
-  duration?: number;
-  size: number;
-  format: string;
-  saved: boolean;
-}
 
 interface EditURIPhotoConfig {
   saveToGallery: boolean;
@@ -146,11 +137,13 @@ class EditURIPhotoConfigurable extends React.Component<
       MediaHistoryService.addMedia({
         mediaType: "photo",
         method: "editURIPhoto",
-        path: result.path,
+        uri: result.uri,
         webPath: result.webPath,
-        format: result.format,
-        size: result.size,
+        thumbnail: result.thumbnail,
+        format: result.metadata?.format,
+        size: result.metadata?.size,
         saved: result.saved,
+        metadata: result.metadata,
       });
     } catch (e) {
       const error = e as any;
@@ -257,14 +250,18 @@ class EditURIPhotoConfigurable extends React.Component<
                 style={{ width: "100%", maxHeight: "300px", objectFit: "contain" }}
               />
               <p>
-                <strong>Path:</strong> {editedPhoto.path}
+                <strong>URI:</strong> {editedPhoto.uri}
               </p>
-              <p>
-                <strong>Size:</strong> {editedPhoto.size} bytes
-              </p>
-              <p>
-                <strong>Format:</strong> {editedPhoto.format}
-              </p>
+              {editedPhoto.metadata?.size && (
+                <p>
+                  <strong>Size:</strong> {editedPhoto.metadata.size} bytes
+                </p>
+              )}
+              {editedPhoto.metadata?.format && (
+                <p>
+                  <strong>Format:</strong> {editedPhoto.metadata.format}
+                </p>
+              )}
               <p>
                 <strong>Saved:</strong> {editedPhoto.saved ? "Yes" : "No"}
               </p>

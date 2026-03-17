@@ -1,10 +1,11 @@
 import React from "react";
 import { IonCard, IonCardContent, IonButton } from "@ionic/react";
 import { Capacitor } from "@capacitor/core";
+import { MediaMetadata } from "@capacitor/camera";
 
 interface IPhotoWithMetadataProps {
   filePath: string;
-  metadata?: string | null;
+  metadata?: MediaMetadata | string | null;
   onEdit?: (filePath: string) => void;
 }
 
@@ -13,6 +14,34 @@ const PhotoWithMetadata: React.FC<IPhotoWithMetadataProps> = ({
   metadata,
   onEdit,
 }) => {
+  const formatMetadata = (meta: MediaMetadata | string | null | undefined): string => {
+    if (!meta) return '';
+
+    // If it's already a string (legacy), return as-is
+    if (typeof meta === 'string') {
+      return meta;
+    }
+
+    // Format MediaMetadata object
+    const parts: string[] = [];
+    if (meta.size !== undefined) {
+      const sizeKB = (meta.size / 1024).toFixed(1);
+      const sizeMB = (meta.size / (1024 * 1024)).toFixed(2);
+      parts.push(`Size: ${meta.size < 1024 * 1024 ? sizeKB + ' KB' : sizeMB + ' MB'}`);
+    }
+    if (meta.format) parts.push(`Format: ${meta.format}`);
+    if (meta.resolution) parts.push(`Resolution: ${meta.resolution}`);
+    if (meta.creationDate) {
+      const date = new Date(meta.creationDate);
+      parts.push(`Created: ${date.toLocaleString()}`);
+    }
+    if (meta.exif) {
+      parts.push(`\nEXIF Data:\n${JSON.stringify(meta.exif, null, 2)}`);
+    }
+
+    return parts.join('\n');
+  };
+
   return (
     <IonCard>
       <IonCardContent>
@@ -31,7 +60,7 @@ const PhotoWithMetadata: React.FC<IPhotoWithMetadataProps> = ({
         )}
         {metadata && (
           <div>
-            <pre>{metadata}</pre>
+            <pre>{formatMetadata(metadata)}</pre>
           </div>
         )}
       </IonCardContent>

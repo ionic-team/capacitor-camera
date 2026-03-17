@@ -7,25 +7,17 @@ import {
   IonToggle,
 } from "@ionic/react";
 import React from "react";
-import { Camera } from "@capacitor/camera";
+import { Camera, MediaResult } from "@capacitor/camera";
 
 interface RecordVideoConfig {
   saveToGallery: boolean;
   includeMetadata: boolean;
-}
-
-interface VideoResult {
-  path: string;
-  webPath: string;
-  duration?: number;
-  size: number;
-  format: string;
-  saved: boolean;
+  isPersistent: boolean;
 }
 
 interface RecordVideoConfigurableProps {
   buttonLabel?: string;
-  onVideoResult: (result: VideoResult) => void;
+  onVideoResult: (result: MediaResult) => void;
 }
 
 interface RecordVideoConfigurableState {
@@ -42,6 +34,7 @@ class RecordVideoConfigurable extends React.Component<
       config: {
         saveToGallery: false,
         includeMetadata: true,
+        isPersistent: true,
       },
     };
   }
@@ -69,6 +62,7 @@ class RecordVideoConfigurable extends React.Component<
       const result = await Camera.recordVideo({
         saveToGallery: config.saveToGallery,
         includeMetadata: config.includeMetadata,
+        isPersistent: config.isPersistent,
       });
       this.props.onVideoResult(result);
     } catch (e) {
@@ -117,6 +111,16 @@ class RecordVideoConfigurable extends React.Component<
                   checked={config.includeMetadata}
                   onIonChange={(e) =>
                     this.updateConfig("includeMetadata", e.detail.checked)
+                  }
+                />
+              </IonItem>
+
+              <IonItem>
+                <IonLabel>Is Persistent</IonLabel>
+                <IonToggle
+                  checked={config.isPersistent}
+                  onIonChange={(e) =>
+                    this.updateConfig("isPersistent", e.detail.checked)
                   }
                 />
               </IonItem>

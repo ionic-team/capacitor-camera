@@ -11,7 +11,7 @@ import {
 import React from "react";
 import {
   Camera,
-  GalleryPhoto,
+  MediaResult,
   MediaType,
 } from "@capacitor/camera";
 
@@ -24,7 +24,7 @@ interface ChooseFromGalleryConfig {
 
 interface ChooseFromGalleryConfigurableProps {
   buttonLabel?: string;
-  onMediaResult: (media: GalleryPhoto[]) => void;
+  onMediaResult: (results: MediaResult[]) => void;
 }
 
 interface ChooseFromGalleryConfigurableState {
@@ -64,15 +64,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
       });
       console.log("chooseFromGallery result", result);
 
-      // Convert MediaResult[] to GalleryPhoto[]
-      const galleryPhotos: GalleryPhoto[] = result.photos.map(photo => ({
-        path: photo.path,
-        webPath: photo.webPath,
-        format: photo.format,
-        exif: undefined, // MediaResult doesn't include exif
-      }));
-
-      this.props.onMediaResult(galleryPhotos);
+      this.props.onMediaResult(result.results);
     } catch (e) {
       const error = e as any;
       const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
@@ -91,15 +83,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
       });
       console.log("chooseFromGallery result", result);
 
-      // Convert MediaResult[] to GalleryPhoto[]
-      const galleryPhotos: GalleryPhoto[] = result.photos.map(photo => ({
-        path: photo.path,
-        webPath: photo.webPath,
-        format: photo.format,
-        exif: undefined, // MediaResult doesn't include exif
-      }));
-
-      this.props.onMediaResult(galleryPhotos);
+      this.props.onMediaResult(result.results);
     } catch (e) {
       const error = e as any;
       const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
