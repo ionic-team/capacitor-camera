@@ -173,6 +173,7 @@ export interface TakePhotoOptions {
   /**
    * Whether to allow the user to crop or make small edits.
    * Note: This option is only supported on Android and iOS.
+   * @default false
    *
    * @since 8.1.0
    */
@@ -300,6 +301,7 @@ export interface ChooseFromGalleryOptions {
    * Whether to allow the user to crop or make small edits.
    * Only applicable for `MediaType.picture` and `allowMultipleSelection` set to `false`.
    * Note: This option is only supported on Android and iOS.
+   * @default false
    *
    * @since 8.1.0
    */
