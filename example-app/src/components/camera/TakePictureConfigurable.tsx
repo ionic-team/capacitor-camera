@@ -18,28 +18,13 @@ import {
   CameraDirection,
 } from "@capacitor/camera";
 
-interface TakePictureConfig {
-  quality: number;
-  allowEdit: boolean;
-  encodingType: EncodingType;
-  saveToGallery: boolean;
-  width: number | undefined;
-  height: number | undefined;
-  correctOrientation: boolean;
-  cameraDirection: CameraDirection;
-  presentationStyle: 'fullscreen' | 'popover';
-  editInApp: boolean;
-  includeMetadata: boolean;
-  webUseInput: boolean;
-}
-
 interface TakePictureConfigurableProps {
   buttonLabel?: string;
   onPhotoResult: (result: MediaResult) => void;
 }
 
 interface TakePictureConfigurableState {
-  config: TakePictureConfig;
+  config: TakePhotoOptions;
 }
 
 class TakePictureConfigurable extends React.Component<
@@ -48,25 +33,23 @@ class TakePictureConfigurable extends React.Component<
 > {
   constructor(props: TakePictureConfigurableProps) {
     super(props);
+    // Initialize with API defaults from TakePhotoOptions
     this.state = {
       config: {
         quality: 100,
         allowEdit: false,
         encodingType: EncodingType.JPEG,
         saveToGallery: false,
-        width: undefined,
-        height: undefined,
         correctOrientation: true,
         cameraDirection: CameraDirection.Rear,
         presentationStyle: 'fullscreen',
         editInApp: true,
         includeMetadata: false,
-        webUseInput: false,
       },
     };
   }
 
-  updateConfig = (field: keyof TakePictureConfig, value: any): void => {
+  updateConfig = (field: keyof TakePhotoOptions, value: any): void => {
     this.setState({
       config: { ...this.state.config, [field]: value },
     });
@@ -86,22 +69,7 @@ class TakePictureConfigurable extends React.Component<
 
   executeWithConfig = async (): Promise<void> => {
     try {
-      const config = this.state.config;
-      const options: TakePhotoOptions = {
-        quality: config.quality,
-        allowEdit: config.allowEdit,
-        encodingType: config.encodingType,
-        saveToGallery: config.saveToGallery,
-        width: config.width,
-        height: config.height,
-        correctOrientation: config.correctOrientation,
-        cameraDirection: config.cameraDirection,
-        presentationStyle: config.presentationStyle,
-        editInApp: config.editInApp,
-        includeMetadata: config.includeMetadata,
-        webUseInput: config.webUseInput,
-      };
-      const result = await Camera.takePhoto(options);
+      const result = await Camera.takePhoto(this.state.config);
       this.props.onPhotoResult(result);
     } catch (e) {
       const error = e as any;

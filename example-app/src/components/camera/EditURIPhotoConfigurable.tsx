@@ -9,16 +9,11 @@ import {
   IonToggle,
 } from "@ionic/react";
 import React from "react";
-import { Camera, MediaResult } from "@capacitor/camera";
+import { Camera, MediaResult, EditURIPhotoOptions } from "@capacitor/camera";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Capacitor } from "@capacitor/core";
 import { TestImage } from "./TestImageData";
 import { MediaHistoryService } from "../../services/MediaHistoryService";
-
-interface EditURIPhotoConfig {
-  saveToGallery: boolean;
-  includeMetadata: boolean;
-}
 
 interface EditURIPhotoConfigurableProps {
   selectedImage: TestImage | null;
@@ -28,7 +23,7 @@ interface EditURIPhotoConfigurableState {
   savedFileUri: string | null;
   savedFileWebPath: string | null;
   editedPhoto: MediaResult | null;
-  config: EditURIPhotoConfig;
+  config: Omit<EditURIPhotoOptions, 'uri'>; // Config excludes 'uri' since it comes from saved file
   isLoading: boolean;
 }
 
@@ -38,6 +33,7 @@ class EditURIPhotoConfigurable extends React.Component<
 > {
   constructor(props: EditURIPhotoConfigurableProps) {
     super(props);
+    // Initialize with API defaults from EditURIPhotoOptions
     this.state = {
       savedFileUri: null,
       savedFileWebPath: null,
@@ -60,7 +56,7 @@ class EditURIPhotoConfigurable extends React.Component<
     }
   }
 
-  updateConfig = (field: keyof EditURIPhotoConfig, value: boolean): void => {
+  updateConfig = (field: keyof Omit<EditURIPhotoOptions, 'uri'>, value: boolean): void => {
     this.setState({
       config: { ...this.state.config, [field]: value },
     });

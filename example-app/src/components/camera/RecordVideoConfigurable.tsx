@@ -7,13 +7,7 @@ import {
   IonToggle,
 } from "@ionic/react";
 import React from "react";
-import { Camera, MediaResult } from "@capacitor/camera";
-
-interface RecordVideoConfig {
-  saveToGallery: boolean;
-  includeMetadata: boolean;
-  isPersistent: boolean;
-}
+import { Camera, MediaResult, RecordVideoOptions } from "@capacitor/camera";
 
 interface RecordVideoConfigurableProps {
   buttonLabel?: string;
@@ -21,7 +15,7 @@ interface RecordVideoConfigurableProps {
 }
 
 interface RecordVideoConfigurableState {
-  config: RecordVideoConfig;
+  config: RecordVideoOptions;
 }
 
 class RecordVideoConfigurable extends React.Component<
@@ -30,16 +24,17 @@ class RecordVideoConfigurable extends React.Component<
 > {
   constructor(props: RecordVideoConfigurableProps) {
     super(props);
+    // Initialize with API defaults from RecordVideoOptions
     this.state = {
       config: {
         saveToGallery: false,
-        includeMetadata: true,
+        includeMetadata: false,
         isPersistent: true,
       },
     };
   }
 
-  updateConfig = (field: keyof RecordVideoConfig, value: any): void => {
+  updateConfig = (field: keyof RecordVideoOptions, value: any): void => {
     this.setState({
       config: { ...this.state.config, [field]: value },
     });
@@ -58,12 +53,7 @@ class RecordVideoConfigurable extends React.Component<
 
   executeWithConfig = async (): Promise<void> => {
     try {
-      const config = this.state.config;
-      const result = await Camera.recordVideo({
-        saveToGallery: config.saveToGallery,
-        includeMetadata: config.includeMetadata,
-        isPersistent: config.isPersistent,
-      });
+      const result = await Camera.recordVideo(this.state.config);
       this.props.onVideoResult(result);
     } catch (e) {
       const error = e as any;
