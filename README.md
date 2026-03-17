@@ -349,15 +349,26 @@ Allows the user to pick multiple pictures from the photo gallery.
 
 #### MediaResult
 
-| Prop           | Type                 |
-| -------------- | -------------------- |
-| **`path`**     | <code>string</code>  |
-| **`webPath`**  | <code>string</code>  |
-| **`exif`**     | <code>any</code>     |
-| **`duration`** | <code>number</code>  |
-| **`size`**     | <code>number</code>  |
-| **`format`**   | <code>string</code>  |
-| **`saved`**    | <code>boolean</code> |
+| Prop            | Type                                                    | Description                                                                                                                                                                                                       | Since |
+| --------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`type`**      | <code><a href="#mediatype">MediaType</a></code>         | The type of media result. Either `Media.Type.picture` or `Media.Type.video`.                                                                                                                                      | 8.1.0 |
+| **`uri`**       | <code>string</code>                                     | The URI pointing to the media file. Not available on Web. Use `webPath` instead for Web.                                                                                                                          | 8.1.0 |
+| **`thumbnail`** | <code>string</code>                                     | Returns the thumbnail of the media, base64 encoded. On Web, for `Media.Type.picture`, the full image is returned here, also base64 encoded.                                                                       | 8.1.0 |
+| **`saved`**     | <code>boolean</code>                                    | Whether if the media was saved to the gallery successfully or not. Only applicable if `saveToGallery` was set to `true` in input options. Otherwise, `false` is always returned for `save`. Not available on Web. | 8.1.0 |
+| **`webPath`**   | <code>string</code>                                     | webPath returns a path that can be used to set the src attribute of a media item for efficient loading and rendering.                                                                                             | 8.1.0 |
+| **`metadata`**  | <code><a href="#mediametadata">MediaMetadata</a></code> | Metadata associated to the media result. Only included if `includeMetadata` was set to `true` in input options.                                                                                                   | 8.1.0 |
+
+
+#### MediaMetadata
+
+| Prop               | Type                | Description                                                                                                                                                                                                                                  | Since |
+| ------------------ | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`size`**         | <code>number</code> | File size of the media, in bytes Not available on Web.                                                                                                                                                                                       | 8.1.0 |
+| **`duration`**     | <code>number</code> | Only applicable for <a href="#mediatype">`MediaType.video`</a> - the duration of the media, in seconds. Not available on Web.                                                                                                                | 8.1.0 |
+| **`format`**       | <code>string</code> | The format of the image, ex: jpeg, png, mp4. Web supports jpeg, png and gif, but the exact availability may vary depending on the browser. gif is only supported for `chooseFromGallery`, and only if `webUseInput` option is set to `true`. | 8.1.0 |
+| **`resolution`**   | <code>string</code> | The resolution of the media, in `&lt;width&gt;x&lt;height&gt;` format. Example: '1920x1080'.                                                                                                                                                 | 8.1.0 |
+| **`creationDate`** | <code>string</code> | The date and time the media was created, in ISO 8601 format. If creation date is not available (e.g. Android 7 and below), the last modified date is returned. Not available on web.                                                         | 8.1.0 |
+| **`exif`**         | <code>string</code> | Exif data, if any, retreived from the media item. Not available on Web.                                                                                                                                                                      | 8.1.0 |
 
 
 #### TakePhotoOptions
@@ -396,9 +407,9 @@ Allows the user to pick multiple pictures from the photo gallery.
 
 #### MediaResults
 
-| Prop         | Type                       |
-| ------------ | -------------------------- |
-| **`photos`** | <code>MediaResult[]</code> |
+| Prop          | Type                       | Description                | Since |
+| ------------- | -------------------------- | -------------------------- | ----- |
+| **`results`** | <code>MediaResult[]</code> | The list of media results. | 8.1.0 |
 
 
 #### ChooseFromGalleryOptions
@@ -541,6 +552,15 @@ Allows the user to pick multiple pictures from the photo gallery.
 ### Enums
 
 
+#### MediaType
+
+| Members       | Value          |
+| ------------- | -------------- |
+| **`picture`** | <code>0</code> |
+| **`video`**   | <code>1</code> |
+| **`all`**     | <code>2</code> |
+
+
 #### EncodingType
 
 | Members    | Value          |
@@ -555,15 +575,6 @@ Allows the user to pick multiple pictures from the photo gallery.
 | ----------- | -------------------- |
 | **`Rear`**  | <code>'REAR'</code>  |
 | **`Front`** | <code>'FRONT'</code> |
-
-
-#### MediaType
-
-| Members       | Value          |
-| ------------- | -------------- |
-| **`picture`** | <code>0</code> |
-| **`video`**   | <code>1</code> |
-| **`all`**     | <code>2</code> |
 
 
 #### CameraResultType

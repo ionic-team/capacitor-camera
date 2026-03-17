@@ -421,18 +421,116 @@ export interface EditPhotoResult {
   outputImage: string;
 }
 
-export interface MediaResults {
-  photos: MediaResult[];
+export interface MediaResult {
+  /**
+   * The type of media result. Either `Media.Type.picture` or `Media.Type.video`.
+   *
+   * @since 8.1.0
+   */
+  type: MediaType;
+
+  /**
+   * The URI pointing to the media file.
+   * Not available on Web. Use `webPath` instead for Web.
+   *
+   * @since 8.1.0
+   */
+  uri?: string;
+
+  /**
+   * Returns the thumbnail of the media, base64 encoded.
+   * On Web, for `Media.Type.picture`, the full image is returned here, also base64 encoded.
+   *
+   * @since 8.1.0
+   */
+  thumbnail?: string;
+
+  /**
+   * Whether if the media was saved to the gallery successfully or not.
+   * Only applicable if `saveToGallery` was set to `true` in input options.
+   * Otherwise, `false` is always returned for `save`.
+   * Not available on Web.
+   *
+   * @since 8.1.0
+   */
+  saved: boolean;
+
+  /**
+   * webPath returns a path that can be used to set the src attribute of a media item for efficient
+   * loading and rendering.
+   *
+   * @since 8.1.0
+   */
+  webPath?: string;
+
+  /**
+   * Metadata associated to the media result.
+   * Only included if `includeMetadata` was set to `true` in input options.
+   *
+   * @since 8.1.0
+   */
+  metadata?: MediaMetadata;
 }
 
-export interface MediaResult {
-  path: string;
-  webPath: string;
-  exif?: any;
+export interface MediaMetadata {
+  /**
+   * File size of the media, in bytes
+   * Not available on Web.
+   *
+   * @since 8.1.0
+   */
+  size?: number;
+
+  /**
+   * Only applicable for `MediaType.video` - the duration of the media, in seconds.
+   * Not available on Web.
+   *
+   * @since 8.1.0
+   */
   duration?: number;
-  size: number;
+
+  /**
+   * The format of the image, ex: jpeg, png, mp4.
+   *
+   * Web supports jpeg, png and gif, but the exact availability may vary depending on the browser.
+   * gif is only supported for `chooseFromGallery`, and only if `webUseInput` option is set to `true`.
+   *
+   * @since 8.1.0
+   */
   format: string;
-  saved: boolean;
+
+  /**
+   * The resolution of the media, in `<width>x<height>` format. Example: '1920x1080'.
+   *
+   * @since 8.1.0
+   */
+  resolution: string;
+
+  /**
+   * The date and time the media was created, in ISO 8601 format.
+   * If creation date is not available (e.g. Android 7 and below), the last modified date is returned.
+   * Not available on web.
+   *
+   * @since 8.1.0
+   */
+  creationDate?: string;
+
+  /**
+   * Exif data, if any, retreived from the media item.
+   * Not available on Web.
+   *
+   * @since 8.1.0
+   */
+  exif?: string;
+}
+
+export interface MediaResults {
+  /**
+   * The list of media results.
+   *
+   * @since 8.1.0
+   */
+  results: MediaResult[];
 }
 
 export interface ImageOptions {
