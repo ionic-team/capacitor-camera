@@ -4,6 +4,7 @@ import {
   IonAccordionGroup,
   IonItem,
   IonLabel,
+  IonInput,
   IonSelect,
   IonSelectOption,
   IonToggle,
@@ -13,14 +14,8 @@ import {
   Camera,
   MediaResult,
   MediaType,
+  ChooseFromGalleryOptions,
 } from "@capacitor/camera";
-
-interface ChooseFromGalleryConfig {
-  mediaType: number;
-  allowMultipleSelection: boolean;
-  includeMetadata: boolean;
-  allowEdit: boolean;
-}
 
 interface ChooseFromGalleryConfigurableProps {
   buttonLabel?: string;
@@ -28,7 +23,7 @@ interface ChooseFromGalleryConfigurableProps {
 }
 
 interface ChooseFromGalleryConfigurableState {
-  config: ChooseFromGalleryConfig;
+  config: ChooseFromGalleryOptions;
 }
 
 class ChooseFromGalleryConfigurable extends React.Component<
@@ -37,17 +32,23 @@ class ChooseFromGalleryConfigurable extends React.Component<
 > {
   constructor(props: ChooseFromGalleryConfigurableProps) {
     super(props);
+    // Initialize with API defaults from ChooseFromGalleryOptions
     this.state = {
       config: {
         mediaType: MediaType.picture,
         allowMultipleSelection: false,
+        limit: 0,
         includeMetadata: false,
         allowEdit: false,
+        editInApp: true,
+        presentationStyle: 'fullscreen',
+        quality: 100,
+        correctOrientation: true,
       },
     };
   }
 
-  updateConfig = (field: keyof ChooseFromGalleryConfig, value: any): void => {
+  updateConfig = (field: keyof ChooseFromGalleryOptions, value: any): void => {
     this.setState({
       config: { ...this.state.config, [field]: value },
     });
@@ -56,11 +57,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
   executeDefault = async (): Promise<void> => {
     try {
       const result = await Camera.chooseFromGallery({
-        mediaType: MediaType.all,
-        allowMultipleSelection: true,
-        includeMetadata: false,
-        allowEdit: false,
-        limit: 2
+        mediaType: MediaType.picture
       });
       console.log("chooseFromGallery result", result);
 
@@ -78,8 +75,16 @@ class ChooseFromGalleryConfigurable extends React.Component<
       const result = await Camera.chooseFromGallery({
         mediaType: config.mediaType,
         allowMultipleSelection: config.allowMultipleSelection,
+        limit: config.limit,
         includeMetadata: config.includeMetadata,
         allowEdit: config.allowEdit,
+        editInApp: config.editInApp,
+        presentationStyle: config.presentationStyle,
+        quality: config.quality,
+        width: config.width,
+        height: config.height,
+        correctOrientation: config.correctOrientation,
+        webUseInput: config.webUseInput,
       });
       console.log("chooseFromGallery result", result);
 
@@ -143,6 +148,81 @@ class ChooseFromGalleryConfigurable extends React.Component<
               </IonItem>
 
               <IonItem>
+                <IonLabel position="stacked">
+                  Limit (0 = unlimited, Android 13+ & iOS)
+                </IonLabel>
+                <IonInput
+                  type="number"
+                  min="0"
+                  value={config.limit}
+                  onIonChange={(e) =>
+                    this.updateConfig("limit", parseInt(e.detail.value!) || 0)
+                  }
+                />
+              </IonItem>
+
+              <IonItem>
+                <IonLabel position="stacked">Quality (0-100)</IonLabel>
+                <IonInput
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={config.quality}
+                  onIonChange={(e) =>
+                    this.updateConfig("quality", parseInt(e.detail.value!) || 100)
+                  }
+                />
+              </IonItem>
+
+              <IonItem>
+                <IonLabel position="stacked">Width (optional)</IonLabel>
+                <IonInput
+                  type="number"
+                  placeholder="Leave empty for no constraint"
+                  value={config.width ?? ""}
+                  onIonChange={(e) =>
+                    this.updateConfig(
+                      "width",
+                      e.detail.value ? parseInt(e.detail.value) : undefined
+                    )
+                  }
+                />
+              </IonItem>
+
+              <IonItem>
+                <IonLabel position="stacked">Height (optional)</IonLabel>
+                <IonInput
+                  type="number"
+                  placeholder="Leave empty for no constraint"
+                  value={config.height ?? ""}
+                  onIonChange={(e) =>
+                    this.updateConfig(
+                      "height",
+                      e.detail.value ? parseInt(e.detail.value) : undefined
+                    )
+                  }
+                />
+              </IonItem>
+
+              <IonItem>
+                <IonLabel position="stacked">
+                  Presentation Style (iOS)
+                </IonLabel>
+                <IonSelect
+                  value={config.presentationStyle}
+                  onIonChange={(e) =>
+                    this.updateConfig("presentationStyle", e.detail.value)
+                  }
+                >
+                  <IonSelectOption value="fullscreen">
+                    Fullscreen
+                  </IonSelectOption>
+                  <IonSelectOption value="popover">Popover</IonSelectOption>
+                </IonSelect>
+              </IonItem>
+
+              {/* Boolean toggles */}
+              <IonItem>
                 <IonLabel>Include Metadata</IonLabel>
                 <IonToggle
                   checked={config.includeMetadata}
@@ -158,6 +238,36 @@ class ChooseFromGalleryConfigurable extends React.Component<
                   checked={config.allowEdit}
                   onIonChange={(e) =>
                     this.updateConfig("allowEdit", e.detail.checked)
+                  }
+                />
+              </IonItem>
+
+              <IonItem>
+                <IonLabel>Edit In App</IonLabel>
+                <IonToggle
+                  checked={config.editInApp}
+                  onIonChange={(e) =>
+                    this.updateConfig("editInApp", e.detail.checked)
+                  }
+                />
+              </IonItem>
+
+              <IonItem>
+                <IonLabel>Correct Orientation</IonLabel>
+                <IonToggle
+                  checked={config.correctOrientation}
+                  onIonChange={(e) =>
+                    this.updateConfig("correctOrientation", e.detail.checked)
+                  }
+                />
+              </IonItem>
+
+              <IonItem>
+                <IonLabel>Web Use Input</IonLabel>
+                <IonToggle
+                  checked={config.webUseInput}
+                  onIonChange={(e) =>
+                    this.updateConfig("webUseInput", e.detail.checked)
                   }
                 />
               </IonItem>
