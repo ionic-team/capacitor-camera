@@ -16,10 +16,11 @@ import type {
   MediaResult,
   MediaResults,
   ChooseFromGalleryOptions,
+  TakePhotoOptions,
 } from './definitions';
 
 export class CameraWeb extends WebPlugin implements CameraPlugin {
-  async takePhoto(_options: ImageOptions): Promise<MediaResult> {
+  async takePhoto(_options: TakePhotoOptions): Promise<MediaResult> {
     throw this.unimplemented('takePhoto is not implemented on Web.');
   }
 

@@ -19,7 +19,7 @@ export interface CameraPlugin {
    *
    * @since 8.1.0
    */
-  takePhoto(options: ImageOptions): Promise<MediaResult>;
+  takePhoto(options: TakePhotoOptions): Promise<MediaResult>;
 
   /**
    * Open the device's camera and allow the user to record a video.

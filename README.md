@@ -126,14 +126,14 @@ const takePicture = async () => {
 ### takePhoto(...)
 
 ```typescript
-takePhoto(options: ImageOptions) => Promise<MediaResult>
+takePhoto(options: TakePhotoOptions) => Promise<MediaResult>
 ```
 
 Open the device's camera and allow the user to take a photo.
 
-| Param         | Type                                                  |
-| ------------- | ----------------------------------------------------- |
-| **`options`** | <code><a href="#imageoptions">ImageOptions</a></code> |
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#takephotooptions">TakePhotoOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#mediaresult">MediaResult</a>&gt;</code>
 
@@ -360,25 +360,22 @@ Allows the user to pick multiple pictures from the photo gallery.
 | **`saved`**    | <code>boolean</code> |
 
 
-#### ImageOptions
+#### TakePhotoOptions
 
-| Prop                     | Type                                                          | Description                                                                                                                                                                                                                                                                     | Default                           | Since |
-| ------------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ----- |
-| **`quality`**            | <code>number</code>                                           | The quality of image to return as JPEG, from 0-100 Note: This option is only supported on Android and iOS.                                                                                                                                                                      |                                   | 1.0.0 |
-| **`allowEditing`**       | <code>boolean</code>                                          | Whether to allow the user to crop or make small edits (platform specific). Note: This option is only supported on Android and iOS. On iOS it's only supported for <a href="#camerasource">CameraSource.Camera</a>, but not for <a href="#camerasource">CameraSource.Photos</a>. |                                   | 1.0.0 |
-| **`resultType`**         | <code><a href="#cameraresulttype">CameraResultType</a></code> | How the data should be returned. Currently, only 'Base64', 'DataUrl' or 'Uri' is supported                                                                                                                                                                                      |                                   | 1.0.0 |
-| **`saveToGallery`**      | <code>boolean</code>                                          | Whether to save the photo to the gallery. If the photo was picked from the gallery, it will only be saved if edited. Note: This option is only supported on Android and iOS.                                                                                                    | <code>false</code>                | 1.0.0 |
-| **`width`**              | <code>number</code>                                           | The desired maximum width of the saved image. The aspect ratio is respected. Note: This option is only supported on Android and iOS.                                                                                                                                            |                                   | 1.0.0 |
-| **`height`**             | <code>number</code>                                           | The desired maximum height of the saved image. The aspect ratio is respected. Note: This option is only supported on Android and iOS.                                                                                                                                           |                                   | 1.0.0 |
-| **`correctOrientation`** | <code>boolean</code>                                          | Whether to automatically rotate the image "up" to correct for orientation in portrait mode. Note: This option is only supported on Android and iOS.                                                                                                                             | <code>true</code>                 | 1.0.0 |
-| **`source`**             | <code><a href="#camerasource">CameraSource</a></code>         | The source to get the photo from. By default this prompts the user to select either the photo album or take a photo.                                                                                                                                                            | <code>CameraSource.Prompt</code>  | 1.0.0 |
-| **`direction`**          | <code><a href="#cameradirection">CameraDirection</a></code>   | iOS and Web only: The camera direction.                                                                                                                                                                                                                                         | <code>CameraDirection.Rear</code> | 1.0.0 |
-| **`presentationStyle`**  | <code>'fullscreen' \| 'popover'</code>                        | iOS only: The presentation style of the Camera.                                                                                                                                                                                                                                 | <code>'fullscreen'</code>         | 1.0.0 |
-| **`webUseInput`**        | <code>boolean</code>                                          | Web only: Whether to use the PWA Element experience or file input. The default is to use PWA Elements if installed and fall back to file input. To always use file input, set this to `true`. Learn more about PWA Elements: https://capacitorjs.com/docs/web/pwa-elements      |                                   | 1.0.0 |
-| **`promptLabelHeader`**  | <code>string</code>                                           | Text value to use when displaying the prompt.                                                                                                                                                                                                                                   | <code>'Photo'</code>              | 1.0.0 |
-| **`promptLabelCancel`**  | <code>string</code>                                           | Text value to use when displaying the prompt. iOS only: The label of the 'cancel' button.                                                                                                                                                                                       | <code>'Cancel'</code>             | 1.0.0 |
-| **`promptLabelPhoto`**   | <code>string</code>                                           | Text value to use when displaying the prompt. The label of the button to select a saved image.                                                                                                                                                                                  | <code>'From Photos'</code>        | 1.0.0 |
-| **`promptLabelPicture`** | <code>string</code>                                           | Text value to use when displaying the prompt. The label of the button to open the camera.                                                                                                                                                                                       | <code>'Take Picture'</code>       | 1.0.0 |
+| Prop                     | Type                                                        | Description                                                                                                                                                                                                                                                                                                    | Default                           | Since |
+| ------------------------ | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ----- |
+| **`quality`**            | <code>number</code>                                         | The quality of image to return, from 0-100. Only applicable for <a href="#encodingtype">`EncodingType.JPEG`</a>. Note: This option is only supported on Android and iOS.                                                                                                                                       | <code>100</code>                  | 8.1.0 |
+| **`width`**              | <code>number</code>                                         | The desired maximum width of the saved image. The aspect ratio is respected. Note: This option is only supported on Android and iOS.                                                                                                                                                                           |                                   | 8.1.0 |
+| **`height`**             | <code>number</code>                                         | The desired maximum height of the saved image. The aspect ratio is respected. Note: This option is only supported on Android and iOS.                                                                                                                                                                          |                                   | 8.1.0 |
+| **`correctOrientation`** | <code>boolean</code>                                        | Whether to automatically rotate the image "up" to correct for orientation in portrait mode. Note: This option is only supported on Android and iOS                                                                                                                                                             | <code>true</code>                 | 8.1.0 |
+| **`encodingType`**       | <code><a href="#encodingtype">EncodingType</a></code>       | The encoding type for the captured photo - JPEG or PNG. Note: This option is only supported on Android and iOS.                                                                                                                                                                                                | <code>EncodingType.JPEG</code>    | 8.1.0 |
+| **`saveToGallery`**      | <code>boolean</code>                                        | Whether to save the photo to the gallery. Note: This option is only supported on Android and iOS.                                                                                                                                                                                                              | <code>false</code>                | 8.1.0 |
+| **`cameraDirection`**    | <code><a href="#cameradirection">CameraDirection</a></code> | iOS and Web only: The camera direction.                                                                                                                                                                                                                                                                        | <code>CameraDirection.Rear</code> | 8.1.0 |
+| **`allowEdit`**          | <code>boolean</code>                                        | Whether to allow the user to crop or make small edits. Note: This option is only supported on Android and iOS.                                                                                                                                                                                                 |                                   | 8.1.0 |
+| **`editInApp`**          | <code>boolean</code>                                        | If `true`, will use an in-app editor for photo edition. If `false`, will open a separate (platform-specific) native app to handle photo edition, falling back to the in-app editor if none is available. Only applicable with `allowEdit` set to true. Note: This option is only supported on Android and iOS. | <code>true</code>                 | 8.1.0 |
+| **`presentationStyle`**  | <code>'fullscreen' \| 'popover'</code>                      | iOS only: The presentation style of the Camera.                                                                                                                                                                                                                                                                | <code>'fullscreen'</code>         | 8.1.0 |
+| **`webUseInput`**        | <code>boolean</code>                                        | Web only: Whether to use the PWA Element experience or file input. The default is to use PWA Elements if installed and fall back to file input. To always use file input, set this to `true`. Learn more about PWA Elements: https://capacitorjs.com/docs/web/pwa-elements                                     |                                   | 8.1.0 |
+| **`includeMetadata`**    | <code>boolean</code>                                        | Whether or not <a href="#mediaresult">MediaResult</a> should include its metadata. If an error occurs when obtaining the metadata, it will return empty. Note: This option is only supported on Android and iOS.                                                                                               | <code>false</code>                | 8.1.0 |
 
 
 #### RecordVideoOptions
@@ -490,6 +487,27 @@ Allows the user to pick multiple pictures from the photo gallery.
 | **`saved`**        | <code>boolean</code> | Whether if the image was saved to the gallery or not. On Android and iOS, saving to the gallery can fail if the user didn't grant the required permissions. On Web there is no gallery, so always returns false.                                                         | 1.1.0 |
 
 
+#### ImageOptions
+
+| Prop                     | Type                                                          | Description                                                                                                                                                                                                                                                                     | Default                           | Since |
+| ------------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ----- |
+| **`quality`**            | <code>number</code>                                           | The quality of image to return as JPEG, from 0-100 Note: This option is only supported on Android and iOS.                                                                                                                                                                      |                                   | 1.0.0 |
+| **`allowEditing`**       | <code>boolean</code>                                          | Whether to allow the user to crop or make small edits (platform specific). Note: This option is only supported on Android and iOS. On iOS it's only supported for <a href="#camerasource">CameraSource.Camera</a>, but not for <a href="#camerasource">CameraSource.Photos</a>. |                                   | 1.0.0 |
+| **`resultType`**         | <code><a href="#cameraresulttype">CameraResultType</a></code> | How the data should be returned. Currently, only 'Base64', 'DataUrl' or 'Uri' is supported                                                                                                                                                                                      |                                   | 1.0.0 |
+| **`saveToGallery`**      | <code>boolean</code>                                          | Whether to save the photo to the gallery. If the photo was picked from the gallery, it will only be saved if edited. Note: This option is only supported on Android and iOS.                                                                                                    | <code>false</code>                | 1.0.0 |
+| **`width`**              | <code>number</code>                                           | The desired maximum width of the saved image. The aspect ratio is respected. Note: This option is only supported on Android and iOS.                                                                                                                                            |                                   | 1.0.0 |
+| **`height`**             | <code>number</code>                                           | The desired maximum height of the saved image. The aspect ratio is respected. Note: This option is only supported on Android and iOS.                                                                                                                                           |                                   | 1.0.0 |
+| **`correctOrientation`** | <code>boolean</code>                                          | Whether to automatically rotate the image "up" to correct for orientation in portrait mode. Note: This option is only supported on Android and iOS.                                                                                                                             | <code>true</code>                 | 1.0.0 |
+| **`source`**             | <code><a href="#camerasource">CameraSource</a></code>         | The source to get the photo from. By default this prompts the user to select either the photo album or take a photo.                                                                                                                                                            | <code>CameraSource.Prompt</code>  | 1.0.0 |
+| **`direction`**          | <code><a href="#cameradirection">CameraDirection</a></code>   | iOS and Web only: The camera direction.                                                                                                                                                                                                                                         | <code>CameraDirection.Rear</code> | 1.0.0 |
+| **`presentationStyle`**  | <code>'fullscreen' \| 'popover'</code>                        | iOS only: The presentation style of the Camera.                                                                                                                                                                                                                                 | <code>'fullscreen'</code>         | 1.0.0 |
+| **`webUseInput`**        | <code>boolean</code>                                          | Web only: Whether to use the PWA Element experience or file input. The default is to use PWA Elements if installed and fall back to file input. To always use file input, set this to `true`. Learn more about PWA Elements: https://capacitorjs.com/docs/web/pwa-elements      |                                   | 1.0.0 |
+| **`promptLabelHeader`**  | <code>string</code>                                           | Text value to use when displaying the prompt.                                                                                                                                                                                                                                   | <code>'Photo'</code>              | 1.0.0 |
+| **`promptLabelCancel`**  | <code>string</code>                                           | Text value to use when displaying the prompt. iOS only: The label of the 'cancel' button.                                                                                                                                                                                       | <code>'Cancel'</code>             | 1.0.0 |
+| **`promptLabelPhoto`**   | <code>string</code>                                           | Text value to use when displaying the prompt. The label of the button to select a saved image.                                                                                                                                                                                  | <code>'From Photos'</code>        | 1.0.0 |
+| **`promptLabelPicture`** | <code>string</code>                                           | Text value to use when displaying the prompt. The label of the button to open the camera.                                                                                                                                                                                       | <code>'Take Picture'</code>       | 1.0.0 |
+
+
 #### GalleryImageOptions
 
 | Prop                     | Type                                   | Description                                                                                                             | Default                    | Since |
@@ -523,22 +541,12 @@ Allows the user to pick multiple pictures from the photo gallery.
 ### Enums
 
 
-#### CameraResultType
+#### EncodingType
 
-| Members       | Value                  |
-| ------------- | ---------------------- |
-| **`Uri`**     | <code>'uri'</code>     |
-| **`Base64`**  | <code>'base64'</code>  |
-| **`DataUrl`** | <code>'dataUrl'</code> |
-
-
-#### CameraSource
-
-| Members      | Value                 | Description                                                        |
-| ------------ | --------------------- | ------------------------------------------------------------------ |
-| **`Prompt`** | <code>'PROMPT'</code> | Prompts the user to select either the photo album or take a photo. |
-| **`Camera`** | <code>'CAMERA'</code> | Take a new photo using the camera.                                 |
-| **`Photos`** | <code>'PHOTOS'</code> | Pick an existing photo from the gallery or photo album.            |
+| Members    | Value          |
+| ---------- | -------------- |
+| **`JPEG`** | <code>0</code> |
+| **`PNG`**  | <code>1</code> |
 
 
 #### CameraDirection
@@ -556,5 +564,23 @@ Allows the user to pick multiple pictures from the photo gallery.
 | **`picture`** | <code>0</code> |
 | **`video`**   | <code>1</code> |
 | **`all`**     | <code>2</code> |
+
+
+#### CameraResultType
+
+| Members       | Value                  |
+| ------------- | ---------------------- |
+| **`Uri`**     | <code>'uri'</code>     |
+| **`Base64`**  | <code>'base64'</code>  |
+| **`DataUrl`** | <code>'dataUrl'</code> |
+
+
+#### CameraSource
+
+| Members      | Value                 | Description                                                        |
+| ------------ | --------------------- | ------------------------------------------------------------------ |
+| **`Prompt`** | <code>'PROMPT'</code> | Prompts the user to select either the photo album or take a photo. |
+| **`Camera`** | <code>'CAMERA'</code> | Take a new photo using the camera.                                 |
+| **`Photos`** | <code>'PHOTOS'</code> | Pick an existing photo from the gallery or photo album.            |
 
 </docgen-api>
