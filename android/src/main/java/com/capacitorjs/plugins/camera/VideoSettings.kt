@@ -1,6 +1,6 @@
 package com.capacitorjs.plugins.camera
 
-class VideoSettings {
-    var saveToGallery: Boolean = false
-    var includeMetadata: Boolean = false
-}
+data class VideoSettings(
+    val saveToGallery: Boolean = false,
+    val includeMetadata: Boolean = false
+)
