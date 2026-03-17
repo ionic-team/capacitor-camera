@@ -533,6 +533,10 @@ export interface MediaResults {
   results: MediaResult[];
 }
 
+/**
+ * @deprecated This interface is only meant to be used for deprecated `getPhoto` method.
+ * It will be removed in a future major version of the plugin, along with `getPhoto`.
+ */
 export interface ImageOptions {
   /**
    * The quality of image to return as JPEG, from 0-100
@@ -659,6 +663,10 @@ export interface ImageOptions {
   promptLabelPicture?: string;
 }
 
+/**
+ * @deprecated This interface is only meant to be used for received the result of deprecated `getPhoto` method.
+ * It will be removed in a future major version of the plugin, along with `getPhoto`.
+ */
 export interface Photo {
   /**
    * The base64 encoded string representation of the image, if using CameraResultType.Base64.
@@ -754,6 +762,11 @@ export interface GalleryPhoto {
    */
   format: string;
 }
+
+/**
+ * @deprecated This interface is only meant to be used for deprecated `pickImages` method.
+ * It will be removed in a future major version of the plugin, along with `pickImages`.
+ */
 export interface GalleryImageOptions {
   /**
    * The quality of image to return as JPEG, from 0-100
@@ -802,6 +815,10 @@ export interface GalleryImageOptions {
   limit?: number;
 }
 
+/**
+ * @deprecated This enum is only meant to be used for deprecated `getPhoto` method.
+ * It will be removed in a future major version of the plugin, along with `getPhoto`.
+ */
 export enum CameraSource {
   /**
    * Prompts the user to select either the photo album or take a photo.
@@ -822,6 +839,10 @@ export enum CameraDirection {
   Front = 'FRONT',
 }
 
+/**
+ * @deprecated This enum is only meant to be used for `ImageOptions` in deprecated `getPhoto` method.
+ * It will be removed in a future major version of the plugin, along with `getPhoto`.
+ */
 export enum CameraResultType {
   Uri = 'uri',
   Base64 = 'base64',
