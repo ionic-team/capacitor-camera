@@ -122,7 +122,7 @@ export interface TakePhotoOptions {
    * The desired maximum width of the saved image. The aspect ratio is respected.
    * Note: This option is only supported on Android and iOS.
    *
-   * @since 1.0.0
+   * @since 8.1.0
    */
   width?: number;
 
@@ -158,9 +158,8 @@ export interface TakePhotoOptions {
    * Note: This option is only supported on Android and iOS.
    * @default: false
    *
-   * @since 1.0.0
+   * @since 8.1.0
    */
-
   saveToGallery?: boolean;
   
   /**
@@ -221,11 +220,41 @@ export interface TakePhotoOptions {
 }
 
 export interface RecordVideoOptions {
+  /**
+   * Whether to save the video to the gallery.
+   * @default false
+   *
+   * @since 8.1.0
+   */
   saveToGallery?: boolean;
+
+  /**
+   * Whether or not MediaResult should include its metadata.
+   * If an error occurs when obtaining the metadata, it will return empty.
+   * @default false
+   * 
+   * @since 8.1.0
+   */
   includeMetadata?: boolean;
+
+  /**
+   * Whether the to store the video in persistent app storage or in temporary cache.
+   * If you plan to use the returned `MediaResult#URI` across app launches, you may want to set to true.
+   * Otherwise, you can set to false.
+   * @default true
+   * 
+   * @since 8.1.0
+   */
+  isPersistent?: boolean;
 }
 
 export interface PlayVideoOptions {
+  /**
+   * The URI of the video to play.
+   * You may use the `MediaResult#URI` returned from `recordVideo` or `chooseFromGallery` directly.
+   * 
+   * @since 8.1.0
+   */
   videoURI: string;
 }
 

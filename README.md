@@ -383,17 +383,18 @@ Allows the user to pick multiple pictures from the photo gallery.
 
 #### RecordVideoOptions
 
-| Prop                  | Type                 |
-| --------------------- | -------------------- |
-| **`saveToGallery`**   | <code>boolean</code> |
-| **`includeMetadata`** | <code>boolean</code> |
+| Prop                  | Type                 | Description                                                                                                                                                                                                          | Default            | Since |
+| --------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ----- |
+| **`saveToGallery`**   | <code>boolean</code> | Whether to save the video to the gallery.                                                                                                                                                                            | <code>false</code> | 8.1.0 |
+| **`includeMetadata`** | <code>boolean</code> | Whether or not <a href="#mediaresult">MediaResult</a> should include its metadata. If an error occurs when obtaining the metadata, it will return empty.                                                             | <code>false</code> | 8.1.0 |
+| **`isPersistent`**    | <code>boolean</code> | Whether the to store the video in persistent app storage or in temporary cache. If you plan to use the returned `MediaResult#URI` across app launches, you may want to set to true. Otherwise, you can set to false. | <code>true</code>  | 8.1.0 |
 
 
 #### PlayVideoOptions
 
-| Prop           | Type                |
-| -------------- | ------------------- |
-| **`videoURI`** | <code>string</code> |
+| Prop           | Type                | Description                                                                                                                  | Since |
+| -------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`videoURI`** | <code>string</code> | The URI of the video to play. You may use the `MediaResult#URI` returned from `recordVideo` or `chooseFromGallery` directly. | 8.1.0 |
 
 
 #### MediaResults
