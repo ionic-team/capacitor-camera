@@ -138,7 +138,7 @@ export interface TakePhotoOptions {
    * Whether to automatically rotate the image "up" to correct for orientation
    * in portrait mode.
    * Note: This option is only supported on Android and iOS
-   * @default: true
+   * @default true
    *
    * @since 8.1.0
    */
@@ -156,7 +156,7 @@ export interface TakePhotoOptions {
   /**
    * Whether to save the photo to the gallery.
    * Note: This option is only supported on Android and iOS.
-   * @default: false
+   * @default false
    *
    * @since 8.1.0
    */
@@ -164,7 +164,7 @@ export interface TakePhotoOptions {
   
   /**
    * iOS and Web only: The camera direction.
-   * @default: CameraDirection.Rear
+   * @default CameraDirection.Rear
    *
    * @since 8.1.0
    */
@@ -191,7 +191,7 @@ export interface TakePhotoOptions {
 
   /**
    * iOS only: The presentation style of the Camera.
-   * @default: 'fullscreen'
+   * @default 'fullscreen'
    *
    * @since 8.1.0
    */
@@ -318,7 +318,7 @@ export interface ChooseFromGalleryOptions {
 
   /**
    * iOS only: The presentation style of media picker.
-   * @default: 'fullscreen'
+   * @default 'fullscreen'
    *
    * @since 8.1.0
    */
@@ -357,7 +357,7 @@ export interface ChooseFromGalleryOptions {
    * in portrait mode.
    * Not applicable when videos are selected.
    * Note: This option is only supported on Android and iOS
-   * @default: true
+   * @default true
    *
    * @since 8.1.0
    */
@@ -385,7 +385,7 @@ export interface EditURIPhotoOptions {
 
   /**
    * Whether to save the edited photo to the gallery.
-   * @default: false
+   * @default false
    *
    * @since 8.1.0
    */
@@ -461,7 +461,7 @@ export interface ImageOptions {
    * Whether to save the photo to the gallery.
    * If the photo was picked from the gallery, it will only be saved if edited.
    * Note: This option is only supported on Android and iOS.
-   * @default: false
+   * @default false
    *
    * @since 1.0.0
    */
@@ -484,7 +484,7 @@ export interface ImageOptions {
    * Whether to automatically rotate the image "up" to correct for orientation
    * in portrait mode.
    * Note: This option is only supported on Android and iOS.
-   * @default: true
+   * @default true
    *
    * @since 1.0.0
    */
@@ -492,14 +492,14 @@ export interface ImageOptions {
   /**
    * The source to get the photo from. By default this prompts the user to select
    * either the photo album or take a photo.
-   * @default: CameraSource.Prompt
+   * @default CameraSource.Prompt
    *
    * @since 1.0.0
    */
   source?: CameraSource;
   /**
    * iOS and Web only: The camera direction.
-   * @default: CameraDirection.Rear
+   * @default CameraDirection.Rear
    *
    * @since 1.0.0
    */
@@ -507,7 +507,7 @@ export interface ImageOptions {
 
   /**
    * iOS only: The presentation style of the Camera.
-   * @default: 'fullscreen'
+   * @default 'fullscreen'
    *
    * @since 1.0.0
    */
@@ -526,7 +526,7 @@ export interface ImageOptions {
 
   /**
    * Text value to use when displaying the prompt.
-   * @default: 'Photo'
+   * @default 'Photo'
    *
    * @since 1.0.0
    *
@@ -536,7 +536,7 @@ export interface ImageOptions {
   /**
    * Text value to use when displaying the prompt.
    * iOS only: The label of the 'cancel' button.
-   * @default: 'Cancel'
+   * @default 'Cancel'
    *
    * @since 1.0.0
    */
@@ -545,7 +545,7 @@ export interface ImageOptions {
   /**
    * Text value to use when displaying the prompt.
    * The label of the button to select a saved image.
-   * @default: 'From Photos'
+   * @default 'From Photos'
    *
    * @since 1.0.0
    */
@@ -554,7 +554,7 @@ export interface ImageOptions {
   /**
    * Text value to use when displaying the prompt.
    * The label of the button to open the camera.
-   * @default: 'Take Picture'
+   * @default 'Take Picture'
    *
    * @since 1.0.0
    */
@@ -679,7 +679,7 @@ export interface GalleryImageOptions {
   /**
    * Whether to automatically rotate the image "up" to correct for orientation
    * in portrait mode
-   * @default: true
+   * @default true
    *
    * @since 1.2.0
    */
@@ -687,7 +687,7 @@ export interface GalleryImageOptions {
 
   /**
    * iOS only: The presentation style of the Camera.
-   * @default: 'fullscreen'
+   * @default 'fullscreen'
    *
    * @since 1.2.0
    */
