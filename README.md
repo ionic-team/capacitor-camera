@@ -183,14 +183,14 @@ Not available on Web.
 ### chooseFromGallery(...)
 
 ```typescript
-chooseFromGallery(options: GalleryOptions) => Promise<MediaResults>
+chooseFromGallery(options: ChooseFromGalleryOptions) => Promise<MediaResults>
 ```
 
 Allow users to choose pictures, videos, or both, directly from their gallery.
 
-| Param         | Type                                                      |
-| ------------- | --------------------------------------------------------- |
-| **`options`** | <code><a href="#galleryoptions">GalleryOptions</a></code> |
+| Param         | Type                                                                          |
+| ------------- | ----------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#choosefromgalleryoptions">ChooseFromGalleryOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#mediaresults">MediaResults</a>&gt;</code>
 
@@ -403,21 +403,22 @@ Allows the user to pick multiple pictures from the photo gallery.
 | **`photos`** | <code>MediaResult[]</code> |
 
 
-#### GalleryOptions
+#### ChooseFromGalleryOptions
 
-| Prop                         | Type                                            |
-| ---------------------------- | ----------------------------------------------- |
-| **`mediaType`**              | <code><a href="#mediatype">MediaType</a></code> |
-| **`allowMultipleSelection`** | <code>boolean</code>                            |
-| **`limit`**                  | <code>number</code>                             |
-| **`includeMetadata`**        | <code>boolean</code>                            |
-| **`allowEdit`**              | <code>boolean</code>                            |
-| **`editInApp`**              | <code>boolean</code>                            |
-| **`presentationStyle`**      | <code>'fullscreen' \| 'popover'</code>          |
-| **`quality`**                | <code>number</code>                             |
-| **`width`**                  | <code>number</code>                             |
-| **`height`**                 | <code>number</code>                             |
-| **`correctOrientation`**     | <code>boolean</code>                            |
+| Prop                         | Type                                            | Description                                                                                                                                                                                                                                                                                                    | Default                        | Since |
+| ---------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ----- |
+| **`mediaType`**              | <code><a href="#mediatype">MediaType</a></code> | The type of media to select. Can be pictures, videos, or both.                                                                                                                                                                                                                                                 | <code>MediaType.picture</code> | 8.1.0 |
+| **`allowMultipleSelection`** | <code>boolean</code>                            | Whether or not to allow selecting multiple media files from the gallery.                                                                                                                                                                                                                                       |                                | 8.1.0 |
+| **`limit`**                  | <code>number</code>                             | The maximum number of media files that the user can choose. Only applicable if `allowMultipleSelection` is `true`. Any non-positive number will be treated as unlimited. Note: This option is only supported on Android 13+ and iOS.                                                                           | <code>0</code>                 | 8.1.0 |
+| **`includeMetadata`**        | <code>boolean</code>                            | Whether or not <a href="#mediaresult">MediaResult</a> should include its metadata. If an error occurs when obtaining the metadata, it will return empty. Note: This option is only supported on Android and iOS.                                                                                               | <code>false</code>             | 8.1.0 |
+| **`allowEdit`**              | <code>boolean</code>                            | Whether to allow the user to crop or make small edits. Only applicable for <a href="#mediatype">`MediaType.picture`</a> and `allowMultipleSelection` set to `false`. Note: This option is only supported on Android and iOS.                                                                                   |                                | 8.1.0 |
+| **`editInApp`**              | <code>boolean</code>                            | If `true`, will use an in-app editor for photo edition. If `false`, will open a separate (platform-specific) native app to handle photo edition, falling back to the in-app editor if none is available. Only applicable with `allowEdit` set to true. Note: This option is only supported on Android and iOS. | <code>true</code>              | 8.1.0 |
+| **`presentationStyle`**      | <code>'fullscreen' \| 'popover'</code>          | iOS only: The presentation style of media picker.                                                                                                                                                                                                                                                              | <code>: 'fullscreen'</code>    | 8.1.0 |
+| **`quality`**                | <code>number</code>                             | The quality of images to return, from 0-100. Only applicable for <a href="#mediatype">`MediaType.picture`</a> and JPEG format. Note: This option is only supported on Android and iOS.                                                                                                                         | <code>100</code>               | 8.1.0 |
+| **`width`**                  | <code>number</code>                             | The desired maximum width of the saved images. The aspect ratio is respected. Not applicable when videos are selected. Note: This option is only supported on Android and iOS.                                                                                                                                 |                                | 1.0.0 |
+| **`height`**                 | <code>number</code>                             | The desired maximum height of the saved image. The aspect ratio is respected. Not applicable when videos are selected. Note: This option is only supported on Android and iOS.                                                                                                                                 |                                | 8.1.0 |
+| **`correctOrientation`**     | <code>boolean</code>                            | Whether to automatically rotate the image "up" to correct for orientation in portrait mode. Not applicable when videos are selected. Note: This option is only supported on Android and iOS                                                                                                                    | <code>: true</code>            | 8.1.0 |
+| **`webUseInput`**            | <code>boolean</code>                            | Web only: Whether to use the PWA Element experience or file input. The default is to use PWA Elements if installed and fall back to file input. To always use file input, set this to `true`. Learn more about PWA Elements: https://capacitorjs.com/docs/web/pwa-elements                                     |                                | 8.1.0 |
 
 
 #### EditPhotoResult

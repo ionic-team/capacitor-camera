@@ -42,7 +42,7 @@ export interface CameraPlugin {
    *
    * @since 8.1.0
    */
-  chooseFromGallery(options: GalleryOptions): Promise<MediaResults>;
+  chooseFromGallery(options: ChooseFromGalleryOptions): Promise<MediaResults>;
 
   /**
    * Open an in-app screen to edit a given photo using the provided base64 string.
@@ -109,8 +109,9 @@ export interface CameraPlugin {
 
 export interface TakePhotoOptions {
   /**
-   * The quality of image to return as JPEG, from 0-100.
-   * Not available on Web.
+   * The quality of image to return, from 0-100.
+   * Only applicable for `EncodingType.JPEG`.
+   * Note: This option is only supported on Android and iOS.
    *
    * @default 100
    * @since 8.1.0
@@ -228,18 +229,120 @@ export interface PlayVideoOptions {
   videoURI: string;
 }
 
-export interface GalleryOptions {
+export interface ChooseFromGalleryOptions {
+  /**
+   * The type of media to select. Can be pictures, videos, or both.
+   * @default MediaType.picture
+   *
+   * @since 8.1.0
+   */
   mediaType: MediaType;
+
+  /**
+   * Whether or not to allow selecting multiple media files from the gallery.
+   * 
+   * @since 8.1.0
+   */
   allowMultipleSelection?: boolean;
+  
+  /**
+   * The maximum number of media files that the user can choose.
+   * Only applicable if `allowMultipleSelection` is `true`.
+   * Any non-positive number will be treated as unlimited.
+   * Note: This option is only supported on Android 13+ and iOS.
+   * @default 0
+   *
+   * @since 8.1.0
+   */
   limit?: number;
+
+  /**
+   * Whether or not MediaResult should include its metadata.
+   * If an error occurs when obtaining the metadata, it will return empty.
+   * Note: This option is only supported on Android and iOS.
+   * @default false
+   * 
+   * @since 8.1.0
+   */
   includeMetadata?: boolean;
+
+  /**
+   * Whether to allow the user to crop or make small edits.
+   * Only applicable for `MediaType.picture` and `allowMultipleSelection` set to `false`.
+   * Note: This option is only supported on Android and iOS.
+   *
+   * @since 8.1.0
+   */
   allowEdit?: boolean;
+
+  /**
+   * If `true`, will use an in-app editor for photo edition.
+   * If `false`, will open a separate (platform-specific) native app to handle photo edition, falling back to the in-app editor if none is available.
+   * Only applicable with `allowEdit` set to true.
+   * Note: This option is only supported on Android and iOS.
+   * 
+   * @default true
+   * @since 8.1.0
+   */
   editInApp?: boolean;
+
+  /**
+   * iOS only: The presentation style of media picker.
+   * @default: 'fullscreen'
+   *
+   * @since 8.1.0
+   */
   presentationStyle?: 'fullscreen' | 'popover';
+
+  /**
+   * The quality of images to return, from 0-100.
+   * Only applicable for `MediaType.picture` and JPEG format.
+   * Note: This option is only supported on Android and iOS.
+   *
+   * @default 100
+   * @since 8.1.0
+   */
   quality?: number;
+
+  /**
+   * The desired maximum width of the saved images. The aspect ratio is respected.
+   * Not applicable when videos are selected.
+   * Note: This option is only supported on Android and iOS.
+   *
+   * @since 1.0.0
+   */
   width?: number;
+
+  /**
+   * The desired maximum height of the saved image. The aspect ratio is respected.
+   * Not applicable when videos are selected.
+   * Note: This option is only supported on Android and iOS.
+   *
+   * @since 8.1.0
+   */
   height?: number;
+
+  /**
+   * Whether to automatically rotate the image "up" to correct for orientation
+   * in portrait mode.
+   * Not applicable when videos are selected.
+   * Note: This option is only supported on Android and iOS
+   * @default: true
+   *
+   * @since 8.1.0
+   */
   correctOrientation?: boolean;
+
+  /**
+   * Web only: Whether to use the PWA Element experience or file input. The
+   * default is to use PWA Elements if installed and fall back to file input.
+   * To always use file input, set this to `true`.
+   *
+   * Learn more about PWA Elements: https://capacitorjs.com/docs/web/pwa-elements
+   *
+   * @since 8.1.0
+   */
+  webUseInput?: boolean
 }
 
 export interface EditURIPhotoOptions {
