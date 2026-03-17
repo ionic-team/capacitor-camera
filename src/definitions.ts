@@ -236,10 +236,11 @@ export interface ChooseFromGalleryOptions {
    *
    * @since 8.1.0
    */
-  mediaType: MediaType;
+  mediaType?: MediaType;
 
   /**
    * Whether or not to allow selecting multiple media files from the gallery.
+   * @default false
    * 
    * @since 8.1.0
    */
@@ -346,18 +347,49 @@ export interface ChooseFromGalleryOptions {
 }
 
 export interface EditURIPhotoOptions {
-  uri?: string;
+  /**
+   * The URI that contains the photo to edit.
+   * 
+   * @since 8.1.0
+   */
+  uri: string;
+
+  /**
+   * Whether to save the edited photo to the gallery.
+   * @default: false
+   *
+   * @since 8.1.0
+   */
+
   saveToGallery?: boolean;
+
+  /**
+   * Whether or not MediaResult should include its metadata.
+   * If an error occurs when obtaining the metadata, it will return empty.
+   * Note: This option is only supported on Android and iOS.
+   * @default false
+   * 
+   * @since 8.1.0
+   */
   includeMetadata?: boolean;
 }
 
 export interface EditPhotoOptions {
-  base64?: string;
+  /**
+   * The base64 encoded image to edit.
+   * 
+   * @since 8.1.0
+   */
+  inputImage: string;
 }
 
 export interface EditPhotoResult {
-  format: string;
-  base64String: string;
+  /**
+   * The edited image, base64 encoded.
+   * 
+   * @since 8.1.0
+   */
+  outputImage: string;
 }
 
 export interface MediaResults {

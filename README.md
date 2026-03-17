@@ -408,7 +408,7 @@ Allows the user to pick multiple pictures from the photo gallery.
 | Prop                         | Type                                            | Description                                                                                                                                                                                                                                                                                                    | Default                        | Since |
 | ---------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ----- |
 | **`mediaType`**              | <code><a href="#mediatype">MediaType</a></code> | The type of media to select. Can be pictures, videos, or both.                                                                                                                                                                                                                                                 | <code>MediaType.picture</code> | 8.1.0 |
-| **`allowMultipleSelection`** | <code>boolean</code>                            | Whether or not to allow selecting multiple media files from the gallery.                                                                                                                                                                                                                                       |                                | 8.1.0 |
+| **`allowMultipleSelection`** | <code>boolean</code>                            | Whether or not to allow selecting multiple media files from the gallery.                                                                                                                                                                                                                                       | <code>false</code>             | 8.1.0 |
 | **`limit`**                  | <code>number</code>                             | The maximum number of media files that the user can choose. Only applicable if `allowMultipleSelection` is `true`. Any non-positive number will be treated as unlimited. Note: This option is only supported on Android 13+ and iOS.                                                                           | <code>0</code>                 | 8.1.0 |
 | **`includeMetadata`**        | <code>boolean</code>                            | Whether or not <a href="#mediaresult">MediaResult</a> should include its metadata. If an error occurs when obtaining the metadata, it will return empty. Note: This option is only supported on Android and iOS.                                                                                               | <code>false</code>             | 8.1.0 |
 | **`allowEdit`**              | <code>boolean</code>                            | Whether to allow the user to crop or make small edits. Only applicable for <a href="#mediatype">`MediaType.picture`</a> and `allowMultipleSelection` set to `false`. Note: This option is only supported on Android and iOS.                                                                                   |                                | 8.1.0 |
@@ -423,26 +423,25 @@ Allows the user to pick multiple pictures from the photo gallery.
 
 #### EditPhotoResult
 
-| Prop               | Type                |
-| ------------------ | ------------------- |
-| **`format`**       | <code>string</code> |
-| **`base64String`** | <code>string</code> |
+| Prop              | Type                | Description                       | Since |
+| ----------------- | ------------------- | --------------------------------- | ----- |
+| **`outputImage`** | <code>string</code> | The edited image, base64 encoded. | 8.1.0 |
 
 
 #### EditPhotoOptions
 
-| Prop         | Type                |
-| ------------ | ------------------- |
-| **`base64`** | <code>string</code> |
+| Prop             | Type                | Description                       | Since |
+| ---------------- | ------------------- | --------------------------------- | ----- |
+| **`inputImage`** | <code>string</code> | The base64 encoded image to edit. | 8.1.0 |
 
 
 #### EditURIPhotoOptions
 
-| Prop                  | Type                 |
-| --------------------- | -------------------- |
-| **`uri`**             | <code>string</code>  |
-| **`saveToGallery`**   | <code>boolean</code> |
-| **`includeMetadata`** | <code>boolean</code> |
+| Prop                  | Type                 | Description                                                                                                                                                                                                      | Default              | Since |
+| --------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ----- |
+| **`uri`**             | <code>string</code>  | The URI that contains the photo to edit.                                                                                                                                                                         |                      | 8.1.0 |
+| **`saveToGallery`**   | <code>boolean</code> | Whether to save the edited photo to the gallery.                                                                                                                                                                 | <code>: false</code> | 8.1.0 |
+| **`includeMetadata`** | <code>boolean</code> | Whether or not <a href="#mediaresult">MediaResult</a> should include its metadata. If an error occurs when obtaining the metadata, it will return empty. Note: This option is only supported on Android and iOS. | <code>false</code>   | 8.1.0 |
 
 
 #### GalleryPhotos
