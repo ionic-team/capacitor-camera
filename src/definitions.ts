@@ -15,19 +15,50 @@ export interface CameraPluginPermissions {
 
 export interface CameraPlugin {
   /**
-   * Prompt the user to pick a photo from an album, or take a new photo
-   * with the camera.
+   * Open the device's camera and allow the user to take a photo.
    *
-   * @since 1.0.0
+   * @since 8.1.0
    */
-  getPhoto(options: ImageOptions): Promise<Photo>;
+  takePhoto(options: TakePhotoOptions): Promise<MediaResult>;
 
   /**
-   * Allows the user to pick multiple pictures from the photo gallery.
+   * Open the device's camera and allow the user to record a video.
+   * Not available on Web.
    *
-   * @since 1.2.0
+   * @since 8.1.0
    */
-  pickImages(options: GalleryImageOptions): Promise<GalleryPhotos>;
+  recordVideo(options: RecordVideoOptions): Promise<MediaResult>;
+
+  /**
+   * Open a native video player.
+   * Not available on Web.
+   *
+   * @since 8.1.0
+   */
+  playVideo(options: PlayVideoOptions): Promise<void>;
+
+  /**
+   * Allow users to choose pictures, videos, or both, directly from their gallery.
+   *
+   * @since 8.1.0
+   */
+  chooseFromGallery(options: ChooseFromGalleryOptions): Promise<MediaResults>;
+
+  /**
+   * Open an in-app screen to edit a given photo using the provided base64 string.
+   * Not available on Web.
+   *
+   * @since 8.1.0
+   */
+  editPhoto(options: EditPhotoOptions): Promise<EditPhotoResult>;
+
+  /**
+   * Open an in-app screen to edit a photo using the provided URI.
+   * Not available on Web.
+   *
+   * @since 8.1.0
+   */
+  editURIPhoto(options: EditURIPhotoOptions): Promise<MediaResult>;
 
   /**
    * Allows the user to update their limited photo library selection.
@@ -59,100 +90,466 @@ export interface CameraPlugin {
   requestPermissions(permissions?: CameraPluginPermissions): Promise<PermissionStatus>;
 
   /**
-   * Prompt the user to take a photo with the camera.
+   * Prompt the user to pick a photo from an album, or take a new photo
+   * with the camera.
    *
-   * @since 2.0.0
+   * @since 1.0.0
+   * @deprecated Use `takePhoto` for a camera photo, or `chooseFromGallery` to select from the gallery. For creating a prompt for the user to select which source, use `@capacitor/action-sheet` or any UI component of your choosing. Refer to the Camera API documentation for more information on migrating.
    */
-  takePhoto(options: ImageOptions): Promise<MediaResult>;
-
-  recordVideo(options: RecordVideoOptions): Promise<MediaResult>;
-
-  playVideo(options: PlayVideoOptions): Promise<void>;
+  getPhoto(options: ImageOptions): Promise<Photo>;
 
   /**
    * Allows the user to pick multiple pictures from the photo gallery.
    *
    * @since 1.2.0
+   * @deprecated Use `chooseFromGallery` instead. Refer to the Camera API documentation for more information on migrating.
    */
-  chooseFromGallery(options: GalleryOptions): Promise<MediaResults>;
+  pickImages(options: GalleryImageOptions): Promise<GalleryPhotos>;
+}
+
+export interface TakePhotoOptions {
+  /**
+   * The quality of image to return, from 0-100.
+   * Only applicable for `EncodingType.JPEG`.
+   * Note: This option is only supported on Android and iOS.
+   *
+   * @default 100
+   * @since 8.1.0
+   */
+  quality?: number;
 
   /**
-   * Returns a string (base64) representing the photo that was edited
+   * The desired maximum width of the saved image. The aspect ratio is respected.
+   * Note: This option is only supported on Android and iOS.
    *
-   * @since 2.0.0
+   * @since 8.1.0
    */
-  editPhoto(options: EditPhotoOptions): Promise<EditPhotoResult>;
+  width?: number;
 
   /**
-   * Returns a MediaResult object with info about the photo that was edited
+   * The desired maximum height of the saved image. The aspect ratio is respected.
+   * Note: This option is only supported on Android and iOS.
    *
-   * @since 2.0.0
+   * @since 8.1.0
    */
-  editURIPhoto(options: EditURIPhotoOptions): Promise<MediaResult>;
+  height?: number;
+
+  /**
+   * Whether to automatically rotate the image "up" to correct for orientation
+   * in portrait mode.
+   * Note: This option is only supported on Android and iOS
+   * @default true
+   *
+   * @since 8.1.0
+   */
+  correctOrientation?: boolean;
+
+  /**
+   * The encoding type for the captured photo - JPEG or PNG.
+   * Note: This option is only supported on Android and iOS.
+   * @default EncodingType.JPEG
+   *
+   * @since 8.1.0
+   */
+  encodingType?: EncodingType;
+
+  /**
+   * Whether to save the photo to the gallery.
+   * Note: This option is only supported on Android and iOS.
+   * @default false
+   *
+   * @since 8.1.0
+   */
+  saveToGallery?: boolean;
+
+  /**
+   * iOS and Web only: The camera direction.
+   * @default CameraDirection.Rear
+   *
+   * @since 8.1.0
+   */
+  cameraDirection?: CameraDirection;
+
+  /**
+   * Whether to allow the user to crop or make small edits.
+   * Note: This option is only supported on Android and iOS.
+   * @default false
+   *
+   * @since 8.1.0
+   */
+  allowEdit?: boolean;
+
+  /**
+   * If `true`, will use an in-app editor for photo edition.
+   * If `false`, will open a separate (platform-specific) native app to handle photo edition, falling back to the in-app editor if none is available.
+   * Only applicable with `allowEdit` set to true.
+   * Note: This option is only supported on Android and iOS.
+   *
+   * @default true
+   * @since 8.1.0
+   */
+  editInApp?: boolean;
+
+  /**
+   * iOS only: The presentation style of the Camera.
+   * @default 'fullscreen'
+   *
+   * @since 8.1.0
+   */
+  presentationStyle?: 'fullscreen' | 'popover';
+
+  /**
+   * Web only: Whether to use the PWA Element experience or file input. The
+   * default is to use PWA Elements if installed and fall back to file input.
+   * To always use file input, set this to `true`.
+   *
+   * Learn more about PWA Elements: https://capacitorjs.com/docs/web/pwa-elements
+   *
+   * @since 8.1.0
+   */
+  webUseInput?: boolean;
+
+  /**
+   * Whether or not MediaResult should include its metadata.
+   * If an error occurs when obtaining the metadata, it will return empty.
+   * Note: This option is only supported on Android and iOS.
+   * @default false
+   *
+   * @since 8.1.0
+   */
+  includeMetadata?: boolean;
 }
 
 export interface RecordVideoOptions {
+  /**
+   * Whether to save the video to the gallery.
+   * @default false
+   *
+   * @since 8.1.0
+   */
   saveToGallery?: boolean;
+
+  /**
+   * Whether or not MediaResult should include its metadata.
+   * If an error occurs when obtaining the metadata, it will return empty.
+   * @default false
+   *
+   * @since 8.1.0
+   */
   includeMetadata?: boolean;
+
+  /**
+   * Whether the to store the video in persistent app storage or in temporary cache.
+   * If you plan to use the returned `MediaResult#URI` across app launches, you may want to set to true.
+   * Otherwise, you can set to false.
+   * @default true
+   *
+   * @since 8.1.0
+   */
+  isPersistent?: boolean;
 }
 
 export interface PlayVideoOptions {
+  /**
+   * The URI of the video to play.
+   * You may use the `MediaResult#URI` returned from `recordVideo` or `chooseFromGallery` directly.
+   *
+   * @since 8.1.0
+   */
   videoURI: string;
 }
 
-export interface GalleryOptions {
-  mediaType: MediaType;
+export interface ChooseFromGalleryOptions {
+  /**
+   * The type of media to select. Can be pictures, videos, or both.
+   * @default MediaType.picture
+   *
+   * @since 8.1.0
+   */
+  mediaType?: MediaType;
+
+  /**
+   * Whether or not to allow selecting multiple media files from the gallery.
+   * @default false
+   *
+   * @since 8.1.0
+   */
   allowMultipleSelection?: boolean;
+
+  /**
+   * The maximum number of media files that the user can choose.
+   * Only applicable if `allowMultipleSelection` is `true`.
+   * Any non-positive number will be treated as unlimited.
+   * Note: This option is only supported on Android 13+ and iOS.
+   * @default 0
+   *
+   * @since 8.1.0
+   */
   limit?: number;
+
+  /**
+   * Whether or not MediaResult should include its metadata.
+   * If an error occurs when obtaining the metadata, it will return empty.
+   * Note: This option is only supported on Android and iOS.
+   * @default false
+   *
+   * @since 8.1.0
+   */
   includeMetadata?: boolean;
+
+  /**
+   * Whether to allow the user to crop or make small edits.
+   * Only applicable for `MediaType.picture` and `allowMultipleSelection` set to `false`.
+   * Note: This option is only supported on Android and iOS.
+   * @default false
+   *
+   * @since 8.1.0
+   */
   allowEdit?: boolean;
+
+  /**
+   * If `true`, will use an in-app editor for photo edition.
+   * If `false`, will open a separate (platform-specific) native app to handle photo edition, falling back to the in-app editor if none is available.
+   * Only applicable with `allowEdit` set to true.
+   * Note: This option is only supported on Android and iOS.
+   *
+   * @default true
+   * @since 8.1.0
+   */
   editInApp?: boolean;
+
+  /**
+   * iOS only: The presentation style of media picker.
+   * @default 'fullscreen'
+   *
+   * @since 8.1.0
+   */
   presentationStyle?: 'fullscreen' | 'popover';
+
+  /**
+   * The quality of images to return, from 0-100.
+   * Only applicable for `MediaType.picture` and JPEG format.
+   * Note: This option is only supported on Android and iOS.
+   *
+   * @default 100
+   * @since 8.1.0
+   */
   quality?: number;
+
+  /**
+   * The desired maximum width of the saved images. The aspect ratio is respected.
+   * Not applicable when videos are selected.
+   * Note: This option is only supported on Android and iOS.
+   *
+   * @since 1.0.0
+   */
   width?: number;
+
+  /**
+   * The desired maximum height of the saved image. The aspect ratio is respected.
+   * Not applicable when videos are selected.
+   * Note: This option is only supported on Android and iOS.
+   *
+   * @since 8.1.0
+   */
   height?: number;
+
+  /**
+   * Whether to automatically rotate the image "up" to correct for orientation
+   * in portrait mode.
+   * Not applicable when videos are selected.
+   * Note: This option is only supported on Android and iOS
+   * @default true
+   *
+   * @since 8.1.0
+   */
   correctOrientation?: boolean;
+
+  /**
+   * Web only: Whether to use the PWA Element experience or file input. The
+   * default is to use PWA Elements if installed and fall back to file input.
+   * To always use file input, set this to `true`.
+   *
+   * Learn more about PWA Elements: https://capacitorjs.com/docs/web/pwa-elements
+   *
+   * @since 8.1.0
+   */
+  webUseInput?: boolean;
 }
 
 export interface EditURIPhotoOptions {
-  uri?: string;
+  /**
+   * The URI that contains the photo to edit.
+   *
+   * @since 8.1.0
+   */
+  uri: string;
+
+  /**
+   * Whether to save the edited photo to the gallery.
+   * @default false
+   *
+   * @since 8.1.0
+   */
+
   saveToGallery?: boolean;
+
+  /**
+   * Whether or not MediaResult should include its metadata.
+   * If an error occurs when obtaining the metadata, it will return empty.
+   * Note: This option is only supported on Android and iOS.
+   * @default false
+   *
+   * @since 8.1.0
+   */
   includeMetadata?: boolean;
 }
 
 export interface EditPhotoOptions {
-  base64?: string;
+  /**
+   * The base64 encoded image to edit.
+   *
+   * @since 8.1.0
+   */
+  inputImage: string;
 }
 
 export interface EditPhotoResult {
-  format: string;
-  base64String: string;
-}
-
-export interface MediaResults {
-  photos: MediaResult[];
+  /**
+   * The edited image, base64 encoded.
+   *
+   * @since 8.1.0
+   */
+  outputImage: string;
 }
 
 export interface MediaResult {
-  path: string;
-  webPath: string;
-  exif?: any;
-  duration?: number;
-  size: number;
-  format: string;
+  /**
+   * The type of media result. Either `Media.Type.picture` or `Media.Type.video`.
+   *
+   * @since 8.1.0
+   */
+  type: MediaType;
+
+  /**
+   * The URI pointing to the media file.
+   * Not available on Web. Use `webPath` instead for Web.
+   *
+   * @since 8.1.0
+   */
+  uri?: string;
+
+  /**
+   * Returns the thumbnail of the media, base64 encoded.
+   * On Web, for `Media.Type.picture`, the full image is returned here, also base64 encoded.
+   *
+   * @since 8.1.0
+   */
+  thumbnail?: string;
+
+  /**
+   * Whether if the media was saved to the gallery successfully or not.
+   * Only applicable if `saveToGallery` was set to `true` in input options.
+   * Otherwise, `false` is always returned for `save`.
+   * Not available on Web.
+   *
+   * @since 8.1.0
+   */
   saved: boolean;
+
+  /**
+   * webPath returns a path that can be used to set the src attribute of a media item for efficient
+   * loading and rendering.
+   *
+   * @since 8.1.0
+   */
+  webPath?: string;
+
+  /**
+   * Metadata associated to the media result.
+   * Only included if `includeMetadata` was set to `true` in input options.
+   *
+   * @since 8.1.0
+   */
+  metadata?: MediaMetadata;
 }
 
+export interface MediaMetadata {
+  /**
+   * File size of the media, in bytes
+   * Not available on Web.
+   *
+   * @since 8.1.0
+   */
+  size?: number;
+
+  /**
+   * Only applicable for `MediaType.video` - the duration of the media, in seconds.
+   * Not available on Web.
+   *
+   * @since 8.1.0
+   */
+  duration?: number;
+
+  /**
+   * The format of the image, ex: jpeg, png, mp4.
+   *
+   * Web supports jpeg, png and gif, but the exact availability may vary depending on the browser.
+   * gif is only supported for `chooseFromGallery`, and only if `webUseInput` option is set to `true`.
+   *
+   * @since 8.1.0
+   */
+  format: string;
+
+  /**
+   * The resolution of the media, in `<width>x<height>` format. Example: '1920x1080'.
+   *
+   * @since 8.1.0
+   */
+  resolution: string;
+
+  /**
+   * The date and time the media was created, in ISO 8601 format.
+   * If creation date is not available (e.g. Android 7 and below), the last modified date is returned.
+   * Not available on web.
+   *
+   * @since 8.1.0
+   */
+  creationDate?: string;
+
+  /**
+   * Exif data, if any, retreived from the media item.
+   * Not available on Web.
+   *
+   * @since 8.1.0
+   */
+  exif?: string;
+}
+
+export interface MediaResults {
+  /**
+   * The list of media results.
+   *
+   * @since 8.1.0
+   */
+  results: MediaResult[];
+}
+
+/**
+ * @deprecated This interface is only meant to be used for deprecated `getPhoto` method.
+ * It will be removed in a future major version of the plugin, along with `getPhoto`.
+ */
 export interface ImageOptions {
   /**
    * The quality of image to return as JPEG, from 0-100
-   * Note: This option is only supported on Android and iOS
+   * Note: This option is only supported on Android and iOS.
    *
    * @since 1.0.0
    */
   quality?: number;
   /**
    * Whether to allow the user to crop or make small edits (platform specific).
+   * Note: This option is only supported on Android and iOS.
    * On iOS it's only supported for CameraSource.Camera, but not for CameraSource.Photos.
    *
    * @since 1.0.0
@@ -167,27 +564,31 @@ export interface ImageOptions {
   /**
    * Whether to save the photo to the gallery.
    * If the photo was picked from the gallery, it will only be saved if edited.
-   * @default: false
+   * Note: This option is only supported on Android and iOS.
+   * @default false
    *
    * @since 1.0.0
    */
   saveToGallery?: boolean;
   /**
    * The desired maximum width of the saved image. The aspect ratio is respected.
+   * Note: This option is only supported on Android and iOS.
    *
    * @since 1.0.0
    */
   width?: number;
   /**
    * The desired maximum height of the saved image. The aspect ratio is respected.
+   * Note: This option is only supported on Android and iOS.
    *
    * @since 1.0.0
    */
   height?: number;
   /**
    * Whether to automatically rotate the image "up" to correct for orientation
-   * in portrait mode
-   * @default: true
+   * in portrait mode.
+   * Note: This option is only supported on Android and iOS.
+   * @default true
    *
    * @since 1.0.0
    */
@@ -195,14 +596,14 @@ export interface ImageOptions {
   /**
    * The source to get the photo from. By default this prompts the user to select
    * either the photo album or take a photo.
-   * @default: CameraSource.Prompt
+   * @default CameraSource.Prompt
    *
    * @since 1.0.0
    */
   source?: CameraSource;
   /**
    * iOS and Web only: The camera direction.
-   * @default: CameraDirection.Rear
+   * @default CameraDirection.Rear
    *
    * @since 1.0.0
    */
@@ -210,7 +611,7 @@ export interface ImageOptions {
 
   /**
    * iOS only: The presentation style of the Camera.
-   * @default: 'fullscreen'
+   * @default 'fullscreen'
    *
    * @since 1.0.0
    */
@@ -229,7 +630,7 @@ export interface ImageOptions {
 
   /**
    * Text value to use when displaying the prompt.
-   * @default: 'Photo'
+   * @default 'Photo'
    *
    * @since 1.0.0
    *
@@ -239,7 +640,7 @@ export interface ImageOptions {
   /**
    * Text value to use when displaying the prompt.
    * iOS only: The label of the 'cancel' button.
-   * @default: 'Cancel'
+   * @default 'Cancel'
    *
    * @since 1.0.0
    */
@@ -248,7 +649,7 @@ export interface ImageOptions {
   /**
    * Text value to use when displaying the prompt.
    * The label of the button to select a saved image.
-   * @default: 'From Photos'
+   * @default 'From Photos'
    *
    * @since 1.0.0
    */
@@ -257,13 +658,17 @@ export interface ImageOptions {
   /**
    * Text value to use when displaying the prompt.
    * The label of the button to open the camera.
-   * @default: 'Take Picture'
+   * @default 'Take Picture'
    *
    * @since 1.0.0
    */
   promptLabelPicture?: string;
 }
 
+/**
+ * @deprecated This interface is only meant to be used for received the result of deprecated `getPhoto` method.
+ * It will be removed in a future major version of the plugin, along with `getPhoto`.
+ */
 export interface Photo {
   /**
    * The base64 encoded string representation of the image, if using CameraResultType.Base64.
@@ -359,6 +764,11 @@ export interface GalleryPhoto {
    */
   format: string;
 }
+
+/**
+ * @deprecated This interface is only meant to be used for deprecated `pickImages` method.
+ * It will be removed in a future major version of the plugin, along with `pickImages`.
+ */
 export interface GalleryImageOptions {
   /**
    * The quality of image to return as JPEG, from 0-100
@@ -382,7 +792,7 @@ export interface GalleryImageOptions {
   /**
    * Whether to automatically rotate the image "up" to correct for orientation
    * in portrait mode
-   * @default: true
+   * @default true
    *
    * @since 1.2.0
    */
@@ -390,7 +800,7 @@ export interface GalleryImageOptions {
 
   /**
    * iOS only: The presentation style of the Camera.
-   * @default: 'fullscreen'
+   * @default 'fullscreen'
    *
    * @since 1.2.0
    */
@@ -407,6 +817,10 @@ export interface GalleryImageOptions {
   limit?: number;
 }
 
+/**
+ * @deprecated This enum is only meant to be used for deprecated `getPhoto` method.
+ * It will be removed in a future major version of the plugin, along with `getPhoto`.
+ */
 export enum CameraSource {
   /**
    * Prompts the user to select either the photo album or take a photo.
@@ -427,6 +841,10 @@ export enum CameraDirection {
   Front = 'FRONT',
 }
 
+/**
+ * @deprecated This enum is only meant to be used for `ImageOptions` in deprecated `getPhoto` method.
+ * It will be removed in a future major version of the plugin, along with `getPhoto`.
+ */
 export enum CameraResultType {
   Uri = 'uri',
   Base64 = 'base64',
@@ -437,6 +855,11 @@ export enum MediaType {
   picture = 0,
   video = 1,
   all = 2,
+}
+
+export enum EncodingType {
+  JPEG = 0,
+  PNG = 1,
 }
 
 /**

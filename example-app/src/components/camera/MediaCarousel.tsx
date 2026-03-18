@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { GalleryPhoto } from "@capacitor/camera";
+import { MediaResult, MediaType } from "@capacitor/camera";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import PhotoWithMetadata from "./PhotoWithMetadata";
@@ -12,8 +12,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 interface IMediaCarouselProps {
-  // TODO change this type to allow including future MediaResult in ChooseFromGallery
-  media: GalleryPhoto[];
+  media: MediaResult[];
   onEditPhoto?: (filePath: string) => void;
 }
 
@@ -24,15 +23,25 @@ const MediaCarousel: React.FC<IMediaCarouselProps> = ({ media, onEditPhoto }) =>
     setCurrentIndex(swiper.activeIndex + 1);
   };
 
-  const isVideo = (format: string | undefined, filePath: string): boolean => {
-    const videoFormats = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'm4v', 'flv'];
+  const isVideo = (item: MediaResult): boolean => {
+    // Primary detection: check MediaType
+    if (item.type === MediaType.video) {
+      return true;
+    }
+    if (item.type === MediaType.picture) {
+      return false;
+    }
 
-    // Check format first if available
+    // Fallback: check format from metadata
+    const videoFormats = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'm4v', 'flv'];
+    const format = item.metadata?.format;
+
     if (format) {
       return videoFormats.includes(format.toLowerCase());
     }
 
-    // Fall back to checking file extension from path
+    // Last resort: check file extension from path
+    const filePath = item.uri ?? item.webPath ?? '';
     const extension = filePath.split('.').pop()?.toLowerCase();
     return extension ? videoFormats.includes(extension) : false;
   };
@@ -52,19 +61,16 @@ const MediaCarousel: React.FC<IMediaCarouselProps> = ({ media, onEditPhoto }) =>
         onSlideChange={handleSlideChange}
       >
         {media.map((item, index) => {
-          const filePath = item.path ?? item.webPath;
-          const metadata = item.exif
-            ? JSON.stringify(item.exif, null, 2)
-            : null;
+          const filePath = item.uri ?? item.webPath ?? '';
 
           return (
             <SwiperSlide key={index}>
-              {isVideo(item.format, filePath) ? (
-                <VideoWithMetadata filePath={filePath} metadata={metadata} />
+              {isVideo(item) ? (
+                <VideoWithMetadata filePath={filePath} metadata={item.metadata} />
               ) : (
                 <PhotoWithMetadata
                   filePath={filePath}
-                  metadata={metadata}
+                  metadata={item.metadata}
                   onEdit={onEditPhoto}
                 />
               )}

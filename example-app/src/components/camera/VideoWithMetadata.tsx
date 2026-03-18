@@ -1,16 +1,50 @@
 import React from "react";
 import { IonCard, IonCardContent } from "@ionic/react";
 import { Capacitor } from "@capacitor/core";
+import { MediaMetadata } from "@capacitor/camera";
 
 interface IVideoWithMetadataProps {
   filePath: string;
-  metadata?: string | null;
+  metadata?: MediaMetadata | string | null;
 }
 
 const VideoWithMetadata: React.FC<IVideoWithMetadataProps> = ({
   filePath,
   metadata,
 }) => {
+  const formatMetadata = (meta: MediaMetadata | string | null | undefined): string => {
+    if (!meta) return '';
+
+    // If it's already a string (legacy), return as-is
+    if (typeof meta === 'string') {
+      return meta;
+    }
+
+    // Format MediaMetadata object
+    const parts: string[] = [];
+    if (meta.duration !== undefined) {
+      const mins = Math.floor(meta.duration / 60);
+      const secs = Math.floor(meta.duration % 60);
+      parts.push(`Duration: ${mins > 0 ? `${mins}m ${secs}s` : `${secs}s`}`);
+    }
+    if (meta.size !== undefined) {
+      const sizeKB = (meta.size / 1024).toFixed(1);
+      const sizeMB = (meta.size / (1024 * 1024)).toFixed(2);
+      parts.push(`Size: ${meta.size < 1024 * 1024 ? sizeKB + ' KB' : sizeMB + ' MB'}`);
+    }
+    if (meta.format) parts.push(`Format: ${meta.format}`);
+    if (meta.resolution) parts.push(`Resolution: ${meta.resolution}`);
+    if (meta.creationDate) {
+      const date = new Date(meta.creationDate);
+      parts.push(`Created: ${date.toLocaleString()}`);
+    }
+    if (meta.exif) {
+      parts.push(`\nEXIF Data:\n${JSON.stringify(meta.exif, null, 2)}`);
+    }
+
+    return parts.join('\n');
+  };
+
   return (
     <IonCard>
       <IonCardContent>
@@ -23,7 +57,7 @@ const VideoWithMetadata: React.FC<IVideoWithMetadataProps> = ({
         </div>
         {metadata && (
           <div>
-            <pre>{metadata}</pre>
+            <pre>{formatMetadata(metadata)}</pre>
           </div>
         )}
       </IonCardContent>

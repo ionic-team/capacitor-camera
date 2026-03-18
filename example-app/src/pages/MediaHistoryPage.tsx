@@ -35,7 +35,12 @@ const MediaHistoryPage: React.FC = () => {
 
   const openFile = async (item: MediaHistoryItem): Promise<void> => {
     try {
-      await FileViewer.openDocumentFromLocalPath({ path: item.path });
+      const filePath = item.uri ?? item.path ?? '';
+      if (!filePath) {
+        alert('No file path available for this item');
+        return;
+      }
+      await FileViewer.openDocumentFromLocalPath({ path: filePath });
     } catch (e) {
       const error = e as any;
       const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
@@ -158,10 +163,10 @@ const MediaHistoryPage: React.FC = () => {
                         {formatDate(item.timestamp)}
                       </p>
                       <p style={{ margin: "4px 0", fontSize: "0.9em" }}>
-                        Format: {item.format || "N/A"} | Size:{" "}
-                        {formatSize(item.size)}
+                        Format: {item.metadata?.format ?? item.format ?? "N/A"} | Size:{" "}
+                        {formatSize(item.metadata?.size ?? item.size)}
                         {item.mediaType === "video" &&
-                          ` | Duration: ${formatDuration(item.duration)}`}
+                          ` | Duration: ${formatDuration(item.metadata?.duration ?? item.duration)}`}
                         {item.saved !== undefined &&
                           ` | Saved: ${item.saved ? "Yes" : "No"}`}
                       </p>
@@ -173,7 +178,7 @@ const MediaHistoryPage: React.FC = () => {
                           wordBreak: "break-all",
                         }}
                       >
-                        {item.path}
+                        {item.uri ?? item.path ?? "N/A"}
                       </p>
                     </IonLabel>
                   </IonItem>

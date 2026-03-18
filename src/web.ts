@@ -15,11 +15,12 @@ import type {
   EditPhotoResult,
   MediaResult,
   MediaResults,
-  GalleryOptions,
+  ChooseFromGalleryOptions,
+  TakePhotoOptions,
 } from './definitions';
 
 export class CameraWeb extends WebPlugin implements CameraPlugin {
-  async takePhoto(_options: ImageOptions): Promise<MediaResult> {
+  async takePhoto(_options: TakePhotoOptions): Promise<MediaResult> {
     throw this.unimplemented('takePhoto is not implemented on Web.');
   }
 
@@ -31,7 +32,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     throw this.unimplemented('playVideo is not implemented on Web.');
   }
 
-  async chooseFromGallery(_options: GalleryOptions): Promise<MediaResults> {
+  async chooseFromGallery(_options: ChooseFromGalleryOptions): Promise<MediaResults> {
     throw this.unimplemented('chooseFromGallery is not implemented on web.');
   }
 

@@ -668,7 +668,7 @@ class IonCameraFlow(
         }
 
         val ret = JSObject()
-        ret.put("photos", photos)
+        ret.put("results", photos)
         currentCall?.resolve(ret)
         currentCall = null
         lastEditUri = null

@@ -18,6 +18,8 @@ import React from "react";
 import {
   Camera,
   CameraSource,
+  MediaResult,
+  MediaMetadata,
   GalleryPhoto,
 } from "@capacitor/camera";
 import PhotoWithMetadata from "../components/camera/PhotoWithMetadata";
@@ -29,21 +31,12 @@ import {
 } from "../components/camera/old-methods";
 import { MediaHistoryService } from "../services/MediaHistoryService";
 
-interface MediaResult {
-  path: string;
-  webPath: string;
-  duration?: number;
-  size: number;
-  format: string;
-  saved: boolean;
-}
-
 interface IGalleryPageState {
   singlePhoto: {
     filePath: string | null;
-    metadata: string | null;
+    metadata: MediaMetadata | string | null;
   } | null;
-  multiplePhotos: GalleryPhoto[] | null;
+  multiplePhotos: MediaResult[] | null;
   editedPhoto: MediaResult | null;
 }
 
@@ -55,6 +48,27 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
       multiplePhotos: null,
       editedPhoto: null,
     };
+  }
+
+  // Adapter to convert GalleryPhoto[] to MediaResult[] for legacy methods
+  private convertGalleryPhotosToMediaResults(photos: GalleryPhoto[]): MediaResult[] {
+    return photos.map((photo) => ({
+      type: 0, // MediaType.picture
+      uri: photo.path,
+      webPath: photo.webPath,
+      saved: false,
+      thumbnail: undefined,
+      metadata: photo.exif
+        ? {
+            format: photo.format,
+            resolution: '',
+            exif: JSON.stringify(photo.exif),
+          }
+        : {
+            format: photo.format,
+            resolution: '',
+          },
+    }));
   }
 
   handlePhotoResult = (result: {
@@ -80,27 +94,38 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
     }
   };
 
-  handlePhotosResult = (photos: GalleryPhoto[]): void => {
+  handlePhotosResult = (results: MediaResult[]): void => {
     this.setState({
       singlePhoto: null,
-      multiplePhotos: photos,
+      multiplePhotos: results,
     });
 
-    photos.forEach((photo) => {
+    results.forEach((result) => {
       MediaHistoryService.addMedia({
         mediaType: "photo",
         method: "chooseFromGallery",
-        path: photo.path || "",
-        webPath: photo.webPath,
-        format: photo.format,
+        uri: result.uri,
+        webPath: result.webPath,
+        thumbnail: result.thumbnail,
+        format: result.metadata?.format,
+        size: result.metadata?.size,
+        saved: result.saved,
+        metadata: result.metadata,
       });
     });
+  };
+
+  // Handler for old methods that still return GalleryPhoto[]
+  handleLegacyPhotosResult = (photos: GalleryPhoto[]): void => {
+    const mediaResults = this.convertGalleryPhotosToMediaResults(photos);
+    this.handlePhotosResult(mediaResults);
   };
 
   pickLimitedLibraryPhotos = async (): Promise<void> => {
     try {
       const res = await Camera.pickLimitedLibraryPhotos();
-      this.handlePhotosResult(res.photos);
+      const mediaResults = this.convertGalleryPhotosToMediaResults(res.photos);
+      this.handlePhotosResult(mediaResults);
     } catch (e) {
       const error = e as any;
       const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
@@ -111,7 +136,8 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
   getLimitedLibraryPhotos = async (): Promise<void> => {
     try {
       const res = await Camera.getLimitedLibraryPhotos();
-      this.handlePhotosResult(res.photos);
+      const mediaResults = this.convertGalleryPhotosToMediaResults(res.photos);
+      this.handlePhotosResult(mediaResults);
     } catch (e) {
       const error = e as any;
       const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;
@@ -139,11 +165,13 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
       MediaHistoryService.addMedia({
         mediaType: "photo",
         method: "editURIPhoto",
-        path: result.path,
+        uri: result.uri,
         webPath: result.webPath,
-        format: result.format,
-        size: result.size,
+        thumbnail: result.thumbnail,
+        format: result.metadata?.format,
+        size: result.metadata?.size,
         saved: result.saved,
+        metadata: result.metadata,
       });
     } catch (e) {
       const error = e as any;
@@ -203,7 +231,7 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
                     />
 
                     <PickImagesConfigurable
-                      onPhotosResult={this.handlePhotosResult}
+                      onPhotosResult={this.handleLegacyPhotosResult}
                     />
                   </div>
                 </IonAccordion>
@@ -244,16 +272,8 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
                 <h3>Edited Photo</h3>
               </div>
               <PhotoWithMetadata
-                filePath={this.state.editedPhoto.path}
-                metadata={JSON.stringify(
-                  {
-                    size: this.state.editedPhoto.size,
-                    format: this.state.editedPhoto.format,
-                    saved: this.state.editedPhoto.saved,
-                  },
-                  null,
-                  2
-                )}
+                filePath={this.state.editedPhoto.uri ?? this.state.editedPhoto.webPath ?? ''}
+                metadata={this.state.editedPhoto.metadata ?? null}
               />
             </>
           )}

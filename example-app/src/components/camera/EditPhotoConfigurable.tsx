@@ -101,7 +101,7 @@ class EditPhotoConfigurable extends React.Component<
 
     try {
       const result = await Camera.editPhoto({
-        base64: this.state.base64Image,
+        inputImage: this.state.base64Image,
       });
       this.setState({ editedResult: result });
     } catch (e) {
@@ -177,11 +177,8 @@ class EditPhotoConfigurable extends React.Component<
           {editedResult && (
             <div style={{ marginTop: "16px" }}>
               <h4>Edited Photo:</h4>
-              <p>
-                <strong>Format:</strong> {editedResult.format}
-              </p>
               <img
-                src={`data:image/${editedResult.format};base64,${editedResult.base64String}`}
+                src={`data:image/png;base64,${editedResult.outputImage}`}
                 alt="Edited"
                 style={{ width: "100%", maxHeight: "300px", objectFit: "contain" }}
               />

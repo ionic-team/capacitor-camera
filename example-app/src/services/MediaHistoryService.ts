@@ -1,10 +1,16 @@
+import { MediaMetadata } from "@capacitor/camera";
+
 export interface MediaHistoryItem {
   id: string;
   timestamp: number;
   mediaType: "photo" | "video";
   method: string;
-  path: string;
-  webPath: string;
+  uri?: string;
+  thumbnail?: string;
+  metadata?: MediaMetadata;
+  // path is a legacy fields (for backward compatibility with deprecated APIs)
+  path?: string;
+  webPath?: string;
   format?: string;
   size?: number;
   duration?: number;
