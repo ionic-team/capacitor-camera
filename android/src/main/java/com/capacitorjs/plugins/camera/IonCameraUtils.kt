@@ -11,12 +11,33 @@ import androidx.core.net.toUri
 object IonCameraUtils {
 
 
-    fun getTempImage(context: Context, uri: Uri): Uri? {
+    internal fun getGalleryTempImage(context: Context, uri: Uri): Uri? {
         return try {
             val inputStream = context.contentResolver.openInputStream(uri) ?: return null
             inputStream.use {
                 saveImage(context, uri, it)
             }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    internal fun getCameraTempImage(context: Context, uri: Uri): Uri? {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(uri) ?: return null
+
+            val extension = when {
+                uri.toString().contains(".png", true) -> ".png"
+                uri.toString().contains(".jpeg", true) -> ".jpeg"
+                else -> ".jpg"
+            }
+
+            val tempFile = File.createTempFile("edit_", extension, context.cacheDir)
+
+            FileOutputStream(tempFile).use { output ->
+                inputStream.copyTo(output)
+            }
+            Uri.fromFile(tempFile)
         } catch (e: Exception) {
             null
         }
