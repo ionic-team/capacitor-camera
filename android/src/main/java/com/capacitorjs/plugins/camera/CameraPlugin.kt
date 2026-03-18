@@ -253,7 +253,8 @@ class CameraPlugin : Plugin() {
     fun getVideoSettings(call: PluginCall): VideoSettings {
         return VideoSettings(
             saveToGallery = call.getBoolean("saveToGallery") ?: false,
-            includeMetadata = call.getBoolean("includeMetadata") ?: false
+            includeMetadata = call.getBoolean("includeMetadata") ?: false,
+            isPersistent = call.getBoolean("isPersistent") ?: true
         )
     }
 

@@ -65,7 +65,7 @@ class IonCameraFlow(
         setupLaunchers()
         cameraManager = IONCAMRCameraManager(
             plugin.getAppId(),
-            ".fileprovider",
+            ".camera.provider",
             IONCAMRExifHelper(),
             IONCAMRFileHelper(),
             IONCAMRMediaHelper(),
@@ -73,7 +73,7 @@ class IonCameraFlow(
         )
 
         videoManager = IONCAMRVideoManager(
-            ".fileprovider",
+            ".camera.provider",
             IONCAMRFileHelper(),
         )
 
@@ -86,7 +86,7 @@ class IonCameraFlow(
 
         editManager = IONCAMREditManager(
             plugin.getAppId(),
-            ".fileprovider",
+            ".camera.provider",
             IONCAMRExifHelper(),
             IONCAMRFileHelper(),
             IONCAMRMediaHelper(),
@@ -527,7 +527,7 @@ class IonCameraFlow(
         val uri = Uri.fromFile(file)
 
         val ret = JSObject()
-        ret.put("path", mediaResult.uri)
+        ret.put("uri", mediaResult.uri)
         ret.put("webPath", FileUtils.getPortablePath(plugin.context, plugin.bridge.localUrl, uri))
         ret.put("saved", mediaResult.saved)
 
@@ -622,6 +622,7 @@ class IonCameraFlow(
                 plugin.activity,
                 uri,
                 settings.saveToGallery,
+                settings.isPersistent,
                 settings.includeMetadata,
                 { mediaResult ->
                     handleVideoMediaResult(mediaResult)
