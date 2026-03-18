@@ -524,7 +524,9 @@ class IonCameraFlow(
         val uri = Uri.fromFile(file)
 
         val ret = JSObject()
+        ret.put("type", mediaResult.type)
         ret.put("uri", mediaResult.uri)
+        ret.put("thumbnail", mediaResult.thumbnail)
         ret.put("webPath", FileUtils.getPortablePath(plugin.context, plugin.bridge.localUrl, uri))
         ret.put("saved", mediaResult.saved)
 
@@ -532,6 +534,8 @@ class IonCameraFlow(
             ret.put("duration", metadata.duration)
             ret.put("size", metadata.size)
             ret.put("format", metadata.format)
+            ret.put("resolution", metadata.resolution)
+            ret.put("creationDate", metadata.creationDate)
         }
         currentCall?.resolve(ret)
         currentCall = null
