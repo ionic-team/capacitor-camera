@@ -65,7 +65,6 @@ class IonCameraFlow(
         setupLaunchers()
         cameraManager = IONCAMRCameraManager(
             plugin.getAppId(),
-            ".camera.provider",
             IONCAMRExifHelper(),
             IONCAMRFileHelper(),
             IONCAMRMediaHelper(),
@@ -73,7 +72,6 @@ class IonCameraFlow(
         )
 
         videoManager = IONCAMRVideoManager(
-            ".camera.provider",
             IONCAMRFileHelper(),
         )
 
@@ -86,7 +84,6 @@ class IonCameraFlow(
 
         editManager = IONCAMREditManager(
             plugin.getAppId(),
-            ".camera.provider",
             IONCAMRExifHelper(),
             IONCAMRFileHelper(),
             IONCAMRMediaHelper(),
