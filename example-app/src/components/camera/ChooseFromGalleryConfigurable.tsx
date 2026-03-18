@@ -20,6 +20,8 @@ interface ChooseFromGalleryConfig {
   allowMultipleSelection: boolean;
   includeMetadata: boolean;
   allowEdit: boolean;
+  limit: number;
+  editInApp: boolean;
 }
 
 interface ChooseFromGalleryConfigurableProps {
@@ -43,6 +45,8 @@ class ChooseFromGalleryConfigurable extends React.Component<
         allowMultipleSelection: false,
         includeMetadata: false,
         allowEdit: false,
+        limit: 0,
+        editInApp: true,
       },
     };
   }
@@ -60,12 +64,13 @@ class ChooseFromGalleryConfigurable extends React.Component<
         allowMultipleSelection: true,
         includeMetadata: false,
         allowEdit: false,
-        limit: 2
+        editInApp: true,
+        limit: 0,
       });
-      console.log("chooseFromGallery result", result);
+      console.log('chooseFromGallery result', result);
 
       // Convert MediaResult[] to GalleryPhoto[]
-      const galleryPhotos: GalleryPhoto[] = result.photos.map(photo => ({
+      const galleryPhotos: GalleryPhoto[] = result.photos.map((photo) => ({
         path: photo.path,
         webPath: photo.webPath,
         format: photo.format,
@@ -88,11 +93,13 @@ class ChooseFromGalleryConfigurable extends React.Component<
         allowMultipleSelection: config.allowMultipleSelection,
         includeMetadata: config.includeMetadata,
         allowEdit: config.allowEdit,
+        editInApp: config.editInApp,
+        limit: config.limit,
       });
-      console.log("chooseFromGallery result", result);
+      console.log('chooseFromGallery result', result);
 
       // Convert MediaResult[] to GalleryPhoto[]
-      const galleryPhotos: GalleryPhoto[] = result.photos.map(photo => ({
+      const galleryPhotos: GalleryPhoto[] = result.photos.map((photo) => ({
         path: photo.path,
         webPath: photo.webPath,
         format: photo.format,
@@ -108,16 +115,12 @@ class ChooseFromGalleryConfigurable extends React.Component<
   };
 
   render() {
-    const { buttonLabel = "chooseFromGallery (Default)" } = this.props;
+    const { buttonLabel = 'chooseFromGallery (Default)' } = this.props;
     const { config } = this.state;
 
     return (
       <>
-        <IonButton
-          expand="block"
-          onClick={() => this.executeDefault()}
-          style={{ marginTop: "16px" }}
-        >
+        <IonButton expand="block" onClick={() => this.executeDefault()} style={{ marginTop: '16px' }}>
           {buttonLabel}
         </IonButton>
 
@@ -126,21 +129,19 @@ class ChooseFromGalleryConfigurable extends React.Component<
             <IonItem slot="header" lines="none">
               <IonLabel
                 style={{
-                  fontSize: "0.9em",
-                  color: "var(--ion-color-medium)",
+                  fontSize: '0.9em',
+                  color: 'var(--ion-color-medium)',
                 }}
               >
                 Expand to call chooseFromGallery with configurable options
               </IonLabel>
             </IonItem>
-            <div slot="content" style={{ padding: "16px" }}>
+            <div slot="content" style={{ padding: '16px' }}>
               <IonItem>
                 <IonLabel position="stacked">Media Type</IonLabel>
                 <IonSelect
                   value={config.mediaType}
-                  onIonChange={(e) =>
-                    this.updateConfig("mediaType", parseInt(e.detail.value!))
-                  }
+                  onIonChange={(e) => this.updateConfig('mediaType', parseInt(e.detail.value!))}
                 >
                   <IonSelectOption value={0}>Picture</IonSelectOption>
                   <IonSelectOption value={1}>Video</IonSelectOption>
@@ -152,9 +153,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
                 <IonLabel>Allow Multiple Selection</IonLabel>
                 <IonToggle
                   checked={config.allowMultipleSelection}
-                  onIonChange={(e) =>
-                    this.updateConfig("allowMultipleSelection", e.detail.checked)
-                  }
+                  onIonChange={(e) => this.updateConfig('allowMultipleSelection', e.detail.checked)}
                 />
               </IonItem>
 
@@ -162,9 +161,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
                 <IonLabel>Include Metadata</IonLabel>
                 <IonToggle
                   checked={config.includeMetadata}
-                  onIonChange={(e) =>
-                    this.updateConfig("includeMetadata", e.detail.checked)
-                  }
+                  onIonChange={(e) => this.updateConfig('includeMetadata', e.detail.checked)}
                 />
               </IonItem>
 
@@ -172,16 +169,35 @@ class ChooseFromGalleryConfigurable extends React.Component<
                 <IonLabel>Allow Edit</IonLabel>
                 <IonToggle
                   checked={config.allowEdit}
-                  onIonChange={(e) =>
-                    this.updateConfig("allowEdit", e.detail.checked)
-                  }
+                  onIonChange={(e) => this.updateConfig('allowEdit', e.detail.checked)}
                 />
               </IonItem>
 
+              <IonItem>
+                <IonLabel>Edit In App</IonLabel>
+                <IonToggle
+                  checked={config.editInApp}
+                  onIonChange={(e) => this.updateConfig('editInApp', e.detail.checked)}
+                />
+              </IonItem>
+              {config.allowMultipleSelection && (
+                <IonItem>
+                  <IonLabel position="stacked">Limit</IonLabel>
+                  <input
+                    type="number"
+                    value={config.limit}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      this.updateConfig('limit', value === '' ? '' : Math.max(0, parseInt(value)));
+                    }}
+                    style={{ width: '100%', padding: '8px', marginTop: '8px' }}
+                  />
+                </IonItem>
+              )}
               <IonButton
                 expand="block"
                 color="primary"
-                style={{ marginTop: "16px" }}
+                style={{ marginTop: '16px' }}
                 onClick={() => this.executeWithConfig()}
               >
                 Execute chooseFromGallery with Configuration
