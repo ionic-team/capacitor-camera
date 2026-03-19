@@ -856,7 +856,7 @@ export enum MediaType {
   Video = 1,
 }
 
-export enum MediaTypeSelection{
+export enum MediaTypeSelection {
   Photo = 0,
   Video = 1,
   All = 2,
