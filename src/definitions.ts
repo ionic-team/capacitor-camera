@@ -262,11 +262,11 @@ export interface PlayVideoOptions {
 export interface ChooseFromGalleryOptions {
   /**
    * The type of media to select. Can be pictures, videos, or both.
-   * @default MediaType.picture
+   * @default MediaTypeSelection.Photo
    *
    * @since 8.1.0
    */
-  mediaType?: MediaType;
+  mediaType?: MediaTypeSelection;
 
   /**
    * Whether or not to allow selecting multiple media files from the gallery.
@@ -299,7 +299,7 @@ export interface ChooseFromGalleryOptions {
 
   /**
    * Whether to allow the user to crop or make small edits.
-   * Only applicable for `MediaType.picture` and `allowMultipleSelection` set to `false`.
+   * Only applicable for `MediaTypeSelection.Photo` and `allowMultipleSelection` set to `false`.
    * Note: This option is only supported on Android and iOS.
    * @default false
    *
@@ -328,7 +328,7 @@ export interface ChooseFromGalleryOptions {
 
   /**
    * The quality of images to return, from 0-100.
-   * Only applicable for `MediaType.picture` and JPEG format.
+   * Only applicable for `MediaType.Photo` and JPEG format.
    * Note: This option is only supported on Android and iOS.
    *
    * @default 100
@@ -484,7 +484,7 @@ export interface MediaMetadata {
   size?: number;
 
   /**
-   * Only applicable for `MediaType.video` - the duration of the media, in seconds.
+   * Only applicable for `MediaType.Video` - the duration of the media, in seconds.
    * Not available on Web.
    *
    * @since 8.1.0
@@ -852,9 +852,14 @@ export enum CameraResultType {
 }
 
 export enum MediaType {
-  picture = 0,
-  video = 1,
-  all = 2,
+  Photo = 0,
+  Video = 1,
+}
+
+export enum MediaTypeSelection{
+  Photo = 0,
+  Video = 1,
+  All = 2,
 }
 
 export enum EncodingType {

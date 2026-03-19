@@ -25,10 +25,10 @@ const MediaCarousel: React.FC<IMediaCarouselProps> = ({ media, onEditPhoto }) =>
 
   const isVideo = (item: MediaResult): boolean => {
     // Primary detection: check MediaType
-    if (item.type === MediaType.video) {
+    if (item.type === MediaType.Video) {
       return true;
     }
-    if (item.type === MediaType.picture) {
+    if (item.type === MediaType.Photo) {
       return false;
     }
 

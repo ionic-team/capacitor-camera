@@ -894,7 +894,7 @@ class IonCameraFlow(
             targetWidth = width,
             targetHeight = height,
             encodingType = CameraPlugin.ENCODING_TYPE, // JPEG
-            mediaType = CameraPlugin.MEDIA_TYPE_PICTURE,
+            mediaType = CameraPlugin.MEDIA_TYPE_PHOTO,
             allowEdit = allowEdit,
             correctOrientation = shouldCorrectOrientation,
             saveToPhotoAlbum = saveToGallery,

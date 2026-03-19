@@ -13,7 +13,7 @@ import React from "react";
 import {
   Camera,
   MediaResult,
-  MediaType,
+  MediaTypeSelection,
   ChooseFromGalleryOptions,
 } from "@capacitor/camera";
 
@@ -36,7 +36,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
     // Initialize with API defaults from ChooseFromGalleryOptions
     this.state = {
       config: {
-        mediaType: MediaType.picture,
+        mediaType: MediaTypeSelection.Photo,
         allowMultipleSelection: false,
         limit: 0,
         includeMetadata: false,
@@ -58,7 +58,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
   executeDefault = async (): Promise<void> => {
     try {
       const result = await Camera.chooseFromGallery({
-        mediaType: MediaType.picture
+        mediaType: MediaTypeSelection.Photo
       });
       console.log('chooseFromGallery result', result);
 
