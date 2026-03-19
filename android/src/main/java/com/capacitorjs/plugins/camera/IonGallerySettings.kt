@@ -2,7 +2,7 @@ package com.capacitorjs.plugins.camera
 
 import io.ionic.libs.ioncameralib.model.IONCAMRMediaType
 
-data class GallerySettings(
+data class IonGallerySettings(
     val mediaType: IONCAMRMediaType = IONCAMRMediaType.ALL,
     val allowMultipleSelection: Boolean = false,
     val limit: Int = 0,

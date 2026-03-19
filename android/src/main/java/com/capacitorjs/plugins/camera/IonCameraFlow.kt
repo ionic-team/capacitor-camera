@@ -53,9 +53,9 @@ class IonCameraFlow(
     private lateinit var videoLauncher: ActivityResultLauncher<Intent>
     private lateinit var editLauncher: ActivityResultLauncher<Intent>
     private var currentCall: PluginCall? = null
-    private var cameraSettings: CameraSettings? = null
-    private var videoSettings: VideoSettings? = null
-    private var gallerySettings: GallerySettings? = null
+    private var cameraSettings: IonCameraSettings? = null
+    private var videoSettings: IonVideoSettings? = null
+    private var gallerySettings: IonGallerySettings? = null
     private var editParameters = IONCAMREditParameters(
         editURI = "", fromUri = false, saveToGallery = false, includeMetadata = false
     )
@@ -96,14 +96,14 @@ class IonCameraFlow(
         cameraManager?.deleteVideoFilesFromCache(plugin.activity)
     }
 
-    fun takePhoto(call: PluginCall, settings: CameraSettings) {
-        cameraSettings = settings
+    fun takePhoto(call: PluginCall) {
+        cameraSettings = getCameraSettings(call)
         currentCall = call
         showCamera(call)
     }
 
-    fun recordVideo(call: PluginCall, settings: VideoSettings) {
-        videoSettings = settings
+    fun recordVideo(call: PluginCall) {
+        videoSettings = getVideoSettings(call)
         currentCall = call
         openRecordVideo(call)
     }
@@ -113,8 +113,8 @@ class IonCameraFlow(
         openPlayVideo(call)
     }
 
-    fun chooseFromGallery(call: PluginCall, settings: GallerySettings) {
-        gallerySettings = settings
+    fun chooseFromGallery(call: PluginCall) {
+        gallerySettings = getGallerySettings(call)
         currentCall = call
         openGallery(call)
     }
@@ -170,6 +170,48 @@ class IonCameraFlow(
         }
 
     }
+
+    fun getVideoSettings(call: PluginCall): IonVideoSettings {
+        return IonVideoSettings(
+            saveToGallery = call.getBoolean("saveToGallery") ?: false,
+            includeMetadata = call.getBoolean("includeMetadata") ?: false
+        )
+    }
+
+    fun getGallerySettings(call: PluginCall): IonGallerySettings {
+        return IonGallerySettings(
+            mediaType = IONCAMRMediaType.fromValue((call.getInt("mediaType") ?: 0)),
+            allowMultipleSelection = call.getBoolean("allowMultipleSelection") ?: false,
+            includeMetadata = call.getBoolean("includeMetadata") ?: false,
+            allowEdit = call.getBoolean("allowEdit") ?: false,
+            limit = call.getInt("limit") ?: 0,
+            editInApp = call.getBoolean("editInApp") ?: true
+        )
+    }
+
+    fun getCameraSettings(call: PluginCall): IonCameraSettings {
+        val settings = IonCameraSettings()
+        settings.resultType = CameraResultType.URI//getResultType(call.getString("resultType"))
+        settings.saveToGallery = call.getBoolean("saveToGallery", IonCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY)!!
+        settings.allowEdit = call.getBoolean("allowEdit", false)!!
+        settings.quality = call.getInt("quality", IonCameraSettings.DEFAULT_QUALITY)!!
+        settings.width = call.getInt("width", 0)!!
+        settings.height = call.getInt("height", 0)!!
+        settings.shouldResize = settings.width > 0 || settings.height > 0
+        settings.shouldCorrectOrientation =
+            call.getBoolean("correctOrientation", IonCameraSettings.DEFAULT_CORRECT_ORIENTATION)!!
+        settings.editInApp = call.getBoolean("editInApp", true)!!
+        settings.includeMetadata = call.getBoolean("includeMetadata", false)!!
+
+        try {
+            settings.source =
+                CameraSource.valueOf(call.getString("source", CameraSource.PROMPT.getSource())!!)
+        } catch (ex: IllegalArgumentException) {
+            settings.source = CameraSource.PROMPT
+        }
+        return settings
+    }
+
 
     private fun showCamera(call: PluginCall) {
         if (!plugin.getContext().getPackageManager()
@@ -842,7 +884,7 @@ class IonCameraFlow(
         )
     }
 
-    private fun CameraSettings.toIonParameters(): IONCAMRCameraParameters {
+    private fun IonCameraSettings.toIonParameters(): IONCAMRCameraParameters {
         val useLatestVersion = (resultType == CameraResultType.URI)
         return IONCAMRCameraParameters(
             mQuality = quality,

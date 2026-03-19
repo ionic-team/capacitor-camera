@@ -1,6 +1,6 @@
 package com.capacitorjs.plugins.camera
 
-data class VideoSettings(
+data class IonVideoSettings(
     val saveToGallery: Boolean = false,
     val includeMetadata: Boolean = false
 )

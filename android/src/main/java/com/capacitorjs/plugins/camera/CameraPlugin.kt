@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.result.ActivityResult
 import com.getcapacitor.Logger
 import com.getcapacitor.PermissionState
@@ -19,7 +18,6 @@ import com.getcapacitor.annotation.CapacitorPlugin
 import com.getcapacitor.annotation.Permission
 import com.getcapacitor.annotation.PermissionCallback
 import org.json.JSONException
-import io.ionic.libs.ioncameralib.model.IONCAMRMediaType
 /**
  * The Camera plugin makes it easy to take a photo or have the user select a photo
  * from their albums.
@@ -61,8 +59,6 @@ class CameraPlugin : Plugin() {
 
     private lateinit var legacyFlow: LegacyCameraFlow
     private lateinit var ionFlow: IonCameraFlow
-    private var videoSettings = VideoSettings()
-    private var gallerySettings = GallerySettings()
 
     override fun load() {
         super.load()
@@ -79,14 +75,12 @@ class CameraPlugin : Plugin() {
 
     @PluginMethod
     fun takePhoto(call: PluginCall) {
-        val settings = getSettings(call)
-        ionFlow.takePhoto(call, settings)
+        ionFlow.takePhoto(call)
     }
 
     @PluginMethod
     fun recordVideo(call: PluginCall) {
-        videoSettings = getVideoSettings(call)
-        ionFlow.recordVideo(call, videoSettings)
+        ionFlow.recordVideo(call)
     }
 
     @PluginMethod
@@ -96,8 +90,7 @@ class CameraPlugin : Plugin() {
 
     @PluginMethod
     fun chooseFromGallery(call: PluginCall) {
-        gallerySettings = getGallerySettings(call)
-        ionFlow.chooseFromGallery(call, gallerySettings)
+        ionFlow.chooseFromGallery(call)
     }
 
     @PluginMethod
@@ -229,45 +222,6 @@ class CameraPlugin : Plugin() {
         return permissionStates
     }
 
-    fun getSettings(call: PluginCall): CameraSettings {
-        val settings = CameraSettings()
-        settings.resultType = getResultType(call.getString("resultType"))
-        settings.saveToGallery =
-            call.getBoolean("saveToGallery", CameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY)!!
-        settings.allowEditing = call.getBoolean("allowEditing", false)!!
-        settings.quality = call.getInt("quality", CameraSettings.DEFAULT_QUALITY)!!
-        settings.width = call.getInt("width", 0)!!
-        settings.height = call.getInt("height", 0)!!
-        settings.shouldResize = settings.width > 0 || settings.height > 0
-        settings.shouldCorrectOrientation =
-            call.getBoolean("correctOrientation", CameraSettings.DEFAULT_CORRECT_ORIENTATION)!!
-        try {
-            settings.source =
-                CameraSource.valueOf(call.getString("source", CameraSource.PROMPT.getSource())!!)
-        } catch (ex: IllegalArgumentException) {
-            settings.source = CameraSource.PROMPT
-        }
-        return settings
-    }
-
-    fun getVideoSettings(call: PluginCall): VideoSettings {
-        return VideoSettings(
-            saveToGallery = call.getBoolean("saveToGallery") ?: false,
-            includeMetadata = call.getBoolean("includeMetadata") ?: false
-        )
-    }
-
-    fun getGallerySettings(call: PluginCall): GallerySettings {
-        return GallerySettings(
-            mediaType = IONCAMRMediaType.fromValue((call.getInt("mediaType") ?: 0)),
-            allowMultipleSelection = call.getBoolean("allowMultipleSelection") ?: false,
-            includeMetadata = call.getBoolean("includeMetadata") ?: false,
-            allowEdit = call.getBoolean("allowEdit") ?: false,
-            limit = call.getInt("limit") ?: 0,
-            editInApp = call.getBoolean("editInApp") ?: true
-        )
-    }
-
     private fun getResultType(resultType: String?): CameraResultType? {
         if (resultType == null) {
             return null
@@ -320,7 +274,4 @@ class CameraPlugin : Plugin() {
         requestPermissionForAliases(aliases, call, callbackName)
     }
 
-    fun getLegacyLogTag(): String {
-        return getLogTag()
-    }
 }
