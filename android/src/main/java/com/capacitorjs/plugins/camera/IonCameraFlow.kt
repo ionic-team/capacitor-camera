@@ -274,7 +274,7 @@ class IonCameraFlow(
                 return
             }
 
-            val videoUri = call.getString("videoURI")
+            val videoUri = call.getString("uri")
                 ?: return sendError(IONCAMRError.PLAY_VIDEO_GENERAL_ERROR)
             manager.playVideo(plugin.activity, videoUri, {
                 call.resolve()

@@ -400,9 +400,9 @@ Allows the user to pick multiple pictures from the photo gallery.
 
 #### PlayVideoOptions
 
-| Prop           | Type                | Description                                                                                                                  | Since |
-| -------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----- |
-| **`videoURI`** | <code>string</code> | The URI of the video to play. You may use the `MediaResult#URI` returned from `recordVideo` or `chooseFromGallery` directly. | 8.1.0 |
+| Prop      | Type                | Description                                                                                                                  | Since |
+| --------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`uri`** | <code>string</code> | The URI of the video to play. You may use the `MediaResult#URI` returned from `recordVideo` or `chooseFromGallery` directly. | 8.1.0 |
 
 
 #### MediaResults

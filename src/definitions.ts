@@ -256,7 +256,7 @@ export interface PlayVideoOptions {
    *
    * @since 8.1.0
    */
-  videoURI: string;
+  uri: string;
 }
 
 export interface ChooseFromGalleryOptions {
