@@ -14,6 +14,9 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
+import com.capacitorjs.plugins.camera.IonCameraSettings.Companion.DEFAULT_CORRECT_ORIENTATION
+import com.capacitorjs.plugins.camera.IonCameraSettings.Companion.DEFAULT_QUALITY
+import com.capacitorjs.plugins.camera.IonCameraSettings.Companion.DEFAULT_SAVE_IMAGE_TO_GALLERY
 import com.getcapacitor.FileUtils
 import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
@@ -189,24 +192,16 @@ class IonCameraFlow(
 
     fun getCameraSettings(call: PluginCall): IonCameraSettings {
         val settings = IonCameraSettings()
-        settings.resultType = CameraResultType.URI//getResultType(call.getString("resultType"))
-        settings.saveToGallery = call.getBoolean("saveToGallery", IonCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY)!!
-        settings.allowEdit = call.getBoolean("allowEdit", false)!!
         settings.quality = call.getInt("quality", IonCameraSettings.DEFAULT_QUALITY)!!
         settings.width = call.getInt("width", 0)!!
         settings.height = call.getInt("height", 0)!!
-        settings.shouldResize = settings.width > 0 || settings.height > 0
-        settings.shouldCorrectOrientation =
-            call.getBoolean("correctOrientation", IonCameraSettings.DEFAULT_CORRECT_ORIENTATION)!!
+        settings.correctOrientation = call.getBoolean("correctOrientation", IonCameraSettings.DEFAULT_CORRECT_ORIENTATION)!!
+        settings.encodingType = call.getInt("encodingType", IonCameraSettings.DEFAULT_ENCODING_TYPE)!!
+        settings.saveToGallery = call.getBoolean("saveToGallery", IonCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY)!!
+        settings.allowEdit = call.getBoolean("allowEdit", false)!!
         settings.editInApp = call.getBoolean("editInApp", true)!!
         settings.includeMetadata = call.getBoolean("includeMetadata", false)!!
-
-        try {
-            settings.source =
-                CameraSource.valueOf(call.getString("source", CameraSource.PROMPT.getSource())!!)
-        } catch (ex: IllegalArgumentException) {
-            settings.source = CameraSource.PROMPT
-        }
+        settings.shouldResize = settings.width > 0 || settings.height > 0
         return settings
     }
 
@@ -677,7 +672,7 @@ class IonCameraFlow(
             return
         }
 
-        when (settings.resultType) {
+      /*  when (settings.resultType) {
             CameraResultType.BASE64 -> {
                 ret.put("base64String", image)
             }
@@ -690,7 +685,7 @@ class IonCameraFlow(
                 sendError(IONCAMRError.PROCESS_IMAGE_ERROR)
                 return
             }
-        }
+        }*/
 
         currentCall?.resolve(ret)
         currentCall = null
@@ -888,18 +883,18 @@ class IonCameraFlow(
     }
 
     private fun IonCameraSettings.toIonParameters(): IONCAMRCameraParameters {
-        val useLatestVersion = (resultType == CameraResultType.URI)
+       // val useLatestVersion = (resultType == CameraResultType.URI)
         return IONCAMRCameraParameters(
             mQuality = quality,
             targetWidth = width,
             targetHeight = height,
-            encodingType = CameraPlugin.ENCODING_TYPE, // JPEG
+            encodingType = encodingType,
             mediaType = CameraPlugin.MEDIA_TYPE_PICTURE,
             allowEdit = allowEdit,
-            correctOrientation = shouldCorrectOrientation,
+            correctOrientation = correctOrientation,
             saveToPhotoAlbum = saveToGallery,
             includeMetadata = includeMetadata,
-            latestVersion = useLatestVersion //TODO check this, because now we don't have resultType in the new Api
+            latestVersion = true //TODO check this, because now we don't have resultType in the new Api
         )
     }
 
