@@ -14,6 +14,9 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
+import com.capacitorjs.plugins.camera.IonCameraSettings.Companion.DEFAULT_CORRECT_ORIENTATION
+import com.capacitorjs.plugins.camera.IonCameraSettings.Companion.DEFAULT_QUALITY
+import com.capacitorjs.plugins.camera.IonCameraSettings.Companion.DEFAULT_SAVE_IMAGE_TO_GALLERY
 import com.getcapacitor.FileUtils
 import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
@@ -189,24 +192,16 @@ class IonCameraFlow(
 
     fun getCameraSettings(call: PluginCall): IonCameraSettings {
         val settings = IonCameraSettings()
-        settings.resultType = CameraResultType.URI//getResultType(call.getString("resultType"))
-        settings.saveToGallery = call.getBoolean("saveToGallery", IonCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY)!!
-        settings.allowEdit = call.getBoolean("allowEdit", false)!!
         settings.quality = call.getInt("quality", IonCameraSettings.DEFAULT_QUALITY)!!
         settings.width = call.getInt("width", 0)!!
         settings.height = call.getInt("height", 0)!!
-        settings.shouldResize = settings.width > 0 || settings.height > 0
-        settings.shouldCorrectOrientation =
-            call.getBoolean("correctOrientation", IonCameraSettings.DEFAULT_CORRECT_ORIENTATION)!!
+        settings.correctOrientation = call.getBoolean("correctOrientation", IonCameraSettings.DEFAULT_CORRECT_ORIENTATION)!!
+        settings.encodingType = call.getInt("encodingType", IonCameraSettings.DEFAULT_ENCODING_TYPE)!!
+        settings.saveToGallery = call.getBoolean("saveToGallery", IonCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY)!!
+        settings.allowEdit = call.getBoolean("allowEdit", false)!!
         settings.editInApp = call.getBoolean("editInApp", true)!!
         settings.includeMetadata = call.getBoolean("includeMetadata", false)!!
-
-        try {
-            settings.source =
-                CameraSource.valueOf(call.getString("source", CameraSource.PROMPT.getSource())!!)
-        } catch (ex: IllegalArgumentException) {
-            settings.source = CameraSource.PROMPT
-        }
+        settings.shouldResize = settings.width > 0 || settings.height > 0
         return settings
     }
 
@@ -234,7 +229,7 @@ class IonCameraFlow(
                     return
                 }
                 currentCall = call
-                manager.takePhoto(plugin.getActivity(), CameraPlugin.ENCODING_TYPE, cameraLauncher)
+                manager.takePhoto(plugin.getActivity(), settings.encodingType, cameraLauncher)
             } catch (ex: Exception) {
                 sendError(IONCAMRError.FAILED_TO_CAPTURE_IMAGE_ERROR)
             }
@@ -369,7 +364,7 @@ class IonCameraFlow(
                             "$appId.fileprovider",
                             editor.createCaptureFile(
                                 plugin.activity,
-                                CameraPlugin.ENCODING_TYPE,
+                                settings.encodingType,
                                 plugin.activity.getSharedPreferences(
                                     CameraPlugin.STORE,
                                     Context.MODE_PRIVATE
@@ -551,13 +546,18 @@ class IonCameraFlow(
             return
         }
 
+        val settings = cameraSettings ?: run {
+            sendError(IONCAMRError.INVALID_ARGUMENT_ERROR)
+            return
+        }
+
         val appId = plugin.getAppId()
         val tmpFile = FileProvider.getUriForFile(
             plugin.activity,
             "$appId.fileprovider",
             editor.createCaptureFile(
                 plugin.activity,
-                CameraPlugin.ENCODING_TYPE,
+                settings.encodingType,
                 plugin.activity.getSharedPreferences(
                     CameraPlugin.STORE,
                     Context.MODE_PRIVATE
@@ -668,34 +668,6 @@ class IonCameraFlow(
         }
     }
 
-    private fun handlePhotoBase64Result(image: String) {
-        val ret = JSObject()
-        ret.put("format", "jpeg")
-
-        val settings = cameraSettings ?: run {
-            sendError(IONCAMRError.INVALID_ARGUMENT_ERROR)
-            return
-        }
-
-        when (settings.resultType) {
-            CameraResultType.BASE64 -> {
-                ret.put("base64String", image)
-            }
-
-            CameraResultType.DATAURL -> {
-                ret.put("dataUrl", "data:image/jpeg;base64,$image")
-            }
-
-            else -> {
-                sendError(IONCAMRError.PROCESS_IMAGE_ERROR)
-                return
-            }
-        }
-
-        currentCall?.resolve(ret)
-        currentCall = null
-    }
-
     private fun handleEditBase64Result(image: String) {
         val ret = JSObject()
         ret.put("format", "jpeg")
@@ -713,13 +685,30 @@ class IonCameraFlow(
             return
         }
 
+
+
         val exif = ImageUtils.getExifData(plugin.context, bitmap, uri)
         val ret = JSObject()
-        ret.put("format", "jpeg")
-        ret.put("exif", exif.toJson())
-        ret.put("path", mediaResult.uri)
+        ret.put("type", mediaResult.type)
+        ret.put("uri", mediaResult.uri)
+        ret.put("thumbnail", mediaResult.thumbnail)
         ret.put("webPath", FileUtils.getPortablePath(plugin.context, plugin.bridge.localUrl, uri))
         ret.put("saved", mediaResult.saved)
+
+
+
+        val metadata = JSObject()
+        mediaResult.metadata?.let {
+            metadata.put("duration", it.duration)
+            metadata.put("size", it.size)
+            metadata.put("format", it.format)
+            metadata.put("resolution", it.resolution)
+            metadata.put("creationDate", it.creationDate)
+            metadata.put("exif", exif.toJson())
+        }
+
+        ret.put("metadata", metadata)
+
         currentCall?.resolve(ret)
         currentCall = null
         lastEditUri = null
@@ -736,13 +725,17 @@ class IonCameraFlow(
         ret.put("webPath", FileUtils.getPortablePath(plugin.context, plugin.bridge.localUrl, uri))
         ret.put("saved", mediaResult.saved)
 
-        mediaResult.metadata?.let { metadata ->
-            ret.put("duration", metadata.duration)
-            ret.put("size", metadata.size)
-            ret.put("format", metadata.format)
-            ret.put("resolution", metadata.resolution)
-            ret.put("creationDate", metadata.creationDate)
+        val metadata = JSObject()
+        mediaResult.metadata?.let {
+            metadata.put("duration", it.duration)
+            metadata.put("size", it.size)
+            metadata.put("format", it.format)
+            metadata.put("resolution", it.resolution)
+            metadata.put("creationDate", it.creationDate)
         }
+
+        ret.put("metadata", metadata)
+
         currentCall?.resolve(ret)
         currentCall = null
     }
@@ -793,7 +786,7 @@ class IonCameraFlow(
             intent,
             ionParams,
             { image ->
-                handlePhotoBase64Result(image)
+              //TODO remove this callback
             },
             { mediaResult ->
                 handleMediaResult(mediaResult)
@@ -888,18 +881,17 @@ class IonCameraFlow(
     }
 
     private fun IonCameraSettings.toIonParameters(): IONCAMRCameraParameters {
-        val useLatestVersion = (resultType == CameraResultType.URI)
         return IONCAMRCameraParameters(
             mQuality = quality,
             targetWidth = width,
             targetHeight = height,
-            encodingType = CameraPlugin.ENCODING_TYPE, // JPEG
+            encodingType = encodingType,
             mediaType = CameraPlugin.MEDIA_TYPE_PICTURE,
             allowEdit = allowEdit,
-            correctOrientation = shouldCorrectOrientation,
+            correctOrientation = correctOrientation,
             saveToPhotoAlbum = saveToGallery,
             includeMetadata = includeMetadata,
-            latestVersion = useLatestVersion //TODO check this, because now we don't have resultType in the new Api
+            latestVersion = true //TODO check this, because now we don't have resultType in the new Api
         )
     }
 
