@@ -229,7 +229,7 @@ class IonCameraFlow(
                     return
                 }
                 currentCall = call
-                manager.takePhoto(plugin.getActivity(), CameraPlugin.ENCODING_TYPE, cameraLauncher)
+                manager.takePhoto(plugin.getActivity(), settings.encodingType, cameraLauncher)
             } catch (ex: Exception) {
                 sendError(IONCAMRError.FAILED_TO_CAPTURE_IMAGE_ERROR)
             }
@@ -364,7 +364,7 @@ class IonCameraFlow(
                             "$appId.fileprovider",
                             editor.createCaptureFile(
                                 plugin.activity,
-                                CameraPlugin.ENCODING_TYPE,
+                                settings.encodingType,
                                 plugin.activity.getSharedPreferences(
                                     CameraPlugin.STORE,
                                     Context.MODE_PRIVATE
@@ -546,13 +546,18 @@ class IonCameraFlow(
             return
         }
 
+        val settings = cameraSettings ?: run {
+            sendError(IONCAMRError.INVALID_ARGUMENT_ERROR)
+            return
+        }
+
         val appId = plugin.getAppId()
         val tmpFile = FileProvider.getUriForFile(
             plugin.activity,
             "$appId.fileprovider",
             editor.createCaptureFile(
                 plugin.activity,
-                CameraPlugin.ENCODING_TYPE,
+                settings.encodingType,
                 plugin.activity.getSharedPreferences(
                     CameraPlugin.STORE,
                     Context.MODE_PRIVATE
@@ -663,34 +668,6 @@ class IonCameraFlow(
         }
     }
 
-    private fun handlePhotoBase64Result(image: String) {
-        val ret = JSObject()
-        ret.put("format", "jpeg")
-
-        val settings = cameraSettings ?: run {
-            sendError(IONCAMRError.INVALID_ARGUMENT_ERROR)
-            return
-        }
-
-      /*  when (settings.resultType) {
-            CameraResultType.BASE64 -> {
-                ret.put("base64String", image)
-            }
-
-            CameraResultType.DATAURL -> {
-                ret.put("dataUrl", "data:image/jpeg;base64,$image")
-            }
-
-            else -> {
-                sendError(IONCAMRError.PROCESS_IMAGE_ERROR)
-                return
-            }
-        }*/
-
-        currentCall?.resolve(ret)
-        currentCall = null
-    }
-
     private fun handleEditBase64Result(image: String) {
         val ret = JSObject()
         ret.put("format", "jpeg")
@@ -708,13 +685,30 @@ class IonCameraFlow(
             return
         }
 
+
+
         val exif = ImageUtils.getExifData(plugin.context, bitmap, uri)
         val ret = JSObject()
-        ret.put("format", "jpeg")
-        ret.put("exif", exif.toJson())
-        ret.put("path", mediaResult.uri)
+        ret.put("type", mediaResult.type)
+        ret.put("uri", mediaResult.uri)
+        ret.put("thumbnail", mediaResult.thumbnail)
         ret.put("webPath", FileUtils.getPortablePath(plugin.context, plugin.bridge.localUrl, uri))
         ret.put("saved", mediaResult.saved)
+
+
+
+        val metadata = JSObject()
+        mediaResult.metadata?.let {
+            metadata.put("duration", it.duration)
+            metadata.put("size", it.size)
+            metadata.put("format", it.format)
+            metadata.put("resolution", it.resolution)
+            metadata.put("creationDate", it.creationDate)
+            metadata.put("exif", exif.toJson())
+        }
+
+        ret.put("metadata", metadata)
+
         currentCall?.resolve(ret)
         currentCall = null
         lastEditUri = null
@@ -731,13 +725,17 @@ class IonCameraFlow(
         ret.put("webPath", FileUtils.getPortablePath(plugin.context, plugin.bridge.localUrl, uri))
         ret.put("saved", mediaResult.saved)
 
-        mediaResult.metadata?.let { metadata ->
-            ret.put("duration", metadata.duration)
-            ret.put("size", metadata.size)
-            ret.put("format", metadata.format)
-            ret.put("resolution", metadata.resolution)
-            ret.put("creationDate", metadata.creationDate)
+        val metadata = JSObject()
+        mediaResult.metadata?.let {
+            metadata.put("duration", it.duration)
+            metadata.put("size", it.size)
+            metadata.put("format", it.format)
+            metadata.put("resolution", it.resolution)
+            metadata.put("creationDate", it.creationDate)
         }
+
+        ret.put("metadata", metadata)
+
         currentCall?.resolve(ret)
         currentCall = null
     }
@@ -788,7 +786,7 @@ class IonCameraFlow(
             intent,
             ionParams,
             { image ->
-                handlePhotoBase64Result(image)
+              //TODO remove this callback
             },
             { mediaResult ->
                 handleMediaResult(mediaResult)
@@ -883,7 +881,6 @@ class IonCameraFlow(
     }
 
     private fun IonCameraSettings.toIonParameters(): IONCAMRCameraParameters {
-       // val useLatestVersion = (resultType == CameraResultType.URI)
         return IONCAMRCameraParameters(
             mQuality = quality,
             targetWidth = width,
