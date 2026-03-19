@@ -62,6 +62,8 @@ public class LegacyCameraFlow {
     private static final String IMAGE_GALLERY_SAVE_ERROR = "Unable to save the image in the gallery";
     private static final String USER_CANCELLED = "User cancelled photos app";
 
+    private static final String LOG_TAG = "LegacyCameraFlow";
+
     private String imageFileSavePath;
     private String imageEditedFileSavePath;
     private Uri imageFileUri;
@@ -74,7 +76,7 @@ public class LegacyCameraFlow {
 
     private final AtomicInteger mNextLocalRequestCode = new AtomicInteger();
 
-    private CameraSettings settings = new CameraSettings();
+    private LegacyCameraSettings settings = new LegacyCameraSettings();
 
     public LegacyCameraFlow(CameraPlugin plugin) {
         this.plugin = plugin;
@@ -82,12 +84,12 @@ public class LegacyCameraFlow {
 
     public void getPhoto(PluginCall call) {
         isEdited = false;
-        settings = plugin.getSettings(call);
+        settings = getSettings(call);
         doShow(call);
     }
 
     public void pickImages(PluginCall call) {
-        settings = plugin.getSettings(call);
+        settings = getSettings(call);
         openPhotos(call, true);
     }
 
@@ -191,13 +193,44 @@ public class LegacyCameraFlow {
             openPhotos(call, true);
         } else {
             if (settings.getSource() == CameraSource.CAMERA && plugin.getPermissionState(CameraPlugin.CAMERA) != PermissionState.GRANTED) {
-                Logger.debug(plugin.getLegacyLogTag(), "User denied camera permission: " + plugin.getPermissionState(CameraPlugin.CAMERA));
+                Logger.debug(LOG_TAG, "User denied camera permission: " + plugin.getPermissionState(CameraPlugin.CAMERA));
                 call.reject(PERMISSION_DENIED_ERROR_CAMERA);
                 return;
             }
             doShow(call);
         }
     }
+
+    private LegacyCameraSettings getSettings(PluginCall call) {
+        LegacyCameraSettings settings = new LegacyCameraSettings();
+        settings.setResultType(getResultType(call.getString("resultType")));
+        settings.setSaveToGallery(call.getBoolean("saveToGallery", LegacyCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY));
+        settings.setAllowEditing(call.getBoolean("allowEditing", false));
+        settings.setQuality(call.getInt("quality", LegacyCameraSettings.DEFAULT_QUALITY));
+        settings.setWidth(call.getInt("width", 0));
+        settings.setHeight(call.getInt("height", 0));
+        settings.setShouldResize(settings.getWidth() > 0 || settings.getHeight() > 0);
+        settings.setShouldCorrectOrientation(call.getBoolean("correctOrientation", LegacyCameraSettings.DEFAULT_CORRECT_ORIENTATION));
+        try {
+            settings.setSource(CameraSource.valueOf(call.getString("source", CameraSource.PROMPT.getSource())));
+        } catch (IllegalArgumentException ex) {
+            settings.setSource(CameraSource.PROMPT);
+        }
+        return settings;
+    }
+
+    private CameraResultType getResultType(String resultType) {
+        if (resultType == null) {
+            return null;
+        }
+        try {
+            return CameraResultType.valueOf(resultType.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ex) {
+            Logger.debug(LOG_TAG, "Invalid result type \"" + resultType + "\", defaulting to base64");
+            return CameraResultType.BASE64;
+        }
+    }
+
 
     public void openCamera(final PluginCall call) {
         if (checkCameraPermissions(call)) {
@@ -312,7 +345,7 @@ public class LegacyCameraFlow {
     }
 
     public void processCameraImage(PluginCall call, ActivityResult result) {
-        settings = plugin.getSettings(call);
+        settings = getSettings(call);
         if (imageFileSavePath == null) {
             call.reject(IMAGE_PROCESS_NO_FILE_ERROR);
             return;
@@ -332,7 +365,7 @@ public class LegacyCameraFlow {
     }
 
     public void processPickedImage(PluginCall call, ActivityResult result) {
-        settings = plugin.getSettings(call);
+        settings = getSettings(call);
         Intent data = result.getData();
         if (data == null) {
             call.reject(USER_CANCELLED);
@@ -373,7 +406,7 @@ public class LegacyCameraFlow {
                 try {
                     imageStream.close();
                 } catch (IOException e) {
-                    Logger.error(plugin.getLegacyLogTag(), UNABLE_TO_PROCESS_IMAGE, e);
+                    Logger.error(LOG_TAG, UNABLE_TO_PROCESS_IMAGE, e);
                 }
             }
         }
@@ -417,13 +450,13 @@ public class LegacyCameraFlow {
             ret.put("error", "Out of memory");
         } catch (FileNotFoundException ex) {
             ret.put("error", "No such image found");
-            Logger.error(plugin.getLegacyLogTag(), "No such image found", ex);
+            Logger.error(LOG_TAG, "No such image found", ex);
         } finally {
             if (imageStream != null) {
                 try {
                     imageStream.close();
                 } catch (IOException e) {
-                    Logger.error(plugin.getLegacyLogTag(), UNABLE_TO_PROCESS_IMAGE, e);
+                    Logger.error(LOG_TAG, UNABLE_TO_PROCESS_IMAGE, e);
                 }
             }
         }
@@ -432,7 +465,7 @@ public class LegacyCameraFlow {
 
     public void processEditedImage(PluginCall call, ActivityResult result) {
         isEdited = true;
-        settings = plugin.getSettings(call);
+        settings = getSettings(call);
         if (result.getResultCode() == Activity.RESULT_CANCELED) {
             // User cancelled the edit operation, if this file was picked from photos,
             // process the original picked image, otherwise process it as a camera photo
@@ -514,7 +547,7 @@ public class LegacyCameraFlow {
             return;
         }
 
-        boolean saveToGallery = call.getBoolean("saveToGallery", CameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY);
+        boolean saveToGallery = call.getBoolean("saveToGallery", LegacyCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY);
         if (saveToGallery && (imageEditedFileSavePath != null || imageFileSavePath != null)) {
             isSaved = true;
             try {
@@ -559,10 +592,10 @@ public class LegacyCameraFlow {
                 }
             } catch (FileNotFoundException e) {
                 isSaved = false;
-                Logger.error(plugin.getLegacyLogTag(), IMAGE_GALLERY_SAVE_ERROR, e);
+                Logger.error(LOG_TAG, IMAGE_GALLERY_SAVE_ERROR, e);
             } catch (IOException e) {
                 isSaved = false;
-                Logger.error(plugin.getLegacyLogTag(), IMAGE_GALLERY_SAVE_ERROR, e);
+                Logger.error(LOG_TAG, IMAGE_GALLERY_SAVE_ERROR, e);
             }
         }
 
@@ -622,7 +655,7 @@ public class LegacyCameraFlow {
                 try {
                     bis.close();
                 } catch (IOException e) {
-                    Logger.error(plugin.getLegacyLogTag(), UNABLE_TO_PROCESS_IMAGE, e);
+                    Logger.error(LOG_TAG, UNABLE_TO_PROCESS_IMAGE, e);
                 }
             }
         }

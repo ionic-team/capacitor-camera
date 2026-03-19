@@ -17,6 +17,7 @@ import {
   ChooseFromGalleryOptions,
 } from "@capacitor/camera";
 
+
 interface ChooseFromGalleryConfigurableProps {
   buttonLabel?: string;
   onMediaResult: (results: MediaResult[]) => void;
@@ -59,7 +60,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
       const result = await Camera.chooseFromGallery({
         mediaType: MediaType.picture
       });
-      console.log("chooseFromGallery result", result);
+      console.log('chooseFromGallery result', result);
 
       this.props.onMediaResult(result.results);
     } catch (e) {
@@ -86,7 +87,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
         correctOrientation: config.correctOrientation,
         webUseInput: config.webUseInput,
       });
-      console.log("chooseFromGallery result", result);
+      console.log('chooseFromGallery result', result);
 
       this.props.onMediaResult(result.results);
     } catch (e) {
@@ -97,16 +98,12 @@ class ChooseFromGalleryConfigurable extends React.Component<
   };
 
   render() {
-    const { buttonLabel = "chooseFromGallery (Default)" } = this.props;
+    const { buttonLabel = 'chooseFromGallery (Default)' } = this.props;
     const { config } = this.state;
 
     return (
       <>
-        <IonButton
-          expand="block"
-          onClick={() => this.executeDefault()}
-          style={{ marginTop: "16px" }}
-        >
+        <IonButton expand="block" onClick={() => this.executeDefault()} style={{ marginTop: '16px' }}>
           {buttonLabel}
         </IonButton>
 
@@ -115,21 +112,19 @@ class ChooseFromGalleryConfigurable extends React.Component<
             <IonItem slot="header" lines="none">
               <IonLabel
                 style={{
-                  fontSize: "0.9em",
-                  color: "var(--ion-color-medium)",
+                  fontSize: '0.9em',
+                  color: 'var(--ion-color-medium)',
                 }}
               >
                 Expand to call chooseFromGallery with configurable options
               </IonLabel>
             </IonItem>
-            <div slot="content" style={{ padding: "16px" }}>
+            <div slot="content" style={{ padding: '16px' }}>
               <IonItem>
                 <IonLabel position="stacked">Media Type</IonLabel>
                 <IonSelect
                   value={config.mediaType}
-                  onIonChange={(e) =>
-                    this.updateConfig("mediaType", parseInt(e.detail.value!))
-                  }
+                  onIonChange={(e) => this.updateConfig('mediaType', parseInt(e.detail.value!))}
                 >
                   <IonSelectOption value={0}>Picture</IonSelectOption>
                   <IonSelectOption value={1}>Video</IonSelectOption>
@@ -141,9 +136,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
                 <IonLabel>Allow Multiple Selection</IonLabel>
                 <IonToggle
                   checked={config.allowMultipleSelection}
-                  onIonChange={(e) =>
-                    this.updateConfig("allowMultipleSelection", e.detail.checked)
-                  }
+                  onIonChange={(e) => this.updateConfig('allowMultipleSelection', e.detail.checked)}
                 />
               </IonItem>
 
@@ -226,9 +219,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
                 <IonLabel>Include Metadata</IonLabel>
                 <IonToggle
                   checked={config.includeMetadata}
-                  onIonChange={(e) =>
-                    this.updateConfig("includeMetadata", e.detail.checked)
-                  }
+                  onIonChange={(e) => this.updateConfig('includeMetadata', e.detail.checked)}
                 />
               </IonItem>
 
@@ -236,9 +227,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
                 <IonLabel>Allow Edit</IonLabel>
                 <IonToggle
                   checked={config.allowEdit}
-                  onIonChange={(e) =>
-                    this.updateConfig("allowEdit", e.detail.checked)
-                  }
+                  onIonChange={(e) => this.updateConfig('allowEdit', e.detail.checked)}
                 />
               </IonItem>
 
@@ -246,9 +235,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
                 <IonLabel>Edit In App</IonLabel>
                 <IonToggle
                   checked={config.editInApp}
-                  onIonChange={(e) =>
-                    this.updateConfig("editInApp", e.detail.checked)
-                  }
+                  onIonChange={(e) => this.updateConfig('editInApp', e.detail.checked)}
                 />
               </IonItem>
 
@@ -275,7 +262,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
               <IonButton
                 expand="block"
                 color="primary"
-                style={{ marginTop: "16px" }}
+                style={{ marginTop: '16px' }}
                 onClick={() => this.executeWithConfig()}
               >
                 Execute chooseFromGallery with Configuration

@@ -1,6 +1,6 @@
 package com.capacitorjs.plugins.camera
 
-class CameraSettings {
+class LegacyCameraSettings {
     var resultType: CameraResultType? = CameraResultType.BASE64
     var quality: Int = DEFAULT_QUALITY
     var shouldResize: Boolean = false
