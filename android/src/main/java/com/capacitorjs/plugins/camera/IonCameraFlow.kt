@@ -65,7 +65,6 @@ class IonCameraFlow(
         setupLaunchers()
         cameraManager = IONCAMRCameraManager(
             plugin.getAppId(),
-            ".fileprovider",
             IONCAMRExifHelper(),
             IONCAMRFileHelper(),
             IONCAMRMediaHelper(),
@@ -73,7 +72,6 @@ class IonCameraFlow(
         )
 
         videoManager = IONCAMRVideoManager(
-            ".fileprovider",
             IONCAMRFileHelper(),
         )
 
@@ -86,7 +84,6 @@ class IonCameraFlow(
 
         editManager = IONCAMREditManager(
             plugin.getAppId(),
-            ".fileprovider",
             IONCAMRExifHelper(),
             IONCAMRFileHelper(),
             IONCAMRMediaHelper(),
@@ -174,7 +171,8 @@ class IonCameraFlow(
     fun getVideoSettings(call: PluginCall): IonVideoSettings {
         return IonVideoSettings(
             saveToGallery = call.getBoolean("saveToGallery") ?: false,
-            includeMetadata = call.getBoolean("includeMetadata") ?: false
+            includeMetadata = call.getBoolean("includeMetadata") ?: false,
+            isPersistent = call.getBoolean("isPersistent") ?: true
         )
     }
 
@@ -732,7 +730,9 @@ class IonCameraFlow(
         val uri = Uri.fromFile(file)
 
         val ret = JSObject()
-        ret.put("path", mediaResult.uri)
+        ret.put("type", mediaResult.type)
+        ret.put("uri", mediaResult.uri)
+        ret.put("thumbnail", mediaResult.thumbnail)
         ret.put("webPath", FileUtils.getPortablePath(plugin.context, plugin.bridge.localUrl, uri))
         ret.put("saved", mediaResult.saved)
 
@@ -740,6 +740,8 @@ class IonCameraFlow(
             ret.put("duration", metadata.duration)
             ret.put("size", metadata.size)
             ret.put("format", metadata.format)
+            ret.put("resolution", metadata.resolution)
+            ret.put("creationDate", metadata.creationDate)
         }
         currentCall?.resolve(ret)
         currentCall = null
@@ -828,6 +830,7 @@ class IonCameraFlow(
                 plugin.activity,
                 uri,
                 settings.saveToGallery,
+                settings.isPersistent,
                 settings.includeMetadata,
                 { mediaResult ->
                     handleVideoMediaResult(mediaResult)
