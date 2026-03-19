@@ -124,7 +124,7 @@ export interface TakePhotoOptions {
    *
    * @since 8.1.0
    */
-  width?: number;
+  targetWidth?: number;
 
   /**
    * The desired maximum height of the saved image. The aspect ratio is respected.
@@ -132,7 +132,7 @@ export interface TakePhotoOptions {
    *
    * @since 8.1.0
    */
-  height?: number;
+  targetHeight?: number;
 
   /**
    * Whether to automatically rotate the image "up" to correct for orientation
@@ -343,7 +343,7 @@ export interface ChooseFromGalleryOptions {
    *
    * @since 1.0.0
    */
-  width?: number;
+  targetWidth?: number;
 
   /**
    * The desired maximum height of the saved image. The aspect ratio is respected.
@@ -352,7 +352,7 @@ export interface ChooseFromGalleryOptions {
    *
    * @since 8.1.0
    */
-  height?: number;
+  targetHeight?: number;
 
   /**
    * Whether to automatically rotate the image "up" to correct for orientation

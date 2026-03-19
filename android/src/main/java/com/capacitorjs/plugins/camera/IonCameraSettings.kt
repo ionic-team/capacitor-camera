@@ -7,8 +7,8 @@ class IonCameraSettings {
     var shouldCorrectOrientation: Boolean = DEFAULT_CORRECT_ORIENTATION
     var saveToGallery: Boolean = DEFAULT_SAVE_IMAGE_TO_GALLERY
     var allowEdit: Boolean = false
-    var width: Int = 0
-    var height: Int = 0
+    var targetWidth: Int = 0
+    var targetHeight: Int = 0
     var source: CameraSource? = CameraSource.PROMPT
     var editInApp: Boolean = true
     var includeMetadata: Boolean = false

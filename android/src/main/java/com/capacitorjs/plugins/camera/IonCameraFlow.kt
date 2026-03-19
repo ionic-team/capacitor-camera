@@ -193,9 +193,9 @@ class IonCameraFlow(
         settings.saveToGallery = call.getBoolean("saveToGallery", IonCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY)!!
         settings.allowEdit = call.getBoolean("allowEdit", false)!!
         settings.quality = call.getInt("quality", IonCameraSettings.DEFAULT_QUALITY)!!
-        settings.width = call.getInt("width", 0)!!
-        settings.height = call.getInt("height", 0)!!
-        settings.shouldResize = settings.width > 0 || settings.height > 0
+        settings.targetWidth = call.getInt("targetWidth", 0)!!
+        settings.targetHeight = call.getInt("targetHeight", 0)!!
+        settings.shouldResize = settings.targetWidth > 0 || settings.targetHeight > 0
         settings.shouldCorrectOrientation =
             call.getBoolean("correctOrientation", IonCameraSettings.DEFAULT_CORRECT_ORIENTATION)!!
         settings.editInApp = call.getBoolean("editInApp", true)!!
@@ -891,8 +891,8 @@ class IonCameraFlow(
         val useLatestVersion = (resultType == CameraResultType.URI)
         return IONCAMRCameraParameters(
             mQuality = quality,
-            targetWidth = width,
-            targetHeight = height,
+            targetWidth = targetWidth,
+            targetHeight = targetHeight,
             encodingType = CameraPlugin.ENCODING_TYPE, // JPEG
             mediaType = CameraPlugin.MEDIA_TYPE_PHOTO,
             allowEdit = allowEdit,
