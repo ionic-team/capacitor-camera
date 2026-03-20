@@ -16,7 +16,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import com.capacitorjs.plugins.camera.IonCameraSettings.Companion.DEFAULT_CORRECT_ORIENTATION
 import com.capacitorjs.plugins.camera.IonCameraSettings.Companion.DEFAULT_QUALITY
-import com.capacitorjs.plugins.camera.IonCameraSettings.Companion.DEFAULT_SAVE_IMAGE_TO_GALLERY
 import com.getcapacitor.FileUtils
 import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
@@ -63,6 +62,10 @@ class IonCameraFlow(
         editURI = "", fromUri = false, saveToGallery = false, includeMetadata = false
     )
     private var lastEditUri: String? = null
+
+    companion object {
+        private const val AUTHORITY = ".camera.provider"
+    }
 
     fun load() {
         setupLaunchers()
@@ -378,7 +381,7 @@ class IonCameraFlow(
                         val appId = plugin.getAppId()
                         val tmpFile = FileProvider.getUriForFile(
                             plugin.activity,
-                            "$appId.fileprovider",
+                            "$appId$AUTHORITY",
                             editor.createCaptureFile(
                                 plugin.activity,
                                 settings.encodingType,
@@ -571,7 +574,7 @@ class IonCameraFlow(
         val appId = plugin.getAppId()
         val tmpFile = FileProvider.getUriForFile(
             plugin.activity,
-            "$appId.fileprovider",
+            "$appId$AUTHORITY",
             editor.createCaptureFile(
                 plugin.activity,
                 settings.encodingType,
@@ -597,16 +600,16 @@ class IonCameraFlow(
                 val editFile = File(origPhotoUri.path!!)
                 editUri = FileProvider.getUriForFile(
                     plugin.activity,
-                    plugin.context.packageName + ".fileprovider",
+                    plugin.context.packageName + AUTHORITY,
                     editFile
                 )
                 lastEditUri = editFile.absolutePath
-            }else if (origPhotoUri.scheme == "content"){
+            } else if (origPhotoUri.scheme == "content") {
                 val tempUri = IonCameraUtils.getCameraTempImage(plugin.activity, origPhotoUri) ?: return null
                 val editFile = File(tempUri.path!!)
                 editUri = FileProvider.getUriForFile(
                     plugin.activity,
-                    plugin.context.packageName + ".fileprovider",
+                    plugin.context.packageName + AUTHORITY,
                     editFile
                 )
                 lastEditUri = editFile.absolutePath
