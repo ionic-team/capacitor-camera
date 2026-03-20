@@ -41,7 +41,6 @@ class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
       method: "recordVideo",
       uri: result.uri,
       webPath: result.webPath,
-      thumbnail: result.thumbnail,
       format: result.metadata?.format,
       size: result.metadata?.size,
       duration: result.metadata?.duration,

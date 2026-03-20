@@ -57,7 +57,6 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
       uri: photo.path,
       webPath: photo.webPath,
       saved: false,
-      thumbnail: undefined,
       metadata: photo.exif
         ? {
             format: photo.format,
@@ -106,7 +105,6 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
         method: "chooseFromGallery",
         uri: result.uri,
         webPath: result.webPath,
-        thumbnail: result.thumbnail,
         format: result.metadata?.format,
         size: result.metadata?.size,
         saved: result.saved,
@@ -167,7 +165,6 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
         method: "editURIPhoto",
         uri: result.uri,
         webPath: result.webPath,
-        thumbnail: result.thumbnail,
         format: result.metadata?.format,
         size: result.metadata?.size,
         saved: result.saved,

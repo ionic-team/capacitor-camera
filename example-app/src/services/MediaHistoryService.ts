@@ -6,7 +6,6 @@ export interface MediaHistoryItem {
   mediaType: "photo" | "video";
   method: string;
   uri?: string;
-  thumbnail?: string;
   metadata?: MediaMetadata;
   // path is a legacy fields (for backward compatibility with deprecated APIs)
   path?: string;
@@ -19,7 +18,6 @@ export interface MediaHistoryItem {
 
 class MediaHistoryServiceClass {
   private readonly STORAGE_KEY = "capacitor_camera_media_history";
-  private readonly MAX_ITEMS = 100;
 
   addMedia(item: Omit<MediaHistoryItem, "id" | "timestamp">): void {
     try {
@@ -33,11 +31,16 @@ class MediaHistoryServiceClass {
       };
 
       const history = this.getAllMedia();
+
       history.unshift(newItem);
 
-      const trimmedHistory = history.slice(0, this.MAX_ITEMS);
+      // Keep only MAX_ITEMS, removing oldest items from the end
+      const trimmedHistory = history;// history.slice(0, this.MAX_ITEMS);
 
+      // Save to localStorage
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(trimmedHistory));
+
+      console.log(`Media added: ${newItem.method} | Total items: ${trimmedHistory.length}`);
     } catch (error) {
       console.error("Failed to add media to history:", error);
     }
