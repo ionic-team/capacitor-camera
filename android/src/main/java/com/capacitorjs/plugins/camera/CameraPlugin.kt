@@ -53,7 +53,7 @@ class CameraPlugin : Plugin() {
         const val STORE = "CameraStore"
         const val EDIT_FILE_NAME_KEY = "EditFileName"
         const val ERROR_FORMAT_PREFIX = "OS-PLUG-CAMR-"
-        const val MEDIA_TYPE_PICTURE = 0
+        const val MEDIA_TYPE_PHOTO = 0
     }
 
     private lateinit var legacyFlow: LegacyCameraFlow

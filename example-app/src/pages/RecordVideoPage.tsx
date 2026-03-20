@@ -54,7 +54,7 @@ class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
     if (!this.state.filePath) return;
 
     try {
-      await Camera.playVideo({ videoURI: this.state.filePath });
+      await Camera.playVideo({ uri: this.state.filePath });
     } catch (e) {
       const error = e as any;
       const errorMessage = error.code ? `[${error.code}] ${error.message}` : error.message;

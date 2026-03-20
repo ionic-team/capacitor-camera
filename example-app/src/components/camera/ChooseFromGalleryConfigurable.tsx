@@ -13,7 +13,7 @@ import React from "react";
 import {
   Camera,
   MediaResult,
-  MediaType,
+  MediaTypeSelection,
   ChooseFromGalleryOptions,
 } from "@capacitor/camera";
 
@@ -36,7 +36,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
     // Initialize with API defaults from ChooseFromGalleryOptions
     this.state = {
       config: {
-        mediaType: MediaType.picture,
+        mediaType: MediaTypeSelection.Photo,
         allowMultipleSelection: false,
         limit: 0,
         includeMetadata: false,
@@ -58,7 +58,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
   executeDefault = async (): Promise<void> => {
     try {
       const result = await Camera.chooseFromGallery({
-        mediaType: MediaType.picture
+        mediaType: MediaTypeSelection.Photo
       });
       console.log('chooseFromGallery result', result);
 
@@ -82,8 +82,8 @@ class ChooseFromGalleryConfigurable extends React.Component<
         editInApp: config.editInApp,
         presentationStyle: config.presentationStyle,
         quality: config.quality,
-        width: config.width,
-        height: config.height,
+        targetWidth: config.targetWidth,
+        targetHeight: config.targetHeight,
         correctOrientation: config.correctOrientation,
         webUseInput: config.webUseInput,
       });
@@ -168,14 +168,14 @@ class ChooseFromGalleryConfigurable extends React.Component<
               </IonItem>
 
               <IonItem>
-                <IonLabel position="stacked">Width (optional)</IonLabel>
+                <IonLabel position="stacked">Target Width (optional)</IonLabel>
                 <IonInput
                   type="number"
                   placeholder="Leave empty for no constraint"
-                  value={config.width ?? ""}
+                  value={config.targetWidth ?? ""}
                   onIonChange={(e) =>
                     this.updateConfig(
-                      "width",
+                      "targetWidth",
                       e.detail.value ? parseInt(e.detail.value) : undefined
                     )
                   }
@@ -183,14 +183,14 @@ class ChooseFromGalleryConfigurable extends React.Component<
               </IonItem>
 
               <IonItem>
-                <IonLabel position="stacked">Height (optional)</IonLabel>
+                <IonLabel position="stacked">Target Height (optional)</IonLabel>
                 <IonInput
                   type="number"
                   placeholder="Leave empty for no constraint"
-                  value={config.height ?? ""}
+                  value={config.targetHeight ?? ""}
                   onIonChange={(e) =>
                     this.updateConfig(
-                      "height",
+                      "targetHeight",
                       e.detail.value ? parseInt(e.detail.value) : undefined
                     )
                   }

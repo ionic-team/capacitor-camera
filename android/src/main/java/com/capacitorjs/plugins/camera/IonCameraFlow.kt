@@ -188,8 +188,8 @@ class IonCameraFlow(
             allowEdit = call.getBoolean("allowEdit") ?: false,
             editInApp = call.getBoolean("editInApp") ?: true,
             quality = call.getInt("quality") ?: DEFAULT_QUALITY,
-            width = call.getInt("width") ?: 0,
-            height = call.getInt("height") ?: 0,
+            width = call.getInt("targetWidth") ?: 0,
+            height = call.getInt("targetWidth") ?: 0,
             correctOrientation = call.getBoolean("correctOrientation") ?:  DEFAULT_CORRECT_ORIENTATION
         )
     }
@@ -210,15 +210,15 @@ class IonCameraFlow(
     fun getCameraSettings(call: PluginCall): IonCameraSettings {
         val settings = IonCameraSettings()
         settings.quality = call.getInt("quality", IonCameraSettings.DEFAULT_QUALITY)!!
-        settings.width = call.getInt("width", 0)!!
-        settings.height = call.getInt("height", 0)!!
+        settings.targetWidth = call.getInt("targetWidth", 0)!!
+        settings.targetHeight = call.getInt("targetHeight", 0)!!
         settings.correctOrientation = call.getBoolean("correctOrientation", IonCameraSettings.DEFAULT_CORRECT_ORIENTATION)!!
         settings.encodingType = call.getInt("encodingType", IonCameraSettings.DEFAULT_ENCODING_TYPE)!!
         settings.saveToGallery = call.getBoolean("saveToGallery", IonCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY)!!
         settings.allowEdit = call.getBoolean("allowEdit", false)!!
         settings.editInApp = call.getBoolean("editInApp", true)!!
         settings.includeMetadata = call.getBoolean("includeMetadata", false)!!
-        settings.shouldResize = settings.width > 0 || settings.height > 0
+        settings.shouldResize = settings.targetWidth > 0 || settings.targetHeight > 0
         return settings
     }
 
@@ -286,7 +286,7 @@ class IonCameraFlow(
                 return
             }
 
-            val videoUri = call.getString("videoURI")
+            val videoUri = call.getString("uri")
                 ?: return sendError(IONCAMRError.PLAY_VIDEO_GENERAL_ERROR)
             manager.playVideo(plugin.activity, videoUri, {
                 call.resolve()
@@ -912,10 +912,10 @@ class IonCameraFlow(
     private fun IonCameraSettings.toIonParameters(): IONCAMRCameraParameters {
         return IONCAMRCameraParameters(
             mQuality = quality,
-            targetWidth = width,
-            targetHeight = height,
+            targetWidth = targetWidth,
+            targetHeight = targetHeight,
             encodingType = encodingType,
-            mediaType = CameraPlugin.MEDIA_TYPE_PICTURE,
+            mediaType = CameraPlugin.MEDIA_TYPE_PHOTO,
             allowEdit = allowEdit,
             correctOrientation = correctOrientation,
             saveToPhotoAlbum = saveToGallery,

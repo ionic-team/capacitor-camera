@@ -231,7 +231,6 @@ public class LegacyCameraFlow {
         }
     }
 
-
     public void openCamera(final PluginCall call) {
         if (checkCameraPermissions(call)) {
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);

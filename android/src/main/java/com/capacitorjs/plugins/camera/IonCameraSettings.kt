@@ -2,8 +2,8 @@ package com.capacitorjs.plugins.camera
 
 class IonCameraSettings {
     var quality: Int = DEFAULT_QUALITY
-    var width: Int = 0
-    var height: Int = 0
+    var targetWidth: Int = 0
+    var targetHeight: Int = 0
     var correctOrientation: Boolean = DEFAULT_CORRECT_ORIENTATION
     var encodingType: Int = 0 //JPEG
     var saveToGallery: Boolean = DEFAULT_SAVE_IMAGE_TO_GALLERY

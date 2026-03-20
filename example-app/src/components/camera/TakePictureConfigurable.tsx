@@ -169,14 +169,14 @@ class TakePictureConfigurable extends React.Component<
 
               {/* Dimensions */}
               <IonItem>
-                <IonLabel position="stacked">Width (optional)</IonLabel>
+                <IonLabel position="stacked">Target Width (optional)</IonLabel>
                 <IonInput
                   type="number"
                   placeholder="Leave empty for no constraint"
-                  value={config.width ?? ""}
+                  value={config.targetWidth ?? ""}
                   onIonChange={(e) =>
                     this.updateConfig(
-                      "width",
+                      "targetWidth",
                       e.detail.value ? parseInt(e.detail.value) : undefined
                     )
                   }
@@ -184,14 +184,14 @@ class TakePictureConfigurable extends React.Component<
               </IonItem>
 
               <IonItem>
-                <IonLabel position="stacked">Height (optional)</IonLabel>
+                <IonLabel position="stacked">Target Height (optional)</IonLabel>
                 <IonInput
                   type="number"
                   placeholder="Leave empty for no constraint"
-                  value={config.height ?? ""}
+                  value={config.targetHeight ?? ""}
                   onIonChange={(e) =>
                     this.updateConfig(
-                      "height",
+                      "targetHeight",
                       e.detail.value ? parseInt(e.detail.value) : undefined
                     )
                   }
