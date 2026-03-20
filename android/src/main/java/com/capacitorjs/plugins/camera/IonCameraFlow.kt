@@ -188,8 +188,8 @@ class IonCameraFlow(
             allowEdit = call.getBoolean("allowEdit") ?: false,
             editInApp = call.getBoolean("editInApp") ?: true,
             quality = call.getInt("quality") ?: DEFAULT_QUALITY,
-            width = call.getInt("width") ?: 0,
-            height = call.getInt("height") ?: 0,
+            width = call.getInt("targetWidth") ?: 0,
+            height = call.getInt("targetWidth") ?: 0,
             correctOrientation = call.getBoolean("correctOrientation") ?:  DEFAULT_CORRECT_ORIENTATION
         )
     }
