@@ -33,14 +33,10 @@ class MediaHistoryServiceClass {
       const history = this.getAllMedia();
 
       history.unshift(newItem);
-
-      // Keep only MAX_ITEMS, removing oldest items from the end
-      const trimmedHistory = history;// history.slice(0, this.MAX_ITEMS);
-
       // Save to localStorage
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(trimmedHistory));
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(history));
 
-      console.log(`Media added: ${newItem.method} | Total items: ${trimmedHistory.length}`);
+      console.log(`Media added: ${newItem.method} | Total items: ${history.length}`);
     } catch (error) {
       console.error("Failed to add media to history:", error);
     }
