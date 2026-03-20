@@ -2,11 +2,20 @@ package com.capacitorjs.plugins.camera
 
 import io.ionic.libs.ioncameralib.model.IONCAMRMediaType
 
-data class IonGallerySettings(
-    val mediaType: IONCAMRMediaType = IONCAMRMediaType.ALL,
-    val allowMultipleSelection: Boolean = false,
-    val limit: Int = 0,
-    val includeMetadata: Boolean = false,
-    val allowEdit: Boolean = false,
-    val editInApp: Boolean = true
-)
+class IonGallerySettings {
+    var mediaType: IONCAMRMediaType = IONCAMRMediaType.ALL
+    var allowMultipleSelection: Boolean = false
+    var limit: Int = 0
+    var includeMetadata: Boolean = false
+    var allowEdit: Boolean = false
+    var editInApp: Boolean = true
+    var quality: Int = DEFAULT_QUALITY
+    var width: Int = 0
+    var height: Int = 0
+    var correctOrientation: Boolean = DEFAULT_CORRECT_ORIENTATION
+
+    companion object {
+        const val DEFAULT_QUALITY: Int = 90
+        const val DEFAULT_CORRECT_ORIENTATION: Boolean = true
+    }
+}
