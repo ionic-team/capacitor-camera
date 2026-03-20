@@ -331,7 +331,7 @@ class IonCameraFlow(
             saveToGallery = false,
             includeMetadata = false
         )
-        val imageBase64 = call.data.getString("base64")
+        val imageBase64 = call.getString("inputImage")
         if (imageBase64 == null) return
         manager.editImage(plugin.activity, imageBase64, editLauncher)
     }
@@ -687,8 +687,7 @@ class IonCameraFlow(
 
     private fun handleEditBase64Result(image: String) {
         val ret = JSObject()
-        ret.put("format", "jpeg")
-        ret.put("base64String", image)
+        ret.put("outputImage", image)
         currentCall?.resolve(ret)
         currentCall = null
     }
