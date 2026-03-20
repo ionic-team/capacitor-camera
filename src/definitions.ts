@@ -119,7 +119,8 @@ export interface TakePhotoOptions {
   quality?: number;
 
   /**
-   * The desired maximum width of the saved image. The aspect ratio is respected.
+   * The target width of photos to apply.
+   * Must be a positive number, and used along `targetHeight`.
    * Note: This option is only supported on Android and iOS.
    *
    * @since 8.1.0
@@ -127,7 +128,8 @@ export interface TakePhotoOptions {
   targetWidth?: number;
 
   /**
-   * The desired maximum height of the saved image. The aspect ratio is respected.
+   * The target width of photos to apply.
+   * Must be a positive number, and used along `targetWidth`.
    * Note: This option is only supported on Android and iOS.
    *
    * @since 8.1.0
@@ -337,7 +339,8 @@ export interface ChooseFromGalleryOptions {
   quality?: number;
 
   /**
-   * The desired maximum width of the saved images. The aspect ratio is respected.
+   * The target width of photos to apply.
+   * Must be a positive number, and used along `targetHeight`.
    * Not applicable when videos are selected.
    * Note: This option is only supported on Android and iOS.
    *
@@ -346,7 +349,8 @@ export interface ChooseFromGalleryOptions {
   targetWidth?: number;
 
   /**
-   * The desired maximum height of the saved image. The aspect ratio is respected.
+   * The target width of photos to apply.
+   * Must be a positive number, and used along `targetWidth`.
    * Not applicable when videos are selected.
    * Note: This option is only supported on Android and iOS.
    *
