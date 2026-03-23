@@ -219,7 +219,10 @@ public class LegacyCameraFlow {
         if (call.getMethodName().equals("pickImages")) {
             openPhotos(call, true);
         } else {
-            if (settings.getSource() == CameraSource.CAMERA && permissionHelper.getPermissionState(CameraPlugin.CAMERA) != PermissionState.GRANTED) {
+            if (
+                settings.getSource() == CameraSource.CAMERA &&
+                permissionHelper.getPermissionState(CameraPlugin.CAMERA) != PermissionState.GRANTED
+            ) {
                 Logger.debug(LOG_TAG, "User denied camera permission: " + permissionHelper.getPermissionState(CameraPlugin.CAMERA));
                 call.reject(PERMISSION_DENIED_ERROR_CAMERA);
                 return;
@@ -757,11 +760,7 @@ public class LegacyCameraFlow {
     private Intent createEditIntent(Uri origPhotoUri) {
         try {
             File editFile = new File(origPhotoUri.getPath());
-            Uri editUri = FileProvider.getUriForFile(
-                activity,
-                context.getPackageName() + ".fileprovider",
-                editFile
-            );
+            Uri editUri = FileProvider.getUriForFile(activity, context.getPackageName() + ".fileprovider", editFile);
             Intent editIntent = new Intent(Intent.ACTION_EDIT);
             editIntent.setDataAndType(editUri, "image/*");
             imageEditedFileSavePath = editFile.getAbsolutePath();
