@@ -76,9 +76,9 @@ public class LegacyCameraFlow {
     private static final String IMAGE_EDIT_ERROR = "Unable to edit image";
     private static final String IMAGE_GALLERY_SAVE_ERROR = "Unable to save the image in the gallery";
     private static final String USER_CANCELLED = "User cancelled photos app";
-
     private static final String LOG_TAG = "LegacyCameraFlow";
-
+    private static final String CAMERA = "camera";
+    private static final String SAVE_GALLERY = "saveGallery";
     private String imageFileSavePath;
     private String imageEditedFileSavePath;
     private Uri imageFileUri;
@@ -180,16 +180,16 @@ public class LegacyCameraFlow {
 
     public boolean checkCameraPermissions(PluginCall call) {
         // if the manifest does not contain the camera permissions key, we don't need to ask the user
-        boolean needCameraPerms = permissionHelper.isPermissionDeclared(CameraPlugin.CAMERA);
-        boolean hasCameraPerms = !needCameraPerms || permissionHelper.getPermissionState(CameraPlugin.CAMERA) == PermissionState.GRANTED;
-        boolean hasGalleryPerms = permissionHelper.getPermissionState(CameraPlugin.SAVE_GALLERY) == PermissionState.GRANTED;
+        boolean needCameraPerms = permissionHelper.isPermissionDeclared(CAMERA);
+        boolean hasCameraPerms = !needCameraPerms || permissionHelper.getPermissionState(CAMERA) == PermissionState.GRANTED;
+        boolean hasGalleryPerms = permissionHelper.getPermissionState(SAVE_GALLERY) == PermissionState.GRANTED;
 
         // If we want to save to the gallery, we need two permissions
         // actually we only need permissions to save to gallery for Android <= 9 (API 28)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             // we might still need to request permission for the camera
             if (!hasCameraPerms) {
-                permissionHelper.requestPermissionForAlias(CameraPlugin.CAMERA, call, "cameraPermissionsCallback");
+                permissionHelper.requestPermissionForAlias(CAMERA, call, "cameraPermissionsCallback");
                 return false;
             }
             return true;
@@ -200,16 +200,16 @@ public class LegacyCameraFlow {
             isFirstRequest = false;
             String[] aliases;
             if (needCameraPerms) {
-                aliases = new String[] { CameraPlugin.CAMERA, CameraPlugin.SAVE_GALLERY };
+                aliases = new String[] { CAMERA, SAVE_GALLERY };
             } else {
-                aliases = new String[] { CameraPlugin.SAVE_GALLERY };
+                aliases = new String[] { SAVE_GALLERY };
             }
             permissionHelper.requestPermissionForAliases(aliases, call, "cameraPermissionsCallback");
             return false;
         }
         // If we don't need to save to the gallery, we can just ask for camera permissions
         else if (!hasCameraPerms) {
-            permissionHelper.requestPermissionForAlias(CameraPlugin.CAMERA, call, "cameraPermissionsCallback");
+            permissionHelper.requestPermissionForAlias(CAMERA, call, "cameraPermissionsCallback");
             return false;
         }
         return true;
@@ -221,9 +221,9 @@ public class LegacyCameraFlow {
         } else {
             if (
                 settings.getSource() == CameraSource.CAMERA &&
-                permissionHelper.getPermissionState(CameraPlugin.CAMERA) != PermissionState.GRANTED
+                permissionHelper.getPermissionState(CAMERA) != PermissionState.GRANTED
             ) {
-                Logger.debug(LOG_TAG, "User denied camera permission: " + permissionHelper.getPermissionState(CameraPlugin.CAMERA));
+                Logger.debug(LOG_TAG, "User denied camera permission: " + permissionHelper.getPermissionState(CAMERA));
                 call.reject(PERMISSION_DENIED_ERROR_CAMERA);
                 return;
             }

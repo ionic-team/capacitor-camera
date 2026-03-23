@@ -46,14 +46,10 @@ import org.json.JSONException
 class CameraPlugin : Plugin() {
 
     companion object {
-        const val CAMERA = "camera"
-        const val PHOTOS = "photos"
-        const val SAVE_GALLERY = "saveGallery"
-        const val READ_EXTERNAL_STORAGE = "readExternalStorage"
-        const val STORE = "CameraStore"
-        const val EDIT_FILE_NAME_KEY = "EditFileName"
-        const val ERROR_FORMAT_PREFIX = "OS-PLUG-CAMR-"
-        const val MEDIA_TYPE_PHOTO = 0
+        private const val CAMERA = "camera"
+        private const val PHOTOS = "photos"
+        private const val SAVE_GALLERY = "saveGallery"
+        private const val READ_EXTERNAL_STORAGE = "readExternalStorage"
     }
 
     private lateinit var legacyFlow: LegacyCameraFlow

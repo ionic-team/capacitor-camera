@@ -71,6 +71,12 @@ class IonCameraFlow(
 
     companion object {
         private const val AUTHORITY = ".camera.provider"
+        private const val CAMERA = "camera"
+        private const val SAVE_GALLERY = "saveGallery"
+        private const val STORE = "CameraStore"
+        private const val EDIT_FILE_NAME_KEY = "EditFileName"
+        private const val ERROR_FORMAT_PREFIX = "OS-PLUG-CAMR-"
+        private const val MEDIA_TYPE_PHOTO = 0
     }
 
     fun load() {
@@ -396,9 +402,9 @@ class IonCameraFlow(
                                 activity,
                                 settings.encodingType,
                                 activity.getSharedPreferences(
-                                    CameraPlugin.STORE,
+                                    STORE,
                                     Context.MODE_PRIVATE
-                                ).getString(CameraPlugin.EDIT_FILE_NAME_KEY, "") ?: ""
+                                ).getString(EDIT_FILE_NAME_KEY, "") ?: ""
                             )
                         )
 
@@ -589,9 +595,9 @@ class IonCameraFlow(
                 activity,
                 settings.encodingType,
                 activity.getSharedPreferences(
-                    CameraPlugin.STORE,
+                    STORE,
                     Context.MODE_PRIVATE
-                ).getString(CameraPlugin.EDIT_FILE_NAME_KEY, "") ?: ""
+                ).getString(EDIT_FILE_NAME_KEY, "") ?: ""
             )
         )
 
@@ -846,8 +852,8 @@ class IonCameraFlow(
         var uri = result.data?.data
         if (uri == null) {
             val fromPreferences =
-                activity.getSharedPreferences(CameraPlugin.STORE, Context.MODE_PRIVATE)
-                    .getString(CameraPlugin.STORE, "")
+                activity.getSharedPreferences(STORE, Context.MODE_PRIVATE)
+                    .getString(STORE, "")
             fromPreferences.let { uri = Uri.parse(fromPreferences) }
         }
         if (activity == null) {
@@ -927,7 +933,7 @@ class IonCameraFlow(
             targetWidth = targetWidth,
             targetHeight = targetHeight,
             encodingType = encodingType,
-            mediaType = CameraPlugin.MEDIA_TYPE_PHOTO,
+            mediaType = MEDIA_TYPE_PHOTO,
             allowEdit = allowEdit,
             correctOrientation = correctOrientation,
             saveToPhotoAlbum = saveToGallery,
@@ -938,11 +944,11 @@ class IonCameraFlow(
 
     fun checkCameraPermissions(call: PluginCall, saveToGallery: Boolean): Boolean {
         // if the manifest does not contain the camera permissions key, we don't need to ask the user
-        val needCameraPerms = permissionHelper.isPermissionDeclared(CameraPlugin.CAMERA)
+        val needCameraPerms = permissionHelper.isPermissionDeclared(CAMERA)
         val hasCameraPerms =
-            !needCameraPerms || permissionHelper.getPermissionState(CameraPlugin.CAMERA) == PermissionState.GRANTED
+            !needCameraPerms || permissionHelper.getPermissionState(CAMERA) == PermissionState.GRANTED
         val hasGalleryPerms =
-            permissionHelper.getPermissionState(CameraPlugin.SAVE_GALLERY) == PermissionState.GRANTED
+            permissionHelper.getPermissionState(SAVE_GALLERY) == PermissionState.GRANTED
 
         // If we want to save to the gallery, we need two permissions
         // actually we only need permissions to save to gallery for Android <= 9 (API 28)
@@ -950,7 +956,7 @@ class IonCameraFlow(
             // we might still need to request permission for the camera
             if (!hasCameraPerms) {
                 permissionHelper.requestPermissionForAlias(
-                    CameraPlugin.CAMERA,
+                    CAMERA,
                     call,
                     "ionCameraPermissionsCallback"
                 )
@@ -963,15 +969,15 @@ class IonCameraFlow(
         if (saveToGallery && !(hasCameraPerms && hasGalleryPerms) && isFirstRequest) {
             isFirstRequest = false
             val aliases: Array<String> = if (needCameraPerms) {
-                arrayOf(CameraPlugin.CAMERA, CameraPlugin.SAVE_GALLERY)
+                arrayOf(CAMERA, SAVE_GALLERY)
             } else {
-                arrayOf(CameraPlugin.SAVE_GALLERY)
+                arrayOf(SAVE_GALLERY)
             }
             permissionHelper.requestPermissionForAliases(aliases, call, "ionCameraPermissionsCallback")
             return false
         } else if (!hasCameraPerms) {
             permissionHelper.requestPermissionForAlias(
-                CameraPlugin.CAMERA,
+                CAMERA,
                 call,
                 "ionCameraPermissionsCallback"
             )
@@ -981,7 +987,7 @@ class IonCameraFlow(
     }
 
     fun handleCameraPermissionsCallback(call: PluginCall) {
-        if (permissionHelper.getPermissionState(CameraPlugin.CAMERA) != PermissionState.GRANTED) {
+        if (permissionHelper.getPermissionState(CAMERA) != PermissionState.GRANTED) {
             sendError(IONCAMRError.CAMERA_PERMISSION_DENIED_ERROR)
             return
         }
@@ -1011,7 +1017,7 @@ class IonCameraFlow(
 
     private fun formatErrorCode(code: Int): String {
         val stringCode = Integer.toString(code)
-        return CameraPlugin.ERROR_FORMAT_PREFIX + "0000$stringCode".substring(stringCode.length)
+        return ERROR_FORMAT_PREFIX + "0000$stringCode".substring(stringCode.length)
     }
 
     fun onDestroy() {
