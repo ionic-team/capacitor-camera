@@ -653,13 +653,46 @@ extension CameraPlugin: IONCAMRCallbackDelegate {
     private func resolve<T: Encodable>(_ value: T) {
         do {
             let data = try JSONEncoder().encode(value)
-            let json = try JSONSerialization.jsonObject(with: data)
-            
+            var json = try JSONSerialization.jsonObject(with: data)
+
+            // Add webPath to results
+            if var dict = json as? [String: Any] {
+                // Handle single result
+                if let uri = dict["uri"] as? String,
+                   let webPath = resolveWebPath(from: uri) {
+                    dict["webPath"] = webPath
+                }
+
+                // Handle array of results
+                if var results = dict["results"] as? [[String: Any]] {
+                    results = results.map { item in
+                        var newItem = item
+                        if let uri = item["uri"] as? String,
+                           let webPath = resolveWebPath(from: uri) {
+                            newItem["webPath"] = webPath
+                        }
+                        return newItem
+                    }
+                    dict["results"] = results
+                }
+
+                json = dict
+            }
+
             DispatchQueue.main.async {
                 self.call?.resolve(json as? [String: Any] ?? [:])
             }
         } catch {
             sendError(.invalidEncodeResultMedia)
         }
+    }
+
+    private func resolveWebPath(from uri: String) -> String? {
+        guard !uri.isEmpty,
+              let fileURL = URL(string: uri),
+              let webURL = bridge?.portablePath(fromLocalURL: fileURL) else {
+            return nil
+        }
+        return webURL.absoluteString
     }
 }
