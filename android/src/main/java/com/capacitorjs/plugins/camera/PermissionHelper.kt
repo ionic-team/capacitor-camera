@@ -4,9 +4,7 @@ import com.getcapacitor.PermissionState
 import com.getcapacitor.PluginCall
 
 /**
- * Helper class that provides permission-related functionality without
- * creating a circular dependency with the plugin.
- * Uses function references instead of holding a plugin reference.
+ * Helper class for wrapping permission-related functionality.
  */
 class PermissionHelper(
     private val isPermissionDeclaredFn: (String) -> Boolean,
