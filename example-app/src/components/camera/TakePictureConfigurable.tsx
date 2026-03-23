@@ -109,7 +109,7 @@ class TakePictureConfigurable extends React.Component<
                   min="0"
                   max="100"
                   value={config.quality}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig("quality", parseInt(e.detail.value!) || 100)
                   }
                 />
@@ -174,7 +174,7 @@ class TakePictureConfigurable extends React.Component<
                   type="number"
                   placeholder="Leave empty for no constraint"
                   value={config.targetWidth ?? ""}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig(
                       "targetWidth",
                       e.detail.value ? parseInt(e.detail.value) : undefined
@@ -189,7 +189,7 @@ class TakePictureConfigurable extends React.Component<
                   type="number"
                   placeholder="Leave empty for no constraint"
                   value={config.targetHeight ?? ""}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig(
                       "targetHeight",
                       e.detail.value ? parseInt(e.detail.value) : undefined

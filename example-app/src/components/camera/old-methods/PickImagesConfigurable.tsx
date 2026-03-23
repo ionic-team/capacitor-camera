@@ -117,7 +117,7 @@ class PickImagesConfigurable extends React.Component<
                   min="0"
                   max="100"
                   value={config.quality}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig("quality", parseInt(e.detail.value!) || 100)
                   }
                 />
@@ -129,7 +129,7 @@ class PickImagesConfigurable extends React.Component<
                   type="number"
                   placeholder="Leave empty for no constraint"
                   value={config.width ?? ""}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig(
                       "width",
                       e.detail.value ? parseInt(e.detail.value) : undefined
@@ -144,7 +144,7 @@ class PickImagesConfigurable extends React.Component<
                   type="number"
                   placeholder="Leave empty for no constraint"
                   value={config.height ?? ""}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig(
                       "height",
                       e.detail.value ? parseInt(e.detail.value) : undefined
@@ -161,7 +161,7 @@ class PickImagesConfigurable extends React.Component<
                   type="number"
                   min="0"
                   value={config.limit}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig("limit", parseInt(e.detail.value!) || 0)
                   }
                 />

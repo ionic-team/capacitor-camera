@@ -148,7 +148,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
                   type="number"
                   min="0"
                   value={config.limit}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig("limit", parseInt(e.detail.value!) || 0)
                   }
                 />
@@ -161,7 +161,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
                   min="0"
                   max="100"
                   value={config.quality}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig("quality", parseInt(e.detail.value!) || 100)
                   }
                 />
@@ -173,7 +173,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
                   type="number"
                   placeholder="Leave empty for no constraint"
                   value={config.targetWidth ?? ""}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig(
                       "targetWidth",
                       e.detail.value ? parseInt(e.detail.value) : undefined
@@ -188,7 +188,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
                   type="number"
                   placeholder="Leave empty for no constraint"
                   value={config.targetHeight ?? ""}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig(
                       "targetHeight",
                       e.detail.value ? parseInt(e.detail.value) : undefined
