@@ -1,6 +1,6 @@
 import { WebPlugin, CapacitorException } from '@capacitor/core';
 
-import { CameraSource, CameraDirection } from './definitions';
+import { CameraSource, CameraDirection, MediaType, MediaTypeSelection } from './definitions';
 import type {
   CameraPlugin,
   GalleryImageOptions,
@@ -20,8 +20,15 @@ import type {
 } from './definitions';
 
 export class CameraWeb extends WebPlugin implements CameraPlugin {
-  async takePhoto(_options: TakePhotoOptions): Promise<MediaResult> {
-    throw this.unimplemented('takePhoto is not implemented on Web.');
+  async takePhoto(options: TakePhotoOptions): Promise<MediaResult> {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise<MediaResult>(async (resolve, reject) => {
+      if (options.webUseInput) {
+        this.takePhotoCameraInputExperience(options, resolve, reject);
+      } else {
+        this.takePhotoCameraExperience(options, resolve, reject);
+      }
+    });
   }
 
   async recordVideo(_options: RecordVideoOptions): Promise<MediaResult> {
@@ -32,8 +39,11 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     throw this.unimplemented('playVideo is not implemented on Web.');
   }
 
-  async chooseFromGallery(_options: ChooseFromGalleryOptions): Promise<MediaResults> {
-    throw this.unimplemented('chooseFromGallery is not implemented on web.');
+  async chooseFromGallery(options: ChooseFromGalleryOptions): Promise<MediaResults> {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise<MediaResults>(async (resolve, reject) => {
+      this.galleryInputExperience(options, resolve, reject);
+    });
   }
 
   async editPhoto(_options: EditPhotoOptions): Promise<EditPhotoResult> {
@@ -265,6 +275,194 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
           reject(e);
         };
       }
+    });
+  }
+
+  private async takePhotoCameraExperience(options: TakePhotoOptions, resolve: any, reject: any) {
+    if (customElements.get('pwa-camera-modal')) {
+      const cameraModal: any = document.createElement('pwa-camera-modal');
+      cameraModal.facingMode = options.cameraDirection === CameraDirection.Front ? 'user' : 'environment';
+      document.body.appendChild(cameraModal);
+      try {
+        await cameraModal.componentOnReady();
+        cameraModal.addEventListener('onPhoto', async (e: any) => {
+          const photo = e.detail;
+
+          if (photo === null) {
+            reject(new CapacitorException('User cancelled photos app'));
+          } else if (photo instanceof Error) {
+            reject(photo);
+          } else {
+            resolve(await this._getCameraPhotoAsMediaResult(photo));
+          }
+
+          cameraModal.dismiss();
+          document.body.removeChild(cameraModal);
+        });
+
+        cameraModal.present();
+      } catch (e) {
+        this.takePhotoCameraInputExperience(options, resolve, reject);
+      }
+    } else {
+      console.error(
+        `Unable to load PWA Element 'pwa-camera-modal'. See the docs: https://capacitorjs.com/docs/web/pwa-elements.`,
+      );
+      this.takePhotoCameraInputExperience(options, resolve, reject);
+    }
+  }
+
+  private takePhotoCameraInputExperience(options: TakePhotoOptions, resolve: any, reject: any) {
+    let input = document.querySelector('#_capacitor-camera-input-takephoto') as HTMLInputElement;
+
+    const cleanup = () => {
+      input.parentNode?.removeChild(input);
+    };
+
+    if (!input) {
+      input = document.createElement('input') as HTMLInputElement;
+      input.id = '_capacitor-camera-input-takephoto';
+      input.type = 'file';
+      input.hidden = true;
+      document.body.appendChild(input);
+      input.addEventListener('change', (_e: any) => {
+        const file = input.files![0];
+        let format = 'jpeg';
+
+        if (file.type === 'image/png') {
+          format = 'png';
+        } else if (file.type === 'image/gif') {
+          format = 'gif';
+        }
+
+        const reader = new FileReader();
+        reader.addEventListener('load', () => {
+          const b64 = (reader.result as string).split(',')[1];
+          resolve({
+            type: MediaType.Photo,
+            thumbnail: b64,
+            webPath: URL.createObjectURL(file),
+            saved: false,
+            metadata: {
+              format,
+              resolution: '0x0', // Resolution not available from file input
+            },
+          } as MediaResult);
+          cleanup();
+        });
+
+        reader.readAsDataURL(file);
+      });
+      input.addEventListener('cancel', (_e: any) => {
+        reject(new CapacitorException('User cancelled photos app'));
+        cleanup();
+      });
+    }
+
+    input.accept = 'image/*';
+    (input as any).capture = true;
+
+    if (options.cameraDirection === CameraDirection.Front) {
+      (input as any).capture = 'user';
+    } else if (options.cameraDirection === CameraDirection.Rear) {
+      (input as any).capture = 'environment';
+    }
+
+    input.click();
+  }
+
+  private galleryInputExperience(options: ChooseFromGalleryOptions, resolve: any, reject: any) {
+    let input = document.querySelector('#_capacitor-camera-input-gallery') as HTMLInputElement;
+
+    const cleanup = () => {
+      input.parentNode?.removeChild(input);
+    };
+
+    if (!input) {
+      input = document.createElement('input') as HTMLInputElement;
+      input.id = '_capacitor-camera-input-gallery';
+      input.type = 'file';
+      input.hidden = true;
+      input.multiple = options.allowMultipleSelection ?? false;
+      document.body.appendChild(input);
+      input.addEventListener('change', (_e: any) => {
+        const results: MediaResult[] = [];
+        const limit = options.limit && options.limit > 0 ? options.limit : input.files!.length;
+        const filesToProcess = Math.min(limit, input.files!.length);
+
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let i = 0; i < filesToProcess; i++) {
+          const file = input.files![i];
+          let format = 'jpeg';
+          let type = MediaType.Photo;
+
+          if (file.type.startsWith('image/')) {
+            type = MediaType.Photo;
+            if (file.type === 'image/png') {
+              format = 'png';
+            } else if (file.type === 'image/gif') {
+              format = 'gif';
+            }
+          } else if (file.type.startsWith('video/')) {
+            type = MediaType.Video;
+            format = file.type.split('/')[1];
+          }
+
+          results.push({
+            type,
+            webPath: URL.createObjectURL(file),
+            saved: false,
+            metadata: {
+              format,
+              resolution: '0x0', // Resolution not available from file input
+            },
+          });
+        }
+        resolve({ results });
+        cleanup();
+      });
+      input.addEventListener('cancel', (_e: any) => {
+        reject(new CapacitorException('User cancelled photos app'));
+        cleanup();
+      });
+    }
+
+    // Set accept attribute based on mediaType
+    const mediaType = options.mediaType ?? MediaTypeSelection.Photo;
+    if (mediaType === MediaTypeSelection.Photo) {
+      input.accept = 'image/*';
+    } else if (mediaType === MediaTypeSelection.Video) {
+      input.accept = 'video/*';
+    } else {
+      // MediaTypeSelection.All
+      input.accept = 'image/*,video/*';
+    }
+
+    input.click();
+  }
+
+  private _getCameraPhotoAsMediaResult(photo: Blob) {
+    return new Promise<MediaResult>((resolve, reject) => {
+      const reader = new FileReader();
+      const format = photo.type.split('/')[1];
+      reader.readAsDataURL(photo);
+      reader.onloadend = () => {
+        const r = reader.result as string;
+        const b64 = r.split(',')[1];
+        resolve({
+          type: MediaType.Photo,
+          thumbnail: b64,
+          webPath: URL.createObjectURL(photo),
+          saved: false,
+          metadata: {
+            format,
+            resolution: '0x0', // Resolution not available from blob
+          },
+        });
+      };
+      reader.onerror = (e) => {
+        reject(e);
+      };
     });
   }
 
