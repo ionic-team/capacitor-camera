@@ -28,10 +28,10 @@ public class CameraPlugin: CAPPlugin, CAPBridgedPlugin {
     private let defaultDirection = CameraDirection.rear
     private var multiple = false
     
-    private lazy var cameraManager = IONCAMRFactory.createCameraManagerWrapper(withDelegate: self, and: self.bridge?.viewController)
-    private lazy var galleryManager = IONCAMRFactory.createGalleryManagerWrapper(withDelegate: self, and: self.bridge?.viewController)
-    private lazy var editManager = IONCAMRFactory.createEditManagerWrapper(withDelegate: self, and: self.bridge?.viewController)
-    private lazy var videoManager = IONCAMRFactory.createVideoManagerWrapper(withDelegate: self, and: self.bridge?.viewController)
+    private lazy var cameraManager = IONCAMRFactory.createCameraManagerWrapper(withDelegate: self, and: self.bridge?.viewController ?? UIViewController())
+    private lazy var galleryManager = IONCAMRFactory.createGalleryManagerWrapper(withDelegate: self, and: self.bridge?.viewController ?? UIViewController())
+    private lazy var editManager = IONCAMRFactory.createEditManagerWrapper(withDelegate: self, and: self.bridge?.viewController ?? UIViewController())
+    private lazy var videoManager = IONCAMRFactory.createVideoManagerWrapper(withDelegate: self, and: self.bridge?.viewController ?? UIViewController())
 
     private var imageCounter = 0
     
@@ -47,6 +47,63 @@ public class CameraPlugin: CAPPlugin, CAPBridgedPlugin {
             self.call?.reject(error.localizedDescription, "OS-PLUG-CAMR-" + String(format: "%04d", error.errorCode))
         }
     }
+
+    private func handleCall<T: Decodable>(_ call: CAPPluginCall, error: IONCAMRError, action: @escaping (T) -> Void) {
+        self.call = call
+        guard let options: T = decodeParameters(from: call) else {
+            sendError(error)
+            return
+        }
+        DispatchQueue.main.async {
+            action(options)
+        }
+    }
+
+    @objc func takePhoto(_ call: CAPPluginCall) {
+        handleCall(call, error: .takePictureArguments) { (options: IONCAMRTakePhotoOptions) in
+            self.cameraManager.takePhoto(with: options)
+        }
+    }
+    
+    @objc func chooseFromGallery(_ call: CAPPluginCall) {
+        handleCall(call, error: .chooseMultimediaIssue) { (options: IONCAMRGalleryOptions) in
+            self.galleryManager.chooseFromGallery(with: options)
+        }
+    }
+    
+    @objc func editURIPhoto(_ call: CAPPluginCall) {
+        handleCall(call, error: .editPictureIssue) { (options: IONCAMRPhotoEditOptions) in
+            self.editManager.editPhoto(with: options)
+        }
+    }
+    
+    @objc func editPhoto(_ call: CAPPluginCall) {
+        handleCall(call, error: .editPictureIssue) { (options: IONCAMRPhotoEditOptions) in
+            self.editManager.editPhoto(with: options)
+        }
+    }
+    
+    @objc func recordVideo(_ call: CAPPluginCall) {
+        handleCall(call, error: .captureVideoIssue) { (options: IONCAMRRecordVideoOptions) in
+            self.cameraManager.recordVideo(with: options)
+        }
+    }
+    
+    @objc func playVideo(_ call: CAPPluginCall) {
+        handleCall(call, error: .playVideoIssue) { (options: IONCAMRPlayVideoOptions) in
+            Task {
+                do {
+                    try await self.videoManager.playVideo(options.url)
+                    call.resolve()
+                } catch let error as IONCAMRError {
+                    self.callback(error: error)
+                } catch {
+                    self.callback(error: .playVideoIssue)
+                }
+            }
+        }
+    }
+
 
     @objc override public func checkPermissions(_ call: CAPPluginCall) {
         var result: [String: Any] = [:]
@@ -176,18 +233,6 @@ public class CameraPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    @objc public func takePhoto(_ call: CAPPluginCall) {
-        guard let options: IONCAMRTakePhotoOptions = decodeParameters(from: call) else {
-            sendError(IONCAMRError.takePictureArguments)
-            return
-        }
-        
-
-        DispatchQueue.main.async {
-            self.showCamera()
-        }
-    }
-    
     private func checkUsageDescriptions() -> String? {
         if let dict = Bundle.main.infoDictionary {
             for key in CameraPropertyListKeys.allCases where dict[key.rawValue] == nil {
