@@ -198,7 +198,7 @@ class IonCameraFlow(
             editInApp = call.getBoolean("editInApp") ?: true,
             quality = call.getInt("quality") ?: DEFAULT_QUALITY,
             width = call.getInt("targetWidth") ?: 0,
-            height = call.getInt("targetWidth") ?: 0,
+            height = call.getInt("targetHeight") ?: 0,
             correctOrientation = call.getBoolean("correctOrientation") ?:  DEFAULT_CORRECT_ORIENTATION
         )
     }
@@ -219,8 +219,12 @@ class IonCameraFlow(
     fun getCameraSettings(call: PluginCall): IonCameraSettings {
         val settings = IonCameraSettings()
         settings.quality = call.getInt("quality", IonCameraSettings.DEFAULT_QUALITY)!!
-        settings.targetWidth = call.getInt("targetWidth", 0)!!
-        settings.targetHeight = call.getInt("targetHeight", 0)!!
+
+        val width = call.getInt("targetWidth", 0)!!
+        val height = call.getInt("targetHeight", 0)!!
+
+        settings.targetWidth = if (width < 1) -1 else width
+        settings.targetHeight = if (height < 1) -1 else height
         settings.correctOrientation = call.getBoolean("correctOrientation", IonCameraSettings.DEFAULT_CORRECT_ORIENTATION)!!
         settings.encodingType = call.getInt("encodingType", IonCameraSettings.DEFAULT_ENCODING_TYPE)!!
         settings.saveToGallery = call.getBoolean("saveToGallery", IonCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY)!!
