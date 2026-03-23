@@ -73,7 +73,6 @@ class CameraPlugin : Plugin() {
             }
         )
 
-        // Create LegacyCameraFlow with required dependencies
         legacyFlow = LegacyCameraFlow(
             context,
             activity,
@@ -85,7 +84,6 @@ class CameraPlugin : Plugin() {
             }
         )
 
-        // Create IonCameraFlow with required dependencies
         ionFlow = IonCameraFlow(
             context,
             activity,
