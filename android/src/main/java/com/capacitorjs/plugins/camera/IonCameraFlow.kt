@@ -218,19 +218,19 @@ class IonCameraFlow(
 
     fun getCameraSettings(call: PluginCall): IonCameraSettings {
         val settings = IonCameraSettings()
-        settings.quality = call.getInt("quality", IonCameraSettings.DEFAULT_QUALITY)!!
+        settings.quality = call.getInt("quality") ?: IonCameraSettings.DEFAULT_QUALITY
 
-        val width = call.getInt("targetWidth", 0)!!
-        val height = call.getInt("targetHeight", 0)!!
+        val width = call.getInt("targetWidth") ?: 0
+        val height = call.getInt("targetHeight") ?: 0
 
         settings.targetWidth = if (width < 1) -1 else width
         settings.targetHeight = if (height < 1) -1 else height
-        settings.correctOrientation = call.getBoolean("correctOrientation", IonCameraSettings.DEFAULT_CORRECT_ORIENTATION)!!
-        settings.encodingType = call.getInt("encodingType", IonCameraSettings.DEFAULT_ENCODING_TYPE)!!
-        settings.saveToGallery = call.getBoolean("saveToGallery", IonCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY)!!
-        settings.allowEdit = call.getBoolean("allowEdit", false)!!
-        settings.editInApp = call.getBoolean("editInApp", true)!!
-        settings.includeMetadata = call.getBoolean("includeMetadata", false)!!
+        settings.correctOrientation = call.getBoolean("correctOrientation") ?: IonCameraSettings.DEFAULT_CORRECT_ORIENTATION
+        settings.encodingType = call.getInt("encodingType") ?: IonCameraSettings.DEFAULT_ENCODING_TYPE
+        settings.saveToGallery = call.getBoolean("saveToGallery") ?: IonCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY
+        settings.allowEdit = call.getBoolean("allowEdit") ?: false
+        settings.editInApp = call.getBoolean("editInApp") ?: true
+        settings.includeMetadata = call.getBoolean("includeMetadata") ?: false
         settings.shouldResize = settings.targetWidth > 0 || settings.targetHeight > 0
         return settings
     }
