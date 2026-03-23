@@ -61,8 +61,36 @@ class CameraPlugin : Plugin() {
 
     override fun load() {
         super.load()
-        legacyFlow = LegacyCameraFlow(this)
-        ionFlow = IonCameraFlow(this)
+
+        val permissionHelper = PermissionHelper(
+            isPermissionDeclaredFn = { alias -> isPermissionDeclared(alias) },
+            getPermissionStateFn = { alias -> getPermissionState(alias) },
+            requestPermissionForAliasFn = { alias, call, callbackName ->
+                requestPermissionForAlias(alias, call, callbackName)
+            },
+            requestPermissionForAliasesFn = { aliases, call, callbackName ->
+                requestPermissionForAliases(aliases, call, callbackName)
+            }
+        )
+
+        legacyFlow = LegacyCameraFlow(
+            context,
+            activity,
+            bridge,
+            appId,
+            permissionHelper,
+            LegacyCameraFlow.ActivityStarter { call, intent, callbackName ->
+                startActivityForResult(call, intent, callbackName)
+            }
+        )
+
+        ionFlow = IonCameraFlow(
+            context,
+            activity,
+            bridge,
+            appId,
+            permissionHelper
+        )
         ionFlow.load()
     }
 
@@ -259,18 +287,6 @@ class CameraPlugin : Plugin() {
     protected override fun handleOnDestroy() {
         legacyFlow.onDestroy()
         ionFlow.onDestroy()
-    }
-
-    fun requestLegacyPermissionForAlias(alias: String, call: PluginCall, callbackName: String) {
-        requestPermissionForAlias(alias, call, callbackName)
-    }
-
-    fun requestLegacyPermissionForAliases(
-        aliases: Array<String>,
-        call: PluginCall,
-        callbackName: String
-    ) {
-        requestPermissionForAliases(aliases, call, callbackName)
     }
 
 }

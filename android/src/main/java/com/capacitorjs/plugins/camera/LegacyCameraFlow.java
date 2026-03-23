@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -23,7 +24,9 @@ import androidx.activity.result.ActivityResultRegistryOwner;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import com.getcapacitor.Bridge;
 import com.getcapacitor.FileUtils;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
@@ -47,7 +50,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class LegacyCameraFlow {
 
-    private final CameraPlugin plugin;
+    /**
+     * Functional interface for starting activities for result.
+     */
+    public interface ActivityStarter {
+        void startActivityForResult(PluginCall call, Intent intent, String callbackName);
+    }
+
+    private final Context context;
+    private final AppCompatActivity activity;
+    private final Bridge bridge;
+    private final String appId;
+    private final PermissionHelper permissionHelper;
+    private final ActivityStarter activityStarter;
 
     // Message constants
     private static final String INVALID_RESULT_TYPE_ERROR = "Invalid resultType option";
@@ -78,8 +93,20 @@ public class LegacyCameraFlow {
 
     private LegacyCameraSettings settings = new LegacyCameraSettings();
 
-    public LegacyCameraFlow(CameraPlugin plugin) {
-        this.plugin = plugin;
+    public LegacyCameraFlow(
+        Context context,
+        AppCompatActivity activity,
+        Bridge bridge,
+        String appId,
+        PermissionHelper permissionHelper,
+        ActivityStarter activityStarter
+    ) {
+        this.context = context;
+        this.activity = activity;
+        this.bridge = bridge;
+        this.appId = appId;
+        this.permissionHelper = permissionHelper;
+        this.activityStarter = activityStarter;
     }
 
     public void getPhoto(PluginCall call) {
@@ -136,11 +163,11 @@ public class LegacyCameraFlow {
             },
             () -> call.reject(USER_CANCELLED)
         );
-        fragment.show(plugin.getActivity().getSupportFragmentManager(), "capacitorModalsActionSheet");
+        fragment.show(activity.getSupportFragmentManager(), "capacitorModalsActionSheet");
     }
 
     private void showCamera(final PluginCall call) {
-        if (!plugin.getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+        if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             call.reject(NO_CAMERA_ERROR);
             return;
         }
@@ -153,16 +180,16 @@ public class LegacyCameraFlow {
 
     public boolean checkCameraPermissions(PluginCall call) {
         // if the manifest does not contain the camera permissions key, we don't need to ask the user
-        boolean needCameraPerms = plugin.isPermissionDeclared(CameraPlugin.CAMERA);
-        boolean hasCameraPerms = !needCameraPerms || plugin.getPermissionState(CameraPlugin.CAMERA) == PermissionState.GRANTED;
-        boolean hasGalleryPerms = plugin.getPermissionState(CameraPlugin.SAVE_GALLERY) == PermissionState.GRANTED;
+        boolean needCameraPerms = permissionHelper.isPermissionDeclared(CameraPlugin.CAMERA);
+        boolean hasCameraPerms = !needCameraPerms || permissionHelper.getPermissionState(CameraPlugin.CAMERA) == PermissionState.GRANTED;
+        boolean hasGalleryPerms = permissionHelper.getPermissionState(CameraPlugin.SAVE_GALLERY) == PermissionState.GRANTED;
 
         // If we want to save to the gallery, we need two permissions
         // actually we only need permissions to save to gallery for Android <= 9 (API 28)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             // we might still need to request permission for the camera
             if (!hasCameraPerms) {
-                plugin.requestLegacyPermissionForAlias(CameraPlugin.CAMERA, call, "cameraPermissionsCallback");
+                permissionHelper.requestPermissionForAlias(CameraPlugin.CAMERA, call, "cameraPermissionsCallback");
                 return false;
             }
             return true;
@@ -177,12 +204,12 @@ public class LegacyCameraFlow {
             } else {
                 aliases = new String[] { CameraPlugin.SAVE_GALLERY };
             }
-            plugin.requestLegacyPermissionForAliases(aliases, call, "cameraPermissionsCallback");
+            permissionHelper.requestPermissionForAliases(aliases, call, "cameraPermissionsCallback");
             return false;
         }
         // If we don't need to save to the gallery, we can just ask for camera permissions
         else if (!hasCameraPerms) {
-            plugin.requestLegacyPermissionForAlias(CameraPlugin.CAMERA, call, "cameraPermissionsCallback");
+            permissionHelper.requestPermissionForAlias(CameraPlugin.CAMERA, call, "cameraPermissionsCallback");
             return false;
         }
         return true;
@@ -192,8 +219,8 @@ public class LegacyCameraFlow {
         if (call.getMethodName().equals("pickImages")) {
             openPhotos(call, true);
         } else {
-            if (settings.getSource() == CameraSource.CAMERA && plugin.getPermissionState(CameraPlugin.CAMERA) != PermissionState.GRANTED) {
-                Logger.debug(LOG_TAG, "User denied camera permission: " + plugin.getPermissionState(CameraPlugin.CAMERA));
+            if (settings.getSource() == CameraSource.CAMERA && permissionHelper.getPermissionState(CameraPlugin.CAMERA) != PermissionState.GRANTED) {
+                Logger.debug(LOG_TAG, "User denied camera permission: " + permissionHelper.getPermissionState(CameraPlugin.CAMERA));
                 call.reject(PERMISSION_DENIED_ERROR_CAMERA);
                 return;
             }
@@ -234,21 +261,21 @@ public class LegacyCameraFlow {
     public void openCamera(final PluginCall call) {
         if (checkCameraPermissions(call)) {
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePictureIntent.resolveActivity(plugin.getContext().getPackageManager()) != null) {
+            if (takePictureIntent.resolveActivity(context.getPackageManager()) != null) {
                 // If we will be saving the photo, send the target file along
                 try {
-                    String appId = plugin.getAppId();
-                    File photoFile = CameraUtils.createImageFile(plugin.getActivity());
+                    String appId = this.appId;
+                    File photoFile = CameraUtils.createImageFile(activity);
                     imageFileSavePath = photoFile.getAbsolutePath();
                     // TODO: Verify provider config exists
-                    imageFileUri = FileProvider.getUriForFile(plugin.getActivity(), appId + ".fileprovider", photoFile);
+                    imageFileUri = FileProvider.getUriForFile(activity, appId + ".fileprovider", photoFile);
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
                 } catch (Exception ex) {
                     call.reject(IMAGE_FILE_SAVE_ERROR, ex);
                     return;
                 }
 
-                plugin.startActivityForResult(call, takePictureIntent, "processCameraImage");
+                activityStarter.startActivityForResult(call, takePictureIntent, "processCameraImage");
             } else {
                 call.reject(NO_CAMERA_ACTIVITY_ERROR);
             }
@@ -264,14 +291,14 @@ public class LegacyCameraFlow {
         ActivityResultCallback<O> callback
     ) {
         String key = "cap_activity_rq#" + mNextLocalRequestCode.getAndIncrement();
-        if (plugin.getBridge().getFragment() != null) {
-            Object host = plugin.getBridge().getFragment().getHost();
+        if (bridge.getFragment() != null) {
+            Object host = bridge.getFragment().getHost();
             if (host instanceof ActivityResultRegistryOwner) {
                 return ((ActivityResultRegistryOwner) host).getActivityResultRegistry().register(key, contract, callback);
             }
-            return plugin.getBridge().getFragment().requireActivity().getActivityResultRegistry().register(key, contract, callback);
+            return bridge.getFragment().requireActivity().getActivityResultRegistry().register(key, contract, callback);
         }
-        return plugin.getBridge().getActivity().getActivityResultRegistry().register(key, contract, callback);
+        return bridge.getActivity().getActivityResultRegistry().register(key, contract, callback);
     }
 
     private ActivityResultContract<PickVisualMediaRequest, List<Uri>> getContractForCall(final PluginCall call) {
@@ -387,7 +414,7 @@ public class LegacyCameraFlow {
         InputStream imageStream = null;
 
         try {
-            imageStream = plugin.getContext().getContentResolver().openInputStream(imageUri);
+            imageStream = context.getContentResolver().openInputStream(imageUri);
             Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
 
             if (bitmap == null) {
@@ -415,7 +442,7 @@ public class LegacyCameraFlow {
         InputStream imageStream = null;
         JSObject ret = new JSObject();
         try {
-            imageStream = plugin.getContext().getContentResolver().openInputStream(imageUri);
+            imageStream = context.getContentResolver().openInputStream(imageUri);
             Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
 
             if (bitmap == null) {
@@ -423,7 +450,7 @@ public class LegacyCameraFlow {
                 return ret;
             }
 
-            ExifWrapper exif = ImageUtils.getExifData(plugin.getContext(), bitmap, imageUri);
+            ExifWrapper exif = ImageUtils.getExifData(context, bitmap, imageUri);
             try {
                 bitmap = prepareBitmap(bitmap, imageUri, exif);
             } catch (IOException e) {
@@ -440,7 +467,7 @@ public class LegacyCameraFlow {
                 ret.put("format", "jpeg");
                 ret.put("exif", exif.toJson());
                 ret.put("path", newUri.toString());
-                ret.put("webPath", FileUtils.getPortablePath(plugin.getContext(), plugin.getBridge().getLocalUrl(), newUri));
+                ret.put("webPath", FileUtils.getPortablePath(context, bridge.getLocalUrl(), newUri));
             } else {
                 ret.put("error", UNABLE_TO_PROCESS_IMAGE);
             }
@@ -518,7 +545,7 @@ public class LegacyCameraFlow {
         if (!filename.contains(".jpg") && !filename.contains(".jpeg")) {
             filename += "." + (new java.util.Date()).getTime() + ".jpeg";
         }
-        File cacheDir = plugin.getContext().getCacheDir();
+        File cacheDir = context.getCacheDir();
         return new File(cacheDir, filename);
     }
 
@@ -530,7 +557,7 @@ public class LegacyCameraFlow {
      */
     @SuppressWarnings("deprecation")
     private void returnResult(PluginCall call, Bitmap bitmap, Uri u) {
-        ExifWrapper exif = ImageUtils.getExifData(plugin.getContext(), bitmap, u);
+        ExifWrapper exif = ImageUtils.getExifData(context, bitmap, u);
         try {
             bitmap = prepareBitmap(bitmap, u, exif);
         } catch (IOException e) {
@@ -554,7 +581,7 @@ public class LegacyCameraFlow {
                 File fileToSave = new File(fileToSavePath);
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    ContentResolver resolver = plugin.getContext().getContentResolver();
+                    ContentResolver resolver = context.getContentResolver();
                     ContentValues values = new ContentValues();
                     values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileToSave.getName());
                     values.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
@@ -579,7 +606,7 @@ public class LegacyCameraFlow {
                     }
                 } else {
                     String inserted = MediaStore.Images.Media.insertImage(
-                        plugin.getContext().getContentResolver(),
+                        context.getContentResolver(),
                         fileToSavePath,
                         fileToSave.getName(),
                         ""
@@ -634,7 +661,7 @@ public class LegacyCameraFlow {
             ret.put("format", "jpeg");
             ret.put("exif", exif.toJson());
             ret.put("path", newUri.toString());
-            ret.put("webPath", FileUtils.getPortablePath(plugin.getContext(), plugin.getBridge().getLocalUrl(), newUri));
+            ret.put("webPath", FileUtils.getPortablePath(context, bridge.getLocalUrl(), newUri));
             ret.put("saved", isSaved);
             call.resolve(ret);
         } else {
@@ -671,7 +698,7 @@ public class LegacyCameraFlow {
      */
     private Bitmap prepareBitmap(Bitmap bitmap, Uri imageUri, ExifWrapper exif) throws IOException {
         if (settings.getShouldCorrectOrientation()) {
-            final Bitmap newBitmap = ImageUtils.correctOrientation(plugin.getContext(), bitmap, imageUri, exif);
+            final Bitmap newBitmap = ImageUtils.correctOrientation(context, bitmap, imageUri, exif);
             bitmap = replaceBitmap(bitmap, newBitmap);
         }
 
@@ -718,7 +745,7 @@ public class LegacyCameraFlow {
             Uri tempImage = getTempImage(uri, bitmapOutputStream);
             Intent editIntent = createEditIntent(tempImage);
             if (editIntent != null) {
-                plugin.startActivityForResult(call, editIntent, "processEditedImage");
+                activityStarter.startActivityForResult(call, editIntent, "processEditedImage");
             } else {
                 call.reject(IMAGE_EDIT_ERROR);
             }
@@ -731,8 +758,8 @@ public class LegacyCameraFlow {
         try {
             File editFile = new File(origPhotoUri.getPath());
             Uri editUri = FileProvider.getUriForFile(
-                plugin.getActivity(),
-                plugin.getContext().getPackageName() + ".fileprovider",
+                activity,
+                context.getPackageName() + ".fileprovider",
                 editFile
             );
             Intent editIntent = new Intent(Intent.ACTION_EDIT);
@@ -745,8 +772,7 @@ public class LegacyCameraFlow {
             List<ResolveInfo> resInfoList;
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                resInfoList = plugin
-                    .getContext()
+                resInfoList = context
                     .getPackageManager()
                     .queryIntentActivities(editIntent, PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY));
             } else {
@@ -755,7 +781,7 @@ public class LegacyCameraFlow {
 
             for (ResolveInfo resolveInfo : resInfoList) {
                 String packageName = resolveInfo.activityInfo.packageName;
-                plugin.getContext().grantUriPermission(packageName, editUri, flags);
+                context.grantUriPermission(packageName, editUri, flags);
             }
             return editIntent;
         } catch (Exception ex) {
@@ -765,7 +791,7 @@ public class LegacyCameraFlow {
 
     @SuppressWarnings("deprecation")
     private List<ResolveInfo> legacyQueryIntentActivities(Intent intent) {
-        return plugin.getContext().getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        return context.getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
     }
 
     public void onSaveInstanceState(Bundle bundle) {
