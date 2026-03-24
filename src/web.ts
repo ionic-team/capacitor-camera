@@ -401,7 +401,6 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
           let resolution = '0x0';
 
           if (file.type.startsWith('image/')) {
-            type = MediaType.Photo;
             if (file.type === 'image/png') {
               format = 'png';
             } else if (file.type === 'image/gif') {
