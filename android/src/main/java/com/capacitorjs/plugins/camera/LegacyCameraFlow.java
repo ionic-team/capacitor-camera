@@ -219,10 +219,7 @@ public class LegacyCameraFlow {
         if (call.getMethodName().equals("pickImages")) {
             openPhotos(call, true);
         } else {
-            if (
-                settings.getSource() == CameraSource.CAMERA &&
-                permissionHelper.getPermissionState(CAMERA) != PermissionState.GRANTED
-            ) {
+            if (settings.getSource() == CameraSource.CAMERA && permissionHelper.getPermissionState(CAMERA) != PermissionState.GRANTED) {
                 Logger.debug(LOG_TAG, "User denied camera permission: " + permissionHelper.getPermissionState(CAMERA));
                 call.reject(PERMISSION_DENIED_ERROR_CAMERA);
                 return;
