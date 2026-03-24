@@ -58,14 +58,22 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
   handlePhotoResult = (result: {
     path?: string;
     webPath?: string;
+    base64String?: string;
+    dataUrl?: string;
     exif?: any;
   }): void => {
+    const filePath =
+      result.path ??
+      result.webPath ??
+      result.dataUrl ??
+      (result.base64String ? `data:image/jpeg;base64,${result.base64String}` : null);
+
     this.setState({
-      filePath: result.path ?? result.webPath ?? null,
+      filePath,
       metadata: JSON.stringify(result.exif, null, 2),
     });
 
-    if (result.path || result.webPath) {
+    if (filePath) {
       MediaHistoryService.addMedia({
         mediaType: "photo",
         method: "getPhoto",
