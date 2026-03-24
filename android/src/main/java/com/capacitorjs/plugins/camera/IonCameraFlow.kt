@@ -832,9 +832,6 @@ class IonCameraFlow(
             activity,
             intent,
             ionParams,
-            { image ->
-              //TODO remove this callback
-            },
             { mediaResult ->
                 handleMediaResult(mediaResult)
             },
@@ -938,7 +935,6 @@ class IonCameraFlow(
             correctOrientation = correctOrientation,
             saveToPhotoAlbum = saveToGallery,
             includeMetadata = includeMetadata,
-            latestVersion = true //TODO check this, because now we don't have resultType in the new Api
         )
     }
 
