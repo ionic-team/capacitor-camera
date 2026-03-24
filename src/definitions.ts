@@ -214,7 +214,6 @@ export interface TakePhotoOptions {
   /**
    * Whether or not MediaResult should include its metadata.
    * If an error occurs when obtaining the metadata, it will return empty.
-   * Note: This option is only supported on Android and iOS.
    * @default false
    *
    * @since 8.1.0
@@ -292,7 +291,6 @@ export interface ChooseFromGalleryOptions {
   /**
    * Whether or not MediaResult should include its metadata.
    * If an error occurs when obtaining the metadata, it will return empty.
-   * Note: This option is only supported on Android and iOS.
    * @default false
    *
    * @since 8.1.0
@@ -401,7 +399,6 @@ export interface EditURIPhotoOptions {
   /**
    * Whether or not MediaResult should include its metadata.
    * If an error occurs when obtaining the metadata, it will return empty.
-   * Note: This option is only supported on Android and iOS.
    * @default false
    *
    * @since 8.1.0
