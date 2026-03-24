@@ -93,37 +93,13 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
   }
 
   private async cameraExperience(options: ImageOptions, resolve: any, reject: any) {
-    if (customElements.get('pwa-camera-modal')) {
-      const cameraModal: any = document.createElement('pwa-camera-modal');
-      cameraModal.facingMode = options.direction === CameraDirection.Front ? 'user' : 'environment';
-      document.body.appendChild(cameraModal);
-      try {
-        await cameraModal.componentOnReady();
-        cameraModal.addEventListener('onPhoto', async (e: any) => {
-          const photo = e.detail;
-
-          if (photo === null) {
-            reject(new CapacitorException('User cancelled photos app'));
-          } else if (photo instanceof Error) {
-            reject(photo);
-          } else {
-            resolve(await this._getCameraPhoto(photo, options));
-          }
-
-          cameraModal.dismiss();
-          document.body.removeChild(cameraModal);
-        });
-
-        cameraModal.present();
-      } catch (e) {
-        this.fileInputExperience(options, resolve, reject);
-      }
-    } else {
-      console.error(
-        `Unable to load PWA Element 'pwa-camera-modal'. See the docs: https://capacitorjs.com/docs/web/pwa-elements.`,
-      );
-      this.fileInputExperience(options, resolve, reject);
-    }
+    await this._setupPWACameraModal(
+      options.direction,
+      (photo) => this._getCameraPhoto(photo, options),
+      () => this.fileInputExperience(options, resolve, reject),
+      resolve,
+      reject
+    );
   }
 
   private fileInputExperience(options: ImageOptions, resolve: any, reject: any) {
@@ -246,11 +222,11 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
   private _getCameraPhoto(photo: Blob, options: ImageOptions) {
     return new Promise<Photo>((resolve, reject) => {
       const reader = new FileReader();
-      const format = photo.type.split('/')[1];
+      const format = this._getFileFormat(photo);
       if (options.resultType === 'uri') {
         resolve({
           webPath: URL.createObjectURL(photo),
-          format: format,
+          format,
           saved: false,
         });
       } else {
@@ -260,13 +236,13 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
           if (options.resultType === 'dataUrl') {
             resolve({
               dataUrl: r,
-              format: format,
+              format,
               saved: false,
             });
           } else {
             resolve({
               base64String: r.split(',')[1],
-              format: format,
+              format,
               saved: false,
             });
           }
@@ -279,69 +255,30 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
   }
 
   private async takePhotoCameraExperience(options: TakePhotoOptions, resolve: any, reject: any) {
-    if (customElements.get('pwa-camera-modal')) {
-      const cameraModal: any = document.createElement('pwa-camera-modal');
-      cameraModal.facingMode = options.cameraDirection === CameraDirection.Front ? 'user' : 'environment';
-      document.body.appendChild(cameraModal);
-      try {
-        await cameraModal.componentOnReady();
-        cameraModal.addEventListener('onPhoto', async (e: any) => {
-          const photo = e.detail;
-
-          if (photo === null) {
-            reject(new CapacitorException('User cancelled photos app'));
-          } else if (photo instanceof Error) {
-            reject(photo);
-          } else {
-            resolve(await this._getCameraPhotoAsMediaResult(photo));
-          }
-
-          cameraModal.dismiss();
-          document.body.removeChild(cameraModal);
-        });
-
-        cameraModal.present();
-      } catch (e) {
-        this.takePhotoCameraInputExperience(options, resolve, reject);
-      }
-    } else {
-      console.error(
-        `Unable to load PWA Element 'pwa-camera-modal'. See the docs: https://capacitorjs.com/docs/web/pwa-elements.`,
-      );
-      this.takePhotoCameraInputExperience(options, resolve, reject);
-    }
+    await this._setupPWACameraModal(
+      options.cameraDirection,
+      (photo) => this._getCameraPhotoAsMediaResult(photo),
+      () => this.takePhotoCameraInputExperience(options, resolve, reject),
+      resolve,
+      reject
+    );
   }
 
   private takePhotoCameraInputExperience(options: TakePhotoOptions, resolve: any, reject: any) {
-    let input = document.querySelector('#_capacitor-camera-input-takephoto') as HTMLInputElement;
+    const input = this._createFileInput('_capacitor-camera-input-takephoto');
 
     const cleanup = () => {
       input.parentNode?.removeChild(input);
     };
 
-    if (!input) {
-      input = document.createElement('input') as HTMLInputElement;
-      input.id = '_capacitor-camera-input-takephoto';
-      input.type = 'file';
-      input.hidden = true;
-      document.body.appendChild(input);
+    if (!input.onchange) {
       input.addEventListener('change', async (_e: any) => {
-        if (!input.files || input.files.length === 0) {
-          reject(new CapacitorException('No file selected'));
-          cleanup();
+        if (!this._validateFileInput(input, reject, cleanup)) {
           return;
         }
 
-        const file = input.files[0];
-        let format = 'jpeg';
-
-        if (file.type === 'image/png') {
-          format = 'png';
-        } else if (file.type === 'image/gif') {
-          format = 'gif';
-        }
-
-        // Get resolution from image file
+        const file = input.files![0];
+        const format = this._getFileFormat(file);
         const resolution = await this._getImageResolution(file);
 
         const reader = new FileReader();
@@ -364,10 +301,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
 
         reader.readAsDataURL(file);
       });
-      input.addEventListener('cancel', (_e: any) => {
-        reject(new CapacitorException('User cancelled photos app'));
-        cleanup();
-      });
+      this._setupInputCancelListener(input, reject, cleanup);
     }
 
     input.accept = 'image/*';
@@ -382,46 +316,30 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
   }
 
   private galleryInputExperience(options: ChooseFromGalleryOptions, resolve: any, reject: any) {
-    let input = document.querySelector('#_capacitor-camera-input-gallery') as HTMLInputElement;
+    const input = this._createFileInput('_capacitor-camera-input-gallery');
+    input.multiple = options.allowMultipleSelection ?? false;
 
     const cleanup = () => {
       input.parentNode?.removeChild(input);
     };
 
-    if (!input) {
-      input = document.createElement('input') as HTMLInputElement;
-      input.id = '_capacitor-camera-input-gallery';
-      input.type = 'file';
-      input.hidden = true;
-      input.multiple = options.allowMultipleSelection ?? false;
-      document.body.appendChild(input);
+    if (!input.onchange) {
       input.addEventListener('change', async (_e: any) => {
-        if (!input.files || input.files.length === 0) {
-          reject(new CapacitorException('No files selected'));
-          cleanup();
+        if (!this._validateFileInput(input, reject, cleanup)) {
           return;
         }
 
         const results: MediaResult[] = [];
 
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < input.files.length; i++) {
-          const file = input.files[i];
-          let format = 'jpeg';
+        for (let i = 0; i < input.files!.length; i++) {
+          const file = input.files![i];
+          const format = this._getFileFormat(file);
           let type = MediaType.Photo;
           let resolution = '0x0';
 
           if (file.type.startsWith('image/')) {
-            if (file.type === 'image/png') {
-              format = 'png';
-            } else if (file.type === 'image/gif') {
-              format = 'gif';
-            }
-
-            // Get resolution from image file
             resolution = await this._getImageResolution(file);
-
-            // Get base64 thumbnail for image
             const thumbnail = await this._getBase64FromFile(file);
 
             results.push({
@@ -438,9 +356,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
             });
           } else if (file.type.startsWith('video/')) {
             type = MediaType.Video;
-            format = file.type.split('/')[1];
 
-            // Get resolution, duration, and thumbnail from video file
             let duration: number | undefined;
             let thumbnail: string | undefined;
             try {
@@ -470,10 +386,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
         resolve({ results });
         cleanup();
       });
-      input.addEventListener('cancel', (_e: any) => {
-        reject(new CapacitorException('User cancelled photos app'));
-        cleanup();
-      });
+      this._setupInputCancelListener(input, reject, cleanup);
     }
 
     // Set accept attribute based on mediaType
@@ -493,9 +406,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
   private async _getCameraPhotoAsMediaResult(photo: Blob): Promise<MediaResult> {
     return new Promise<MediaResult>(async (resolve, reject) => {
       const reader = new FileReader();
-      const format = photo.type.split('/')[1];
-
-      // Get resolution from image blob
+      const format = this._getFileFormat(photo);
       const resolution = await this._getImageResolution(photo);
 
       reader.readAsDataURL(photo);
@@ -518,6 +429,90 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       reader.onerror = (e) => {
         reject(e);
       };
+    });
+  }
+
+  private _getFileFormat(file: File | Blob): string {
+    if (file.type === 'image/png') {
+      return 'png';
+    } else if (file.type === 'image/gif') {
+      return 'gif';
+    } else if (file.type.startsWith('video/')) {
+      return file.type.split('/')[1];
+    } else if (file.type.startsWith('image/')) {
+      return 'jpeg';
+    }
+    return file.type.split('/')[1] || 'jpeg';
+  }
+
+  private _validateFileInput(input: HTMLInputElement, reject: any, cleanup: () => void): boolean {
+    if (!input.files || input.files.length === 0) {
+      const message = input.multiple ? 'No files selected' : 'No file selected';
+      reject(new CapacitorException(message));
+      cleanup();
+      return false;
+    }
+    return true;
+  }
+
+  private async _setupPWACameraModal(
+    cameraDirection: CameraDirection | undefined,
+    onPhotoCallback: (photo: Blob) => Promise<any>,
+    fallbackCallback: () => void,
+    resolve: any,
+    reject: any
+  ): Promise<void> {
+    if (customElements.get('pwa-camera-modal')) {
+      const cameraModal: any = document.createElement('pwa-camera-modal');
+      cameraModal.facingMode = cameraDirection === CameraDirection.Front ? 'user' : 'environment';
+      document.body.appendChild(cameraModal);
+      try {
+        await cameraModal.componentOnReady();
+        cameraModal.addEventListener('onPhoto', async (e: any) => {
+          const photo = e.detail;
+
+          if (photo === null) {
+            reject(new CapacitorException('User cancelled photos app'));
+          } else if (photo instanceof Error) {
+            reject(photo);
+          } else {
+            resolve(await onPhotoCallback(photo));
+          }
+
+          cameraModal.dismiss();
+          document.body.removeChild(cameraModal);
+        });
+
+        cameraModal.present();
+      } catch (e) {
+        fallbackCallback();
+      }
+    } else {
+      console.error(
+        `Unable to load PWA Element 'pwa-camera-modal'. See the docs: https://capacitorjs.com/docs/web/pwa-elements.`,
+      );
+      fallbackCallback();
+    }
+  }
+
+  private _createFileInput(id: string): HTMLInputElement {
+    let input = document.querySelector(`#${id}`) as HTMLInputElement;
+
+    if (!input) {
+      input = document.createElement('input') as HTMLInputElement;
+      input.id = id;
+      input.type = 'file';
+      input.hidden = true;
+      document.body.appendChild(input);
+    }
+
+    return input;
+  }
+
+  private _setupInputCancelListener(input: HTMLInputElement, reject: any, cleanup: () => void): void {
+    input.addEventListener('cancel', (_e: any) => {
+      reject(new CapacitorException('User cancelled photos app'));
+      cleanup();
     });
   }
 
