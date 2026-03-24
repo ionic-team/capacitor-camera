@@ -363,11 +363,10 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     }
 
     input.accept = 'image/*';
-    (input as any).capture = true;
-
     if (options.cameraDirection === CameraDirection.Front) {
       (input as any).capture = 'user';
-    } else if (options.cameraDirection === CameraDirection.Rear) {
+    } else {
+      // CameraDirection.Rear
       (input as any).capture = 'environment';
     }
 
