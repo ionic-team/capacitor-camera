@@ -257,7 +257,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
   private async takePhotoCameraExperience(options: TakePhotoOptions, resolve: any, reject: any) {
     await this._setupPWACameraModal(
       options.cameraDirection,
-      (photo) => this._getCameraPhotoAsMediaResult(photo, options.includeMetadata ?? false),
+      (photo) => this._buildPhotoMediaResult(photo, options.includeMetadata ?? false),
       () => this.takePhotoCameraInputExperience(options, resolve, reject),
       resolve,
       reject
@@ -271,44 +271,20 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       input.parentNode?.removeChild(input);
     };
 
-    if (!input.onchange) {
-      input.addEventListener('change', async (_e: any) => {
-        if (!this._validateFileInput(input, reject, cleanup)) {
-          return;
-        }
+    input.onchange = async (_e: any) => {
+      if (!this._validateFileInput(input, reject, cleanup)) {
+        return;
+      }
 
-        const file = input.files![0];
-        const format = this._getFileFormat(file);
+      const file = input.files![0];
+      resolve(await this._buildPhotoMediaResult(file, options.includeMetadata ?? false));
+      cleanup();
+    };
 
-        const reader = new FileReader();
-        reader.addEventListener('load', async () => {
-          const b64 = (reader.result as string).split(',')[1];
-
-          const result: MediaResult = {
-            type: MediaType.Photo,
-            thumbnail: b64,
-            webPath: URL.createObjectURL(file),
-            saved: false,
-          };
-
-          if (options.includeMetadata) {
-            const resolution = await this._getImageResolution(file);
-            result.metadata = {
-              format,
-              resolution,
-              size: file.size,
-              creationDate: new Date(file.lastModified).toISOString(),
-            };
-          }
-
-          resolve(result);
-          cleanup();
-        });
-
-        reader.readAsDataURL(file);
-      });
-      this._setupInputCancelListener(input, reject, cleanup);
-    }
+    input.oncancel = () => {
+      reject(new CapacitorException('User cancelled photos app'));
+      cleanup();
+    };
 
     input.accept = 'image/*';
     if (options.cameraDirection === CameraDirection.Front) {
@@ -329,84 +305,64 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       input.parentNode?.removeChild(input);
     };
 
-    if (!input.onchange) {
-      input.addEventListener('change', async (_e: any) => {
-        if (!this._validateFileInput(input, reject, cleanup)) {
-          return;
-        }
+    input.onchange = async (_e: any) => {
+      if (!this._validateFileInput(input, reject, cleanup)) {
+        return;
+      }
 
-        const results: MediaResult[] = [];
+      const results: MediaResult[] = [];
 
-        // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < input.files!.length; i++) {
-          const file = input.files![i];
+      // eslint-disable-next-line @typescript-eslint/prefer-for-of
+      for (let i = 0; i < input.files!.length; i++) {
+        const file = input.files![i];
+
+        if (file.type.startsWith('image/')) {
+          results.push(await this._buildPhotoMediaResult(file, options.includeMetadata ?? false));
+        } else if (file.type.startsWith('video/')) {
           const format = this._getFileFormat(file);
-          let type = MediaType.Photo;
+          let thumbnail: string | undefined;
+          let resolution: string | undefined;
+          let duration: number | undefined;
 
-          if (file.type.startsWith('image/')) {
-            const thumbnail = await this._getBase64FromFile(file);
-
-            const result: MediaResult = {
-              type,
-              thumbnail,
-              webPath: URL.createObjectURL(file),
-              saved: false,
-            };
-
-            if (options.includeMetadata) {
-              const resolution = await this._getImageResolution(file);
-              result.metadata = {
-                format,
-                resolution,
-                size: file.size,
-                creationDate: new Date(file.lastModified).toISOString(),
-              };
+          if (options.includeMetadata) {
+            try {
+              const videoMetadata = await this._getVideoMetadata(file);
+              resolution = videoMetadata.resolution;
+              duration = videoMetadata.duration;
+              thumbnail = videoMetadata.thumbnail;
+            } catch (e) {
+              console.warn('Failed to get video metadata:', e);
             }
-
-            results.push(result);
-          } else if (file.type.startsWith('video/')) {
-            type = MediaType.Video;
-
-            let thumbnail: string | undefined;
-            let resolution: string | undefined;
-            let duration: number | undefined;
-
-            if (options.includeMetadata) {
-              try {
-                const videoMetadata = await this._getVideoMetadata(file);
-                resolution = videoMetadata.resolution;
-                duration = videoMetadata.duration;
-                thumbnail = videoMetadata.thumbnail;
-              } catch (e) {
-                console.warn('Failed to get video metadata:', e);
-              }
-            }
-
-            const result: MediaResult = {
-              type,
-              thumbnail,
-              webPath: URL.createObjectURL(file),
-              saved: false,
-            };
-
-            if (options.includeMetadata && resolution) {
-              result.metadata = {
-                format,
-                resolution,
-                size: file.size,
-                creationDate: new Date(file.lastModified).toISOString(),
-                duration,
-              };
-            }
-
-            results.push(result);
           }
+
+          const result: MediaResult = {
+            type: MediaType.Video,
+            thumbnail,
+            webPath: URL.createObjectURL(file),
+            saved: false,
+          };
+
+          if (options.includeMetadata && resolution) {
+            result.metadata = {
+              format,
+              resolution,
+              size: file.size,
+              creationDate: new Date(file.lastModified).toISOString(),
+              duration,
+            };
+          }
+
+          results.push(result);
         }
-        resolve({ results });
-        cleanup();
-      });
-      this._setupInputCancelListener(input, reject, cleanup);
-    }
+      }
+      resolve({ results });
+      cleanup();
+    };
+
+    input.oncancel = () => {
+      reject(new CapacitorException('User cancelled photos app'));
+      cleanup();
+    };
 
     // Set accept attribute based on mediaType
     const mediaType = options.mediaType ?? MediaTypeSelection.Photo;
@@ -422,41 +378,6 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     input.click();
   }
 
-  private async _getCameraPhotoAsMediaResult(photo: Blob, includeMetadata: boolean): Promise<MediaResult> {
-    return new Promise<MediaResult>(async (resolve, reject) => {
-      const reader = new FileReader();
-      const format = this._getFileFormat(photo);
-
-      reader.readAsDataURL(photo);
-      reader.onloadend = async () => {
-        const r = reader.result as string;
-        const b64 = r.split(',')[1];
-
-        const result: MediaResult = {
-          type: MediaType.Photo,
-          thumbnail: b64,
-          webPath: URL.createObjectURL(photo),
-          saved: false,
-        };
-
-        if (includeMetadata) {
-          const resolution = await this._getImageResolution(photo);
-          result.metadata = {
-            format,
-            resolution,
-            size: photo.size,
-            creationDate: new Date().toISOString(),
-          };
-        }
-
-        resolve(result);
-      };
-      reader.onerror = (e) => {
-        reject(e);
-      };
-    });
-  }
-
   private _getFileFormat(file: File | Blob): string {
     if (file.type === 'image/png') {
       return 'png';
@@ -468,6 +389,30 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       return 'jpeg';
     }
     return file.type.split('/')[1] || 'jpeg';
+  }
+
+  private async _buildPhotoMediaResult(file: File | Blob, includeMetadata: boolean): Promise<MediaResult> {
+    const format = this._getFileFormat(file);
+    const thumbnail = await this._getBase64FromFile(file);
+
+    const result: MediaResult = {
+      type: MediaType.Photo,
+      thumbnail,
+      webPath: URL.createObjectURL(file),
+      saved: false,
+    };
+
+    if (includeMetadata) {
+      const resolution = await this._getImageResolution(file);
+      result.metadata = {
+        format,
+        resolution,
+        size: file.size,
+        creationDate: 'lastModified' in file ? new Date(file.lastModified).toISOString() : new Date().toISOString(),
+      };
+    }
+
+    return result;
   }
 
   private _validateFileInput(input: HTMLInputElement, reject: any, cleanup: () => void): boolean {
@@ -534,13 +479,6 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     return input;
   }
 
-  private _setupInputCancelListener(input: HTMLInputElement, reject: any, cleanup: () => void): void {
-    input.addEventListener('cancel', (_e: any) => {
-      reject(new CapacitorException('User cancelled photos app'));
-      cleanup();
-    });
-  }
-
   private async _getImageResolution(image: Blob | File): Promise<string> {
     try {
       const bitmap = await createImageBitmap(image);
@@ -553,7 +491,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     }
   }
 
-  private _getBase64FromFile(file: File): Promise<string> {
+  private _getBase64FromFile(file: File | Blob): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => {
