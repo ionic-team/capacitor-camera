@@ -446,6 +446,7 @@ export interface MediaResult {
   /**
    * Returns the thumbnail of the media, base64 encoded.
    * On Web, for `MediaType.Photo`, the full image is returned here, also base64 encoded.
+   * On Web, for `MediaType.Video`, a JPEG thumbnail captured from the video is returned.
    *
    * @since 8.1.0
    */

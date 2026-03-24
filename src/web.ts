@@ -420,22 +420,41 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
 
             // Get resolution from image file
             resolution = await this._getImageResolution(file);
+
+            // Get base64 thumbnail for image
+            const thumbnail = await this._getBase64FromFile(file);
+
+            results.push({
+              type,
+              thumbnail,
+              webPath: URL.createObjectURL(file),
+              saved: false,
+              metadata: {
+                format,
+                resolution,
+                size: file.size,
+                creationDate: new Date(file.lastModified).toISOString(),
+              },
+            });
           } else if (file.type.startsWith('video/')) {
             type = MediaType.Video;
             format = file.type.split('/')[1];
 
-            // Get resolution and duration from video file
+            // Get resolution, duration, and thumbnail from video file
             let duration: number | undefined;
+            let thumbnail: string | undefined;
             try {
               const videoMetadata = await this._getVideoMetadata(file);
               resolution = videoMetadata.resolution;
               duration = videoMetadata.duration;
+              thumbnail = videoMetadata.thumbnail;
             } catch (e) {
               console.warn('Failed to get video metadata:', e);
             }
 
             results.push({
               type,
+              thumbnail,
               webPath: URL.createObjectURL(file),
               saved: false,
               metadata: {
@@ -446,20 +465,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
                 duration,
               },
             });
-            continue;
           }
-
-          results.push({
-            type,
-            webPath: URL.createObjectURL(file),
-            saved: false,
-            metadata: {
-              format,
-              resolution,
-              size: file.size,
-              creationDate: new Date(file.lastModified).toISOString(),
-            },
-          });
         }
         resolve({ results });
         cleanup();
@@ -527,17 +533,69 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     }
   }
 
-  private _getVideoMetadata(videoFile: File): Promise<{ resolution: string; duration: number }> {
+  private _getBase64FromFile(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
+        const base64 = dataUrl.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = (e) => {
+        reject(e);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  private _getVideoMetadata(videoFile: File): Promise<{ resolution: string; duration: number; thumbnail?: string }> {
     return new Promise((resolve) => {
       const video = document.createElement('video');
       video.preload = 'metadata';
+      video.muted = true;
 
       video.onloadedmetadata = () => {
-        // Clean up
-        URL.revokeObjectURL(video.src);
-        const resolution = `${video.videoWidth}x${video.videoHeight}`;
-        const duration = video.duration;
-        resolve({ resolution, duration });
+        // Seek to 1 second or 10% of duration to capture thumbnail
+        const seekTime = Math.min(1, video.duration * 0.1);
+        video.currentTime = seekTime;
+      };
+
+      video.onseeked = () => {
+        try {
+          // Create canvas and capture frame
+          const canvas = document.createElement('canvas');
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          const ctx = canvas.getContext('2d');
+
+          if (ctx) {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const thumbnail = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+
+            // Clean up
+            URL.revokeObjectURL(video.src);
+            resolve({
+              resolution: `${video.videoWidth}x${video.videoHeight}`,
+              duration: video.duration,
+              thumbnail,
+            });
+          } else {
+            // Clean up and return without thumbnail
+            URL.revokeObjectURL(video.src);
+            resolve({
+              resolution: `${video.videoWidth}x${video.videoHeight}`,
+              duration: video.duration,
+            });
+          }
+        } catch (e) {
+          console.warn('Failed to generate video thumbnail:', e);
+          // Clean up and return without thumbnail
+          URL.revokeObjectURL(video.src);
+          resolve({
+            resolution: `${video.videoWidth}x${video.videoHeight}`,
+            duration: video.duration,
+          });
+        }
       };
 
       video.onerror = () => {
