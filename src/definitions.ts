@@ -429,7 +429,7 @@ export interface EditPhotoResult {
 
 export interface MediaResult {
   /**
-   * The type of media result. Either `Media.Type.picture` or `Media.Type.video`.
+   * The type of media result. Either `Photo` or `Video`.
    *
    * @since 8.1.0
    */
@@ -445,7 +445,7 @@ export interface MediaResult {
 
   /**
    * Returns the thumbnail of the media, base64 encoded.
-   * On Web, for `Media.Type.picture`, the full image is returned here, also base64 encoded.
+   * On Web, for `MediaType.Photo`, the full image is returned here, also base64 encoded.
    *
    * @since 8.1.0
    */
