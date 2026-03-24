@@ -326,7 +326,13 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       input.hidden = true;
       document.body.appendChild(input);
       input.addEventListener('change', async (_e: any) => {
-        const file = input.files![0];
+        if (!input.files || input.files.length === 0) {
+          reject(new CapacitorException('No file selected'));
+          cleanup();
+          return;
+        }
+
+        const file = input.files[0];
         let format = 'jpeg';
 
         if (file.type === 'image/png') {
@@ -390,13 +396,17 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       input.multiple = options.allowMultipleSelection ?? false;
       document.body.appendChild(input);
       input.addEventListener('change', async (_e: any) => {
+        if (!input.files || input.files.length === 0) {
+          reject(new CapacitorException('No files selected'));
+          cleanup();
+          return;
+        }
+
         const results: MediaResult[] = [];
-        const limit = options.limit && options.limit > 0 ? options.limit : input.files!.length;
-        const filesToProcess = Math.min(limit, input.files!.length);
 
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < filesToProcess; i++) {
-          const file = input.files![i];
+        for (let i = 0; i < input.files.length; i++) {
+          const file = input.files[i];
           let format = 'jpeg';
           let type = MediaType.Photo;
           let resolution = '0x0';
