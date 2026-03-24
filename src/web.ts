@@ -325,7 +325,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       input.type = 'file';
       input.hidden = true;
       document.body.appendChild(input);
-      input.addEventListener('change', (_e: any) => {
+      input.addEventListener('change', async (_e: any) => {
         const file = input.files![0];
         let format = 'jpeg';
 
@@ -334,6 +334,9 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
         } else if (file.type === 'image/gif') {
           format = 'gif';
         }
+
+        // Get resolution from image file
+        const resolution = await this._getImageResolution(file);
 
         const reader = new FileReader();
         reader.addEventListener('load', () => {
@@ -345,7 +348,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
             saved: false,
             metadata: {
               format,
-              resolution: '0x0', // Resolution not available from file input
+              resolution,
             },
           } as MediaResult);
           cleanup();
@@ -385,7 +388,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       input.hidden = true;
       input.multiple = options.allowMultipleSelection ?? false;
       document.body.appendChild(input);
-      input.addEventListener('change', (_e: any) => {
+      input.addEventListener('change', async (_e: any) => {
         const results: MediaResult[] = [];
         const limit = options.limit && options.limit > 0 ? options.limit : input.files!.length;
         const filesToProcess = Math.min(limit, input.files!.length);
@@ -395,6 +398,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
           const file = input.files![i];
           let format = 'jpeg';
           let type = MediaType.Photo;
+          let resolution = '0x0';
 
           if (file.type.startsWith('image/')) {
             type = MediaType.Photo;
@@ -403,9 +407,19 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
             } else if (file.type === 'image/gif') {
               format = 'gif';
             }
+
+            // Get resolution from image file
+            resolution = await this._getImageResolution(file);
           } else if (file.type.startsWith('video/')) {
             type = MediaType.Video;
             format = file.type.split('/')[1];
+
+            // Get resolution from video file
+            try {
+              resolution = await this._getVideoResolution(file);
+            } catch (e) {
+              console.warn('Failed to get video resolution:', e);
+            }
           }
 
           results.push({
@@ -414,7 +428,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
             saved: false,
             metadata: {
               format,
-              resolution: '0x0', // Resolution not available from file input
+              resolution,
             },
           });
         }
@@ -441,10 +455,14 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     input.click();
   }
 
-  private _getCameraPhotoAsMediaResult(photo: Blob) {
-    return new Promise<MediaResult>((resolve, reject) => {
+  private async _getCameraPhotoAsMediaResult(photo: Blob): Promise<MediaResult> {
+    return new Promise<MediaResult>(async (resolve, reject) => {
       const reader = new FileReader();
       const format = photo.type.split('/')[1];
+
+      // Get resolution from image blob
+      const resolution = await this._getImageResolution(photo);
+
       reader.readAsDataURL(photo);
       reader.onloadend = () => {
         const r = reader.result as string;
@@ -456,13 +474,47 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
           saved: false,
           metadata: {
             format,
-            resolution: '0x0', // Resolution not available from blob
+            resolution,
           },
         });
       };
       reader.onerror = (e) => {
         reject(e);
       };
+    });
+  }
+
+  private async _getImageResolution(image: Blob | File): Promise<string> {
+    try {
+      const bitmap = await createImageBitmap(image);
+      const resolution = `${bitmap.width}x${bitmap.height}`;
+      bitmap.close();
+      return resolution;
+    } catch (e) {
+      console.warn('Failed to get image resolution:', e);
+      return '0x0';
+    }
+  }
+
+  private _getVideoResolution(videoFile: File): Promise<string> {
+    return new Promise((resolve) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+
+      video.onloadedmetadata = () => {
+        // Clean up
+        URL.revokeObjectURL(video.src);
+        const resolution = `${video.videoWidth}x${video.videoHeight}`;
+        resolve(resolution);
+      };
+
+      video.onerror = () => {
+        // Clean up and return default
+        URL.revokeObjectURL(video.src);
+        resolve('0x0');
+      };
+
+      video.src = URL.createObjectURL(videoFile);
     });
   }
 
