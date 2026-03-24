@@ -480,8 +480,7 @@ export interface MediaResult {
 
 export interface MediaMetadata {
   /**
-   * File size of the media, in bytes
-   * Not available on Web.
+   * File size of the media, in bytes.
    *
    * @since 8.1.0
    */
@@ -489,7 +488,6 @@ export interface MediaMetadata {
 
   /**
    * Only applicable for `MediaType.Video` - the duration of the media, in seconds.
-   * Not available on Web.
    *
    * @since 8.1.0
    */
@@ -515,7 +513,6 @@ export interface MediaMetadata {
   /**
    * The date and time the media was created, in ISO 8601 format.
    * If creation date is not available (e.g. Android 7 and below), the last modified date is returned.
-   * Not available on web.
    *
    * @since 8.1.0
    */

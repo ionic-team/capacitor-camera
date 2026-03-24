@@ -349,6 +349,8 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
             metadata: {
               format,
               resolution,
+              size: file.size,
+              creationDate: new Date(file.lastModified).toISOString(),
             },
           } as MediaResult);
           cleanup();
@@ -412,12 +414,29 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
             type = MediaType.Video;
             format = file.type.split('/')[1];
 
-            // Get resolution from video file
+            // Get resolution and duration from video file
+            let duration: number | undefined;
             try {
-              resolution = await this._getVideoResolution(file);
+              const videoMetadata = await this._getVideoMetadata(file);
+              resolution = videoMetadata.resolution;
+              duration = videoMetadata.duration;
             } catch (e) {
-              console.warn('Failed to get video resolution:', e);
+              console.warn('Failed to get video metadata:', e);
             }
+
+            results.push({
+              type,
+              webPath: URL.createObjectURL(file),
+              saved: false,
+              metadata: {
+                format,
+                resolution,
+                size: file.size,
+                creationDate: new Date(file.lastModified).toISOString(),
+                duration,
+              },
+            });
+            continue;
           }
 
           results.push({
@@ -427,6 +446,8 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
             metadata: {
               format,
               resolution,
+              size: file.size,
+              creationDate: new Date(file.lastModified).toISOString(),
             },
           });
         }
@@ -473,6 +494,8 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
           metadata: {
             format,
             resolution,
+            size: photo.size,
+            creationDate: new Date().toISOString(),
           },
         });
       };
@@ -494,7 +517,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     }
   }
 
-  private _getVideoResolution(videoFile: File): Promise<string> {
+  private _getVideoMetadata(videoFile: File): Promise<{ resolution: string; duration: number }> {
     return new Promise((resolve) => {
       const video = document.createElement('video');
       video.preload = 'metadata';
@@ -503,13 +526,14 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
         // Clean up
         URL.revokeObjectURL(video.src);
         const resolution = `${video.videoWidth}x${video.videoHeight}`;
-        resolve(resolution);
+        const duration = video.duration;
+        resolve({ resolution, duration });
       };
 
       video.onerror = () => {
-        // Clean up and return default
+        // Clean up and return defaults
         URL.revokeObjectURL(video.src);
-        resolve('0x0');
+        resolve({ resolution: '0x0', duration: 0 });
       };
 
       video.src = URL.createObjectURL(videoFile);
