@@ -340,7 +340,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
             saved: false,
           };
 
-          if (options.includeMetadata && resolution) {
+          if (options.includeMetadata) {
             result.metadata = {
               format,
               resolution,
