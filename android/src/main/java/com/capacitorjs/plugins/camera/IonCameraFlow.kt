@@ -64,7 +64,9 @@ class IonCameraFlow(
     private var currentCall: PluginCall? = null
     private var cameraSettings: IonCameraSettings? = null
     private var gallerySettings: IonGallerySettings? = null
-    private var editParameters: IONCAMREditParameters? = null
+    private var editParameters = IONCAMREditParameters(
+        editURI = "", fromUri = false, saveToGallery = false, includeMetadata = false
+    )
     private var videoParameters: IONCAMRVideoParameters? = null
     private var lastEditUri: String? = null
 
@@ -343,9 +345,15 @@ class IonCameraFlow(
             return
         }
 
+        editParameters = IONCAMREditParameters(
+            "",
+            fromUri = false,
+            saveToGallery = false,
+            includeMetadata = false
+        )
+
         val imageBase64 = call.getString("inputImage")
         if (imageBase64 == null) return
-        editParameters = null
         manager.editImage(activity, imageBase64, editLauncher)
     }
 
@@ -902,14 +910,10 @@ class IonCameraFlow(
             return
         }
 
-        val params = editParameters ?: IONCAMREditParameters(
-            editURI = "", fromUri = false, saveToGallery = false, includeMetadata = false
-        )
-
         manager.processResultFromEdit(
             activity,
             result.data,
-            params,
+            editParameters,
             { image ->
                 handleEditBase64Result(image)
             },
