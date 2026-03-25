@@ -511,6 +511,7 @@ export interface MediaMetadata {
   /**
    * The date and time the media was created, in ISO 8601 format.
    * If creation date is not available (e.g. Android 7 and below), the last modified date is returned.
+   * For Web, the last modified date is always returned.
    *
    * @since 8.1.0
    */
