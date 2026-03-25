@@ -516,8 +516,12 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       };
 
       video.onseeked = () => {
+        const result: { resolution?: string; duration?: number; thumbnail?: string } = {
+          resolution: `${video.videoWidth}x${video.videoHeight}`,
+          duration: video.duration,
+        };
+
         try {
-          // Create canvas and capture frame
           const canvas = document.createElement('canvas');
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
@@ -525,32 +529,14 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
 
           if (ctx) {
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const thumbnail = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-
-            // Clean up
-            URL.revokeObjectURL(video.src);
-            resolve({
-              resolution: `${video.videoWidth}x${video.videoHeight}`,
-              duration: video.duration,
-              thumbnail,
-            });
-          } else {
-            // Clean up and return without thumbnail
-            URL.revokeObjectURL(video.src);
-            resolve({
-              resolution: `${video.videoWidth}x${video.videoHeight}`,
-              duration: video.duration,
-            });
+            result.thumbnail = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
           }
         } catch (e) {
           console.warn('Failed to generate video thumbnail:', e);
-          // Clean up and return without thumbnail
-          URL.revokeObjectURL(video.src);
-          resolve({
-            resolution: `${video.videoWidth}x${video.videoHeight}`,
-            duration: video.duration,
-          });
         }
+
+        URL.revokeObjectURL(video.src);
+        resolve(result);
       };
 
       video.onerror = () => {
