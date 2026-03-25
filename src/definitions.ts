@@ -281,7 +281,7 @@ export interface ChooseFromGalleryOptions {
    * The maximum number of media files that the user can choose.
    * Only applicable if `allowMultipleSelection` is `true`.
    * Any non-positive number will be treated as unlimited.
-   * Note: This option is only supported on Android 13+ and iOS. Not available on Web.
+   * Note: This option is only supported on Android 13+ and iOS.
    * @default 0
    *
    * @since 8.1.0
