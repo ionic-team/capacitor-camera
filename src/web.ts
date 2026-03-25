@@ -321,15 +321,16 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
           let resolution: string | undefined;
           let duration: number | undefined;
 
-          if (options.includeMetadata) {
-            try {
-              const videoMetadata = await this._getVideoMetadata(file);
-              resolution = videoMetadata.resolution;
-              duration = videoMetadata.duration;
-              thumbnail = videoMetadata.thumbnail;
-            } catch (e) {
-              console.warn('Failed to get video metadata:', e);
+          try {
+            const videoInfo = await this._getVideoMetadata(file);
+            thumbnail = videoInfo.thumbnail;
+
+            if (options.includeMetadata) {
+              resolution = videoInfo.resolution;
+              duration = videoInfo.duration;
             }
+          } catch (e) {
+            console.warn('Failed to get video metadata:', e);
           }
 
           const result: MediaResult = {
