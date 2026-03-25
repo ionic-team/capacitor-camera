@@ -503,7 +503,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     });
   }
 
-  private _getVideoMetadata(videoFile: File): Promise<{ resolution: string; duration: number; thumbnail?: string }> {
+  private _getVideoMetadata(videoFile: File): Promise<{ resolution?: string; duration?: number; thumbnail?: string }> {
     return new Promise((resolve) => {
       const video = document.createElement('video');
       video.preload = 'metadata';
@@ -556,7 +556,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       video.onerror = () => {
         // Clean up and return defaults
         URL.revokeObjectURL(video.src);
-        resolve({ resolution: '0x0', duration: 0 });
+        resolve({});
       };
 
       video.src = URL.createObjectURL(videoFile);

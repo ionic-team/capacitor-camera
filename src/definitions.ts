@@ -506,7 +506,7 @@ export interface MediaMetadata {
    *
    * @since 8.1.0
    */
-  resolution: string;
+  resolution?: string;
 
   /**
    * The date and time the media was created, in ISO 8601 format.
