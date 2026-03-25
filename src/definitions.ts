@@ -722,7 +722,7 @@ export interface Photo {
    *
    * @since 1.1.0
    */
-  saved: boolean;
+  saved?: boolean;
 }
 
 export interface GalleryPhotos {
