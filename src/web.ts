@@ -98,7 +98,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       (photo) => this._getCameraPhoto(photo, options),
       () => this.fileInputExperience(options, resolve, reject),
       resolve,
-      reject
+      reject,
     );
   }
 
@@ -257,7 +257,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       (photo) => this._buildPhotoMediaResult(photo, options.includeMetadata ?? false),
       () => this.takePhotoCameraInputExperience(options, resolve, reject),
       resolve,
-      reject
+      reject,
     );
   }
 
@@ -428,7 +428,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     onPhotoCallback: (photo: Blob) => Promise<any>,
     fallbackCallback: () => void,
     resolve: any,
-    reject: any
+    reject: any,
   ): Promise<void> {
     if (customElements.get('pwa-camera-modal')) {
       const cameraModal: any = document.createElement('pwa-camera-modal');
