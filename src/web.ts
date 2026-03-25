@@ -98,7 +98,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       (photo) => this._getCameraPhoto(photo, options),
       () => this.fileInputExperience(options, resolve, reject),
       resolve,
-      reject
+      reject,
     );
   }
 
@@ -227,7 +227,6 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
         resolve({
           webPath: URL.createObjectURL(photo),
           format,
-          saved: false,
         });
       } else {
         reader.readAsDataURL(photo);
@@ -237,13 +236,11 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
             resolve({
               dataUrl: r,
               format,
-              saved: false,
             });
           } else {
             resolve({
               base64String: r.split(',')[1],
               format,
-              saved: false,
             });
           }
         };
@@ -260,7 +257,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       (photo) => this._buildPhotoMediaResult(photo, options.includeMetadata ?? false),
       () => this.takePhotoCameraInputExperience(options, resolve, reject),
       resolve,
-      reject
+      reject,
     );
   }
 
@@ -324,15 +321,16 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
           let resolution: string | undefined;
           let duration: number | undefined;
 
-          if (options.includeMetadata) {
-            try {
-              const videoMetadata = await this._getVideoMetadata(file);
-              resolution = videoMetadata.resolution;
-              duration = videoMetadata.duration;
-              thumbnail = videoMetadata.thumbnail;
-            } catch (e) {
-              console.warn('Failed to get video metadata:', e);
+          try {
+            const videoInfo = await this._getVideoMetadata(file);
+            thumbnail = videoInfo.thumbnail;
+
+            if (options.includeMetadata) {
+              resolution = videoInfo.resolution;
+              duration = videoInfo.duration;
             }
+          } catch (e) {
+            console.warn('Failed to get video metadata:', e);
           }
 
           const result: MediaResult = {
@@ -342,7 +340,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
             saved: false,
           };
 
-          if (options.includeMetadata && resolution) {
+          if (options.includeMetadata) {
             result.metadata = {
               format,
               resolution,
@@ -430,7 +428,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     onPhotoCallback: (photo: Blob) => Promise<any>,
     fallbackCallback: () => void,
     resolve: any,
-    reject: any
+    reject: any,
   ): Promise<void> {
     if (customElements.get('pwa-camera-modal')) {
       const cameraModal: any = document.createElement('pwa-camera-modal');
@@ -479,7 +477,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     return input;
   }
 
-  private async _getImageResolution(image: Blob | File): Promise<string> {
+  private async _getImageResolution(image: Blob | File): Promise<string | undefined> {
     try {
       const bitmap = await createImageBitmap(image);
       const resolution = `${bitmap.width}x${bitmap.height}`;
@@ -487,7 +485,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       return resolution;
     } catch (e) {
       console.warn('Failed to get image resolution:', e);
-      return '0x0';
+      return undefined;
     }
   }
 
@@ -506,7 +504,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     });
   }
 
-  private _getVideoMetadata(videoFile: File): Promise<{ resolution: string; duration: number; thumbnail?: string }> {
+  private _getVideoMetadata(videoFile: File): Promise<{ resolution?: string; duration?: number; thumbnail?: string }> {
     return new Promise((resolve) => {
       const video = document.createElement('video');
       video.preload = 'metadata';
@@ -519,8 +517,12 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       };
 
       video.onseeked = () => {
+        const result: { resolution?: string; duration?: number; thumbnail?: string } = {
+          resolution: `${video.videoWidth}x${video.videoHeight}`,
+          duration: video.duration,
+        };
+
         try {
-          // Create canvas and capture frame
           const canvas = document.createElement('canvas');
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
@@ -528,38 +530,20 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
 
           if (ctx) {
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const thumbnail = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-
-            // Clean up
-            URL.revokeObjectURL(video.src);
-            resolve({
-              resolution: `${video.videoWidth}x${video.videoHeight}`,
-              duration: video.duration,
-              thumbnail,
-            });
-          } else {
-            // Clean up and return without thumbnail
-            URL.revokeObjectURL(video.src);
-            resolve({
-              resolution: `${video.videoWidth}x${video.videoHeight}`,
-              duration: video.duration,
-            });
+            result.thumbnail = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
           }
         } catch (e) {
           console.warn('Failed to generate video thumbnail:', e);
-          // Clean up and return without thumbnail
-          URL.revokeObjectURL(video.src);
-          resolve({
-            resolution: `${video.videoWidth}x${video.videoHeight}`,
-            duration: video.duration,
-          });
         }
+
+        URL.revokeObjectURL(video.src);
+        resolve(result);
       };
 
       video.onerror = () => {
         // Clean up and return defaults
         URL.revokeObjectURL(video.src);
-        resolve({ resolution: '0x0', duration: 0 });
+        resolve({});
       };
 
       video.src = URL.createObjectURL(videoFile);

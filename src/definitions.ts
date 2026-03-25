@@ -281,7 +281,7 @@ export interface ChooseFromGalleryOptions {
    * The maximum number of media files that the user can choose.
    * Only applicable if `allowMultipleSelection` is `true`.
    * Any non-positive number will be treated as unlimited.
-   * Note: This option is only supported on Android 13+ and iOS. Not available on Web.
+   * Note: This option is only supported on Android 13+ and iOS.
    * @default 0
    *
    * @since 8.1.0
@@ -443,7 +443,7 @@ export interface MediaResult {
   /**
    * Returns the thumbnail of the media, base64 encoded.
    * On Web, for `MediaType.Photo`, the full image is returned here, also base64 encoded.
-   * On Web, for `MediaType.Video`, a JPEG thumbnail captured from the video is returned.
+   * On Web, for `MediaType.Video`, a full-resolution JPEG frame captured from the video is returned, base64 encoded at 80% quality.
    *
    * @since 8.1.0
    */
@@ -495,7 +495,7 @@ export interface MediaMetadata {
    * The format of the image, ex: jpeg, png, mp4.
    *
    * Web supports jpeg, png and gif, but the exact availability may vary depending on the browser.
-   * gif is only supported for `chooseFromGallery`, and only if `webUseInput` option is set to `true`.
+   * gif is only supported for `chooseFromGallery` on Web.
    *
    * @since 8.1.0
    */
@@ -506,11 +506,12 @@ export interface MediaMetadata {
    *
    * @since 8.1.0
    */
-  resolution: string;
+  resolution?: string;
 
   /**
    * The date and time the media was created, in ISO 8601 format.
    * If creation date is not available (e.g. Android 7 and below), the last modified date is returned.
+   * For Web, the last modified date is always returned.
    *
    * @since 8.1.0
    */
@@ -721,7 +722,7 @@ export interface Photo {
    *
    * @since 1.1.0
    */
-  saved: boolean;
+  saved?: boolean;
 }
 
 export interface GalleryPhotos {
