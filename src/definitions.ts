@@ -495,7 +495,7 @@ export interface MediaMetadata {
    * The format of the image, ex: jpeg, png, mp4.
    *
    * Web supports jpeg, png and gif, but the exact availability may vary depending on the browser.
-   * gif is only supported for `chooseFromGallery`, and only if `webUseInput` option is set to `true`.
+   * gif is only supported for `chooseFromGallery` on Web.
    *
    * @since 8.1.0
    */
