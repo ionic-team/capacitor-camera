@@ -476,7 +476,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
     return input;
   }
 
-  private async _getImageResolution(image: Blob | File): Promise<string> {
+  private async _getImageResolution(image: Blob | File): Promise<string | undefined> {
     try {
       const bitmap = await createImageBitmap(image);
       const resolution = `${bitmap.width}x${bitmap.height}`;
@@ -484,7 +484,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
       return resolution;
     } catch (e) {
       console.warn('Failed to get image resolution:', e);
-      return '0x0';
+      return undefined;
     }
   }
 
