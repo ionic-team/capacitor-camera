@@ -33,6 +33,7 @@ import io.ionic.libs.ioncameralib.manager.IONCAMRGalleryManager
 import io.ionic.libs.ioncameralib.manager.IONCAMRVideoManager
 import io.ionic.libs.ioncameralib.model.IONCAMRCameraParameters
 import io.ionic.libs.ioncameralib.model.IONCAMREditParameters
+import io.ionic.libs.ioncameralib.model.IONCAMRVideoParameters
 import io.ionic.libs.ioncameralib.model.IONCAMRError
 import io.ionic.libs.ioncameralib.model.IONCAMRMediaResult
 import io.ionic.libs.ioncameralib.model.IONCAMRMediaType
@@ -62,11 +63,11 @@ class IonCameraFlow(
     private lateinit var editLauncher: ActivityResultLauncher<Intent>
     private var currentCall: PluginCall? = null
     private var cameraSettings: IonCameraSettings? = null
-    private var videoSettings: IonVideoSettings? = null
     private var gallerySettings: IonGallerySettings? = null
     private var editParameters = IONCAMREditParameters(
         editURI = "", fromUri = false, saveToGallery = false, includeMetadata = false
     )
+    private var videoParameters: IONCAMRVideoParameters? = null
     private var lastEditUri: String? = null
 
     companion object {
@@ -118,7 +119,7 @@ class IonCameraFlow(
     }
 
     fun recordVideo(call: PluginCall) {
-        videoSettings = getVideoSettings(call)
+        videoParameters = getVideoSettings(call)
         currentCall = call
         openRecordVideo(call)
     }
@@ -186,8 +187,8 @@ class IonCameraFlow(
 
     }
 
-    fun getVideoSettings(call: PluginCall): IonVideoSettings {
-        return IonVideoSettings(
+    fun getVideoSettings(call: PluginCall): IONCAMRVideoParameters {
+        return IONCAMRVideoParameters(
             saveToGallery = call.getBoolean("saveToGallery") ?: false,
             includeMetadata = call.getBoolean("includeMetadata") ?: false,
             isPersistent = call.getBoolean("isPersistent") ?: true
@@ -273,7 +274,7 @@ class IonCameraFlow(
     }
 
     fun openRecordVideo(call: PluginCall) {
-        val settings = videoSettings ?: run {
+        val settings = videoParameters ?: run {
             sendError(IONCAMRError.INVALID_ARGUMENT_ERROR)
             return
         }
@@ -350,6 +351,7 @@ class IonCameraFlow(
             saveToGallery = false,
             includeMetadata = false
         )
+
         val imageBase64 = call.getString("inputImage")
         if (imageBase64 == null) return
         manager.editImage(activity, imageBase64, editLauncher)
@@ -857,7 +859,7 @@ class IonCameraFlow(
             sendError(IONCAMRError.CAPTURE_VIDEO_ERROR)
             return
         }
-        val settings = videoSettings ?: run {
+        val settings = videoParameters ?: run {
             sendError(IONCAMRError.INVALID_ARGUMENT_ERROR)
             return
         }
