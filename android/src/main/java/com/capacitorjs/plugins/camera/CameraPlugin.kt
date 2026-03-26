@@ -160,7 +160,7 @@ class CameraPlugin : Plugin() {
      */
     @PermissionCallback
     private fun ionCameraPermissionsCallback(call: PluginCall) {
-        ionFlow.handleCameraPermissionsCallback(call)
+        ionFlow.handlePermissionsCallback(call)
     }
 
     override fun requestPermissionForAliases(
