@@ -294,7 +294,7 @@ class IonCameraFlow(
                     sendError(it)
                 }
             } catch (ex: Exception) {
-                sendError(IONCAMRError.VIDEO_CAPTURE_NOT_SUPPORTED_ERROR)
+                sendError(IONCAMRError.CAPTURE_VIDEO_ERROR)
             }
         }
     }
@@ -542,7 +542,7 @@ class IonCameraFlow(
                     processResultEditFromGallery(intent)
                 } else {
                     lastEditUri = null
-                    sendError(IONCAMRError.EDIT_OPERATION_CANCELLED_ERROR)
+                    sendError(IONCAMRError.EDIT_CANCELLED_ERROR)
                 }
             }
             else -> sendError(IONCAMRError.EDIT_IMAGE_ERROR)
@@ -575,7 +575,7 @@ class IonCameraFlow(
     private fun handleEditResult(result: ActivityResult) {
         when (result.resultCode) {
             Activity.RESULT_OK -> processResultFromEdit(result)
-            Activity.RESULT_CANCELED -> sendError(IONCAMRError.EDIT_OPERATION_CANCELLED_ERROR)
+            Activity.RESULT_CANCELED -> sendError(IONCAMRError.EDIT_CANCELLED_ERROR)
             else -> sendError(IONCAMRError.EDIT_IMAGE_ERROR)
         }
     }
@@ -700,7 +700,7 @@ class IonCameraFlow(
                     processResult(intent)
                 } else {
                     lastEditUri = null
-                    sendError(IONCAMRError.EDIT_OPERATION_CANCELLED_ERROR)
+                    sendError(IONCAMRError.EDIT_CANCELLED_ERROR)
                 }
             }
             else -> sendError(IONCAMRError.EDIT_IMAGE_ERROR)
