@@ -19,6 +19,7 @@ import { MediaHistoryService } from "../services/MediaHistoryService";
 interface IRecordVideoPageState {
   filePath: string | null;
   metadata: MediaMetadata | string | null;
+  thumbnail: string | null;
 }
 
 class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
@@ -27,6 +28,7 @@ class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
     this.state = {
       filePath: null,
       metadata: null,
+      thumbnail: null,
     };
   }
 
@@ -34,6 +36,7 @@ class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
     this.setState({
       filePath: result.uri ?? result.webPath ?? '',
       metadata: result.metadata ?? null,
+      thumbnail: result.thumbnail ?? null,
     });
 
     MediaHistoryService.addMedia({
@@ -65,6 +68,7 @@ class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
     this.setState({
       filePath: null,
       metadata: null,
+      thumbnail: null,
     });
   };
 
@@ -106,6 +110,7 @@ class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
               <VideoWithMetadata
                 filePath={this.state.filePath}
                 metadata={this.state.metadata}
+                thumbnail={this.state.thumbnail ?? undefined}
               />
             </>
           )}
