@@ -66,7 +66,11 @@ const MediaCarousel: React.FC<IMediaCarouselProps> = ({ media, onEditPhoto }) =>
           return (
             <SwiperSlide key={index}>
               {isVideo(item) ? (
-                <VideoWithMetadata filePath={filePath} metadata={item.metadata} />
+                <VideoWithMetadata
+                  filePath={filePath}
+                  metadata={item.metadata}
+                  thumbnail={item.thumbnail}
+                />
               ) : (
                 <PhotoWithMetadata
                   filePath={filePath}

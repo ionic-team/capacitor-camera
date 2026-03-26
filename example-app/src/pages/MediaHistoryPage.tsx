@@ -20,6 +20,7 @@ import {
   MediaHistoryItem,
 } from "../services/MediaHistoryService";
 import { FileViewer } from "@capacitor/file-viewer";
+import { Capacitor } from "@capacitor/core";
 
 const MediaHistoryPage: React.FC = () => {
   const [history, setHistory] = useState<MediaHistoryItem[]>([]);
@@ -35,6 +36,10 @@ const MediaHistoryPage: React.FC = () => {
 
   const openFile = async (item: MediaHistoryItem): Promise<void> => {
     try {
+      if (Capacitor.getPlatform() === 'web') {
+        alert('Opening media from history is not available on Web/PWA.');
+        return;
+      }
       const filePath = item.uri ?? item.path ?? '';
       if (!filePath) {
         alert('No file path available for this item');

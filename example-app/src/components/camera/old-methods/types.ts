@@ -30,5 +30,7 @@ export interface PickImagesConfig {
 export interface PhotoResult {
   path?: string;
   webPath?: string;
+  base64String?: string;
+  dataUrl?: string;
   exif?: any;
 }

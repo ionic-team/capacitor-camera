@@ -72,6 +72,8 @@ class GetPhotoConfigurable extends React.Component<
       this.props.onPhotoResult({
         path: photo.path,
         webPath: photo.webPath,
+        base64String: photo.base64String,
+        dataUrl: photo.dataUrl,
         exif: photo.exif,
       });
     } catch (e) {
@@ -105,6 +107,8 @@ class GetPhotoConfigurable extends React.Component<
       this.props.onPhotoResult({
         path: photo.path,
         webPath: photo.webPath,
+        base64String: photo.base64String,
+        dataUrl: photo.dataUrl,
         exif: photo.exif,
       });
     } catch (e) {

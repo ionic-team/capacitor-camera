@@ -214,7 +214,6 @@ export interface TakePhotoOptions {
   /**
    * Whether or not MediaResult should include its metadata.
    * If an error occurs when obtaining the metadata, it will return empty.
-   * Note: This option is only supported on Android and iOS.
    * @default false
    *
    * @since 8.1.0
@@ -292,7 +291,6 @@ export interface ChooseFromGalleryOptions {
   /**
    * Whether or not MediaResult should include its metadata.
    * If an error occurs when obtaining the metadata, it will return empty.
-   * Note: This option is only supported on Android and iOS.
    * @default false
    *
    * @since 8.1.0
@@ -401,7 +399,6 @@ export interface EditURIPhotoOptions {
   /**
    * Whether or not MediaResult should include its metadata.
    * If an error occurs when obtaining the metadata, it will return empty.
-   * Note: This option is only supported on Android and iOS.
    * @default false
    *
    * @since 8.1.0
@@ -446,6 +443,7 @@ export interface MediaResult {
   /**
    * Returns the thumbnail of the media, base64 encoded.
    * On Web, for `MediaType.Photo`, the full image is returned here, also base64 encoded.
+   * On Web, for `MediaType.Video`, a full-resolution JPEG frame captured from the video is returned, base64 encoded at 80% quality.
    *
    * @since 8.1.0
    */
@@ -480,8 +478,7 @@ export interface MediaResult {
 
 export interface MediaMetadata {
   /**
-   * File size of the media, in bytes
-   * Not available on Web.
+   * File size of the media, in bytes.
    *
    * @since 8.1.0
    */
@@ -489,7 +486,6 @@ export interface MediaMetadata {
 
   /**
    * Only applicable for `MediaType.Video` - the duration of the media, in seconds.
-   * Not available on Web.
    *
    * @since 8.1.0
    */
@@ -499,7 +495,7 @@ export interface MediaMetadata {
    * The format of the image, ex: jpeg, png, mp4.
    *
    * Web supports jpeg, png and gif, but the exact availability may vary depending on the browser.
-   * gif is only supported for `chooseFromGallery`, and only if `webUseInput` option is set to `true`.
+   * gif is only supported for `chooseFromGallery` on Web.
    *
    * @since 8.1.0
    */
@@ -510,12 +506,12 @@ export interface MediaMetadata {
    *
    * @since 8.1.0
    */
-  resolution: string;
+  resolution?: string;
 
   /**
    * The date and time the media was created, in ISO 8601 format.
    * If creation date is not available (e.g. Android 7 and below), the last modified date is returned.
-   * Not available on web.
+   * For Web, the last modified date is always returned.
    *
    * @since 8.1.0
    */
