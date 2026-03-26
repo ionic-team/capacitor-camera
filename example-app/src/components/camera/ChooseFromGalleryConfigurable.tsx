@@ -85,7 +85,6 @@ class ChooseFromGalleryConfigurable extends React.Component<
         targetWidth: config.targetWidth,
         targetHeight: config.targetHeight,
         correctOrientation: config.correctOrientation,
-        webUseInput: config.webUseInput,
       });
       console.log('chooseFromGallery result', result);
 
@@ -245,16 +244,6 @@ class ChooseFromGalleryConfigurable extends React.Component<
                   checked={config.correctOrientation}
                   onIonChange={(e) =>
                     this.updateConfig("correctOrientation", e.detail.checked)
-                  }
-                />
-              </IonItem>
-
-              <IonItem>
-                <IonLabel>Web Use Input</IonLabel>
-                <IonToggle
-                  checked={config.webUseInput}
-                  onIonChange={(e) =>
-                    this.updateConfig("webUseInput", e.detail.checked)
                   }
                 />
               </IonItem>

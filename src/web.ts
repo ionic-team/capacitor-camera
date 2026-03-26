@@ -227,6 +227,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
         resolve({
           webPath: URL.createObjectURL(photo),
           format,
+          saved: false,
         });
       } else {
         reader.readAsDataURL(photo);
@@ -236,11 +237,13 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
             resolve({
               dataUrl: r,
               format,
+              saved: false,
             });
           } else {
             resolve({
               base64String: r.split(',')[1],
               format,
+              saved: false,
             });
           }
         };

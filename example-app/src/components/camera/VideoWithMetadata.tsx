@@ -6,11 +6,13 @@ import { MediaMetadata } from "@capacitor/camera";
 interface IVideoWithMetadataProps {
   filePath: string;
   metadata?: MediaMetadata | string | null;
+  thumbnail?: string;
 }
 
 const VideoWithMetadata: React.FC<IVideoWithMetadataProps> = ({
   filePath,
   metadata,
+  thumbnail,
 }) => {
   const formatMetadata = (meta: MediaMetadata | string | null | undefined): string => {
     if (!meta) return '';
@@ -51,6 +53,7 @@ const VideoWithMetadata: React.FC<IVideoWithMetadataProps> = ({
         <div>
           <video
             src={Capacitor.convertFileSrc(filePath)}
+            poster={thumbnail ? `data:image/jpeg;base64,${thumbnail}` : undefined}
             controls
             style={{ width: "100%", maxWidth: "100%" }}
           />
