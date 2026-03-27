@@ -268,7 +268,7 @@ class IonCameraFlow(
                 currentCall = call
                 manager.takePhoto(activity, settings.encodingType, cameraLauncher)
             } catch (ex: Exception) {
-                sendError(IONCAMRError.FAILED_TO_CAPTURE_IMAGE_ERROR)
+                sendError(IONCAMRError.TAKE_PHOTO_ERROR)
             }
         }
     }
@@ -294,7 +294,7 @@ class IonCameraFlow(
                     sendError(it)
                 }
             } catch (ex: Exception) {
-                sendError(IONCAMRError.VIDEO_CAPTURE_NOT_SUPPORTED_ERROR)
+                sendError(IONCAMRError.CAPTURE_VIDEO_ERROR)
             }
         }
     }
@@ -320,6 +320,8 @@ class IonCameraFlow(
     }
 
     private fun openGallery(call: PluginCall) {
+        if (!checkGalleryPermissions(call)) return
+
         val manager = galleryManager ?: run {
             sendError(IONCAMRError.CONTEXT_ERROR)
             return
@@ -540,7 +542,7 @@ class IonCameraFlow(
                     processResultEditFromGallery(intent)
                 } else {
                     lastEditUri = null
-                    sendError(IONCAMRError.EDIT_OPERATION_CANCELLED_ERROR)
+                    sendError(IONCAMRError.EDIT_CANCELLED_ERROR)
                 }
             }
             else -> sendError(IONCAMRError.EDIT_IMAGE_ERROR)
@@ -573,7 +575,7 @@ class IonCameraFlow(
     private fun handleEditResult(result: ActivityResult) {
         when (result.resultCode) {
             Activity.RESULT_OK -> processResultFromEdit(result)
-            Activity.RESULT_CANCELED -> sendError(IONCAMRError.EDIT_OPERATION_CANCELLED_ERROR)
+            Activity.RESULT_CANCELED -> sendError(IONCAMRError.EDIT_CANCELLED_ERROR)
             else -> sendError(IONCAMRError.EDIT_IMAGE_ERROR)
         }
     }
@@ -698,7 +700,7 @@ class IonCameraFlow(
                     processResult(intent)
                 } else {
                     lastEditUri = null
-                    sendError(IONCAMRError.EDIT_OPERATION_CANCELLED_ERROR)
+                    sendError(IONCAMRError.EDIT_CANCELLED_ERROR)
                 }
             }
             else -> sendError(IONCAMRError.EDIT_IMAGE_ERROR)
@@ -984,13 +986,46 @@ class IonCameraFlow(
         return true
     }
 
-    fun handleCameraPermissionsCallback(call: PluginCall) {
-        if (permissionHelper.getPermissionState(CAMERA) != PermissionState.GRANTED) {
+    private fun checkGalleryPermissions(call: PluginCall): Boolean {
+        // Android 10+ does not require storage permissions to use the system gallery picker
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return true
+        }
+        val needGalleryPerms = permissionHelper.isPermissionDeclared(SAVE_GALLERY)
+        val hasGalleryPerms = !needGalleryPerms || permissionHelper.getPermissionState(SAVE_GALLERY) == PermissionState.GRANTED
+        if (!hasGalleryPerms) {
+            permissionHelper.requestPermissionForAlias(SAVE_GALLERY, call, "ionCameraPermissionsCallback")
+            return false
+        }
+        return true
+    }
+
+    fun handlePermissionsCallback(call: PluginCall) {
+        // chooseFromGallery does not require CAMERA permission
+        if (call.methodName != "chooseFromGallery" &&
+            permissionHelper.getPermissionState(CAMERA) != PermissionState.GRANTED) {
             sendError(IONCAMRError.CAMERA_PERMISSION_DENIED_ERROR)
             return
         }
 
-        when (call.getMethodName()) {
+        // On Android <= 9, SAVE_GALLERY (READ/WRITE_EXTERNAL_STORAGE) is required:
+        // - for takePhoto/recordVideo when saveToGallery is true
+        // - always for chooseFromGallery (READ_EXTERNAL_STORAGE is needed to access the gallery)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            val needsGalleryPerm = when (call.methodName) {
+                "takePhoto" -> cameraSettings?.saveToGallery ?: false
+                "recordVideo" -> videoParameters?.saveToGallery ?: false
+                "chooseFromGallery" -> true
+                else -> false
+            }
+            val galleryPermDeclared = permissionHelper.isPermissionDeclared(SAVE_GALLERY)
+            if (needsGalleryPerm && galleryPermDeclared && permissionHelper.getPermissionState(SAVE_GALLERY) != PermissionState.GRANTED) {
+                sendError(IONCAMRError.GALLERY_PERMISSION_DENIED_ERROR)
+                return
+            }
+        }
+
+        when (call.methodName) {
             "takePhoto" -> openCamera(call)
             "recordVideo" -> openRecordVideo(call)
             "chooseFromGallery" -> openGallery(call)
