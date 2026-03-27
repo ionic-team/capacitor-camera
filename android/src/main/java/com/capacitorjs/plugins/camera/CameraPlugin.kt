@@ -46,14 +46,10 @@ import org.json.JSONException
 class CameraPlugin : Plugin() {
 
     companion object {
-        const val CAMERA = "camera"
-        const val PHOTOS = "photos"
-        const val SAVE_GALLERY = "saveGallery"
-        const val READ_EXTERNAL_STORAGE = "readExternalStorage"
-        const val STORE = "CameraStore"
-        const val EDIT_FILE_NAME_KEY = "EditFileName"
-        const val ERROR_FORMAT_PREFIX = "OS-PLUG-CAMR-"
-        const val MEDIA_TYPE_PHOTO = 0
+        private const val CAMERA = "camera"
+        private const val PHOTOS = "photos"
+        private const val SAVE_GALLERY = "saveGallery"
+        private const val READ_EXTERNAL_STORAGE = "readExternalStorage"
     }
 
     private lateinit var legacyFlow: LegacyCameraFlow
@@ -61,8 +57,36 @@ class CameraPlugin : Plugin() {
 
     override fun load() {
         super.load()
-        legacyFlow = LegacyCameraFlow(this)
-        ionFlow = IonCameraFlow(this)
+
+        val permissionHelper = PermissionHelper(
+            isPermissionDeclaredFn = { alias -> isPermissionDeclared(alias) },
+            getPermissionStateFn = { alias -> getPermissionState(alias) },
+            requestPermissionForAliasFn = { alias, call, callbackName ->
+                requestPermissionForAlias(alias, call, callbackName)
+            },
+            requestPermissionForAliasesFn = { aliases, call, callbackName ->
+                requestPermissionForAliases(aliases, call, callbackName)
+            }
+        )
+
+        legacyFlow = LegacyCameraFlow(
+            context,
+            activity,
+            bridge,
+            appId,
+            permissionHelper,
+            LegacyCameraFlow.ActivityStarter { call, intent, callbackName ->
+                startActivityForResult(call, intent, callbackName)
+            }
+        )
+
+        ionFlow = IonCameraFlow(
+            context,
+            activity,
+            bridge,
+            appId,
+            permissionHelper
+        )
         ionFlow.load()
     }
 
@@ -136,7 +160,7 @@ class CameraPlugin : Plugin() {
      */
     @PermissionCallback
     private fun ionCameraPermissionsCallback(call: PluginCall) {
-        ionFlow.handleCameraPermissionsCallback(call)
+        ionFlow.handlePermissionsCallback(call)
     }
 
     override fun requestPermissionForAliases(
@@ -259,18 +283,6 @@ class CameraPlugin : Plugin() {
     protected override fun handleOnDestroy() {
         legacyFlow.onDestroy()
         ionFlow.onDestroy()
-    }
-
-    fun requestLegacyPermissionForAlias(alias: String, call: PluginCall, callbackName: String) {
-        requestPermissionForAlias(alias, call, callbackName)
-    }
-
-    fun requestLegacyPermissionForAliases(
-        aliases: Array<String>,
-        call: PluginCall,
-        callbackName: String
-    ) {
-        requestPermissionForAliases(aliases, call, callbackName)
     }
 
 }

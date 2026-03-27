@@ -85,7 +85,6 @@ class ChooseFromGalleryConfigurable extends React.Component<
         targetWidth: config.targetWidth,
         targetHeight: config.targetHeight,
         correctOrientation: config.correctOrientation,
-        webUseInput: config.webUseInput,
       });
       console.log('chooseFromGallery result', result);
 
@@ -148,7 +147,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
                   type="number"
                   min="0"
                   value={config.limit}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig("limit", parseInt(e.detail.value!) || 0)
                   }
                 />
@@ -161,7 +160,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
                   min="0"
                   max="100"
                   value={config.quality}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig("quality", parseInt(e.detail.value!) || 100)
                   }
                 />
@@ -173,7 +172,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
                   type="number"
                   placeholder="Leave empty for no constraint"
                   value={config.targetWidth ?? ""}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig(
                       "targetWidth",
                       e.detail.value ? parseInt(e.detail.value) : undefined
@@ -188,7 +187,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
                   type="number"
                   placeholder="Leave empty for no constraint"
                   value={config.targetHeight ?? ""}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig(
                       "targetHeight",
                       e.detail.value ? parseInt(e.detail.value) : undefined
@@ -245,16 +244,6 @@ class ChooseFromGalleryConfigurable extends React.Component<
                   checked={config.correctOrientation}
                   onIonChange={(e) =>
                     this.updateConfig("correctOrientation", e.detail.checked)
-                  }
-                />
-              </IonItem>
-
-              <IonItem>
-                <IonLabel>Web Use Input</IonLabel>
-                <IonToggle
-                  checked={config.webUseInput}
-                  onIonChange={(e) =>
-                    this.updateConfig("webUseInput", e.detail.checked)
                   }
                 />
               </IonItem>

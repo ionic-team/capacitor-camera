@@ -72,6 +72,8 @@ class GetPhotoConfigurable extends React.Component<
       this.props.onPhotoResult({
         path: photo.path,
         webPath: photo.webPath,
+        base64String: photo.base64String,
+        dataUrl: photo.dataUrl,
         exif: photo.exif,
       });
     } catch (e) {
@@ -105,6 +107,8 @@ class GetPhotoConfigurable extends React.Component<
       this.props.onPhotoResult({
         path: photo.path,
         webPath: photo.webPath,
+        base64String: photo.base64String,
+        dataUrl: photo.dataUrl,
         exif: photo.exif,
       });
     } catch (e) {
@@ -145,7 +149,7 @@ class GetPhotoConfigurable extends React.Component<
                   min="0"
                   max="100"
                   value={config.quality}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig("quality", parseInt(e.detail.value!) || 100)
                   }
                 />
@@ -231,7 +235,7 @@ class GetPhotoConfigurable extends React.Component<
                   type="number"
                   placeholder="Leave empty for no constraint"
                   value={config.width ?? ""}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig(
                       "width",
                       e.detail.value ? parseInt(e.detail.value) : undefined
@@ -246,7 +250,7 @@ class GetPhotoConfigurable extends React.Component<
                   type="number"
                   placeholder="Leave empty for no constraint"
                   value={config.height ?? ""}
-                  onIonChange={(e) =>
+                  onIonInput={(e) =>
                     this.updateConfig(
                       "height",
                       e.detail.value ? parseInt(e.detail.value) : undefined

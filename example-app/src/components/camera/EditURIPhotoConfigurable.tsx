@@ -135,7 +135,6 @@ class EditURIPhotoConfigurable extends React.Component<
         method: "editURIPhoto",
         uri: result.uri,
         webPath: result.webPath,
-        thumbnail: result.thumbnail,
         format: result.metadata?.format,
         size: result.metadata?.size,
         saved: result.saved,
