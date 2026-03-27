@@ -268,7 +268,7 @@ class IonCameraFlow(
                 currentCall = call
                 manager.takePhoto(activity, settings.encodingType, cameraLauncher)
             } catch (ex: Exception) {
-                sendError(IONCAMRError.FAILED_TO_CAPTURE_IMAGE_ERROR)
+                sendError(IONCAMRError.TAKE_PHOTO_ERROR)
             }
         }
     }
