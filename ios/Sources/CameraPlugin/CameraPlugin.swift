@@ -3,6 +3,7 @@ import IONCameraLib
 import Capacitor
 import Photos
 import PhotosUI
+import ImageIO
 
 @objc(CAPCameraPlugin)
 public class CameraPlugin: CAPPlugin, CAPBridgedPlugin {
@@ -654,27 +655,12 @@ extension CameraPlugin: IONCAMRCallbackDelegate {
             let data = try JSONEncoder().encode(value)
             var json = try JSONSerialization.jsonObject(with: data)
 
-            // Add webPath to results
             if var dict = json as? [String: Any] {
-                // Handle single result
-                if let uri = dict["uri"] as? String,
-                   let webPath = resolveWebPath(from: uri) {
-                    dict["webPath"] = webPath
+                if dict["uri"] != nil {
+                    dict = resolveMediaResult(dict)
+                } else if let results = dict["results"] as? [[String: Any]] {
+                    dict["results"] = results.map(resolveMediaResult)
                 }
-
-                // Handle array of results
-                if var results = dict["results"] as? [[String: Any]] {
-                    results = results.map { item in
-                        var newItem = item
-                        if let uri = item["uri"] as? String,
-                           let webPath = resolveWebPath(from: uri) {
-                            newItem["webPath"] = webPath
-                        }
-                        return newItem
-                    }
-                    dict["results"] = results
-                }
-
                 json = dict
             }
 
@@ -686,6 +672,14 @@ extension CameraPlugin: IONCAMRCallbackDelegate {
         }
     }
 
+    private func resolveMediaResult(_ item: [String: Any]) -> [String: Any] {
+        guard let uri = item["uri"] as? String else { return item }
+        var result = item
+        result["webPath"] = resolveWebPath(from: uri)
+        result["exif"] = resolveExif(from: uri)
+        return result
+    }
+
     private func resolveWebPath(from uri: String) -> String? {
         guard !uri.isEmpty,
               let fileURL = URL(string: uri),
@@ -693,5 +687,18 @@ extension CameraPlugin: IONCAMRCallbackDelegate {
             return nil
         }
         return webURL.absoluteString
+    }
+
+    private func resolveExif(from uri: String) -> [String: Any]? {
+        guard !uri.isEmpty,
+              let fileURL = URL(string: uri),
+              let imageSource = CGImageSourceCreateWithURL(fileURL as CFURL, nil),
+              let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [String: Any] else {
+            return nil
+        }
+        var exif = properties[kCGImagePropertyExifDictionary as String] as? [String: Any] ?? [:]
+        exif["Orientation"] = properties[kCGImagePropertyOrientation as String]
+        exif["GPS"] = properties[kCGImagePropertyGPSDictionary as String]
+        return exif.isEmpty ? nil : exif
     }
 }
