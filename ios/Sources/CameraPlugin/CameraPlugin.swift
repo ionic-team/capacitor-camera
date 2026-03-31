@@ -27,14 +27,14 @@ public class CameraPlugin: CAPPlugin, CAPBridgedPlugin {
     private let defaultSource = CameraSource.prompt
     private let defaultDirection = CameraDirection.rear
     private var multiple = false
-    
+
     private lazy var cameraManager = IONCAMRFactory.createCameraManagerWrapper(withDelegate: self, and: self.bridge?.viewController ?? UIViewController())
     private lazy var galleryManager = IONCAMRFactory.createGalleryManagerWrapper(withDelegate: self, and: self.bridge?.viewController ?? UIViewController())
     private lazy var editManager = IONCAMRFactory.createEditManagerWrapper(withDelegate: self, and: self.bridge?.viewController ?? UIViewController())
     private lazy var videoManager = IONCAMRFactory.createVideoManagerWrapper(withDelegate: self, and: self.bridge?.viewController ?? UIViewController())
 
     private var imageCounter = 0
-    
+
     private func decodeParameters<T: Decodable>(from call: CAPPluginCall) -> T? {
         guard let dict = call.options as? [String: Any],
               let data = try? JSONSerialization.data(withJSONObject: dict)
@@ -64,31 +64,31 @@ public class CameraPlugin: CAPPlugin, CAPBridgedPlugin {
             self.cameraManager.takePhoto(with: options)
         }
     }
-    
+
     @objc func chooseFromGallery(_ call: CAPPluginCall) {
         handleCall(call, error: .chooseMultimediaIssue) { (options: IONCAMRGalleryOptions) in
             self.galleryManager.chooseFromGallery(with: options)
         }
     }
-    
+
     @objc func editURIPhoto(_ call: CAPPluginCall) {
         handleCall(call, error: .editPictureIssue) { (options: IONCAMRPhotoEditOptions) in
             self.editManager.editPhoto(with: options)
         }
     }
-    
+
     @objc func editPhoto(_ call: CAPPluginCall) {
         handleCall(call, error: .editPictureIssue) { (options: IONCAMRPhotoEditOptions) in
             self.editManager.editPhoto(with: options)
         }
     }
-    
+
     @objc func recordVideo(_ call: CAPPluginCall) {
         handleCall(call, error: .captureVideoIssue) { (options: IONCAMRRecordVideoOptions) in
             self.cameraManager.recordVideo(with: options)
         }
     }
-    
+
     @objc func playVideo(_ call: CAPPluginCall) {
         handleCall(call, error: .playVideoIssue) { (options: IONCAMRPlayVideoOptions) in
             Task {
@@ -103,7 +103,6 @@ public class CameraPlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
     }
-
 
     @objc override public func checkPermissions(_ call: CAPPluginCall) {
         var result: [String: Any] = [:]
@@ -637,19 +636,19 @@ private extension CameraPlugin {
 }
 
 extension CameraPlugin: IONCAMRCallbackDelegate {
-    
+
     public func callback(error: IONCAMRError) {
         sendError(error)
     }
-    
+
     public func callback(result: IONCAMRMediaResult) {
         resolve(result)
     }
-    
+
     public func callback(result: [IONCAMRMediaResult]) {
         resolve(["results": result])
     }
-    
+
     private func resolve<T: Encodable>(_ value: T) {
         do {
             let data = try JSONEncoder().encode(value)
