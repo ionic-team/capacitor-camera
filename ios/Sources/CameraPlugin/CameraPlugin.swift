@@ -676,7 +676,10 @@ extension CameraPlugin: IONCAMRCallbackDelegate {
         guard let uri = item["uri"] as? String else { return item }
         var result = item
         result["webPath"] = resolveWebPath(from: uri)
-        result["exif"] = resolveExif(from: uri)
+        if var metadata = result["metadata"] as? [String: Any] {
+            metadata["exif"] = resolveExif(from: uri)
+            result["metadata"] = metadata
+        }
         return result
     }
 
