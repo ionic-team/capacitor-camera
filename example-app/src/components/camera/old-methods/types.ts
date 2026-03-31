@@ -33,4 +33,5 @@ export interface PhotoResult {
   base64String?: string;
   dataUrl?: string;
   exif?: any;
+  saved?: boolean;
 }

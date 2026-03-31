@@ -69,12 +69,14 @@ const MediaCarousel: React.FC<IMediaCarouselProps> = ({ media, onEditPhoto }) =>
                 <VideoWithMetadata
                   filePath={filePath}
                   metadata={item.metadata}
+                  saved={item.saved}
                   thumbnail={item.thumbnail}
                 />
               ) : (
                 <PhotoWithMetadata
                   filePath={filePath}
                   metadata={item.metadata}
+                  saved={item.saved}
                   onEdit={onEditPhoto}
                 />
               )}

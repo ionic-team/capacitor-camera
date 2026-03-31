@@ -75,6 +75,7 @@ class GetPhotoConfigurable extends React.Component<
         base64String: photo.base64String,
         dataUrl: photo.dataUrl,
         exif: photo.exif,
+        saved: photo.saved,
       });
     } catch (e) {
       const error = e as any;
@@ -110,6 +111,7 @@ class GetPhotoConfigurable extends React.Component<
         base64String: photo.base64String,
         dataUrl: photo.dataUrl,
         exif: photo.exif,
+        saved: photo.saved,
       });
     } catch (e) {
       const error = e as any;

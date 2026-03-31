@@ -24,6 +24,7 @@ import { MediaHistoryService } from "../services/MediaHistoryService";
 interface ITakePicturePageState {
   filePath: string | null;
   metadata: MediaMetadata | string | null;
+  saved: boolean | null;
   editedPhoto: MediaResult | null;
 }
 
@@ -33,6 +34,7 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
     this.state = {
       filePath: null,
       metadata: null,
+      saved: null,
       editedPhoto: null,
     };
   }
@@ -41,6 +43,7 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
     this.setState({
       filePath: result.uri ?? result.webPath ?? '',
       metadata: result.metadata ?? null,
+      saved: result.saved,
     });
 
     MediaHistoryService.addMedia({
@@ -61,6 +64,7 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
     base64String?: string;
     dataUrl?: string;
     exif?: any;
+    saved?: boolean;
   }): void => {
     const filePath =
       result.path ??
@@ -71,6 +75,7 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
     this.setState({
       filePath,
       metadata: JSON.stringify(result.exif, null, 2),
+      saved: result.saved ?? null,
     });
 
     if (filePath) {
@@ -87,6 +92,7 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
     this.setState({
       filePath: null,
       metadata: null,
+      saved: null,
       editedPhoto: null,
     });
   };
@@ -167,6 +173,7 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
               <PhotoWithMetadata
                 filePath={this.state.filePath}
                 metadata={this.state.metadata}
+                saved={this.state.saved ?? undefined}
                 onEdit={this.handleEditPhoto}
               />
             </>
@@ -179,6 +186,7 @@ class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
               <PhotoWithMetadata
                 filePath={this.state.editedPhoto.uri ?? this.state.editedPhoto.webPath ?? ''}
                 metadata={this.state.editedPhoto.metadata ?? null}
+                saved={this.state.editedPhoto.saved}
               />
             </>
           )}

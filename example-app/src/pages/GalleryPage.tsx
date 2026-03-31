@@ -35,6 +35,7 @@ interface IGalleryPageState {
   singlePhoto: {
     filePath: string | null;
     metadata: MediaMetadata | string | null;
+    saved: boolean | undefined;
   } | null;
   multiplePhotos: MediaResult[] | null;
   editedPhoto: MediaResult | null;
@@ -74,11 +75,13 @@ class GalleryPage extends React.Component<{}, IGalleryPageState> {
     path?: string;
     webPath?: string;
     exif?: any;
+    saved?: boolean;
   }): void => {
     this.setState({
       singlePhoto: {
         filePath: result.path ?? result.webPath ?? null,
         metadata: JSON.stringify(result.exif, null, 2),
+        saved: result.saved,
       },
       multiplePhotos: null,
     });
