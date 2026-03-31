@@ -651,7 +651,9 @@ extension CameraPlugin: IONCAMRCallbackDelegate {
 
     private func resolve<T: Encodable>(_ value: T) {
         do {
-            let data = try JSONEncoder().encode(value)
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            let data = try encoder.encode(value)
             var json = try JSONSerialization.jsonObject(with: data)
 
             // Add webPath to results
