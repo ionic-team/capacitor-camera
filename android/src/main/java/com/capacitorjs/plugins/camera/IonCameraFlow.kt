@@ -731,17 +731,16 @@ class IonCameraFlow(
         ret.put("webPath", FileUtils.getPortablePath(context, bridge.localUrl, uri))
         ret.put("saved", mediaResult.saved)
 
-        val metadata = JSObject()
         mediaResult.metadata?.let {
+            val metadata = JSObject()
             metadata.put("duration", it.duration)
             metadata.put("size", it.size)
             metadata.put("format", it.format)
             metadata.put("resolution", it.resolution)
             metadata.put("creationDate", it.creationDate)
             metadata.put("exif", exif.toJson())
+            ret.put("metadata", metadata)
         }
-
-        ret.put("metadata", metadata)
 
         currentCall?.resolve(ret)
         currentCall = null
@@ -759,16 +758,15 @@ class IonCameraFlow(
         ret.put("webPath", FileUtils.getPortablePath(context, bridge.localUrl, uri))
         ret.put("saved", mediaResult.saved)
 
-        val metadata = JSObject()
         mediaResult.metadata?.let {
+            val metadata = JSObject()
             metadata.put("duration", it.duration)
             metadata.put("size", it.size)
             metadata.put("format", it.format)
             metadata.put("resolution", it.resolution)
             metadata.put("creationDate", it.creationDate)
+            ret.put("metadata", metadata)
         }
-
-        ret.put("metadata", metadata)
 
         currentCall?.resolve(ret)
         currentCall = null
@@ -790,27 +788,27 @@ class IonCameraFlow(
                 FileUtils.getPortablePath(context, bridge.localUrl, uri)
             )
 
-            val metadata = JSObject()
             mediaResult.metadata?.let {
+                val metadata = JSObject()
                 metadata.put("duration", it.duration)
                 metadata.put("size", it.size)
                 metadata.put("format", it.format)
                 metadata.put("resolution", it.resolution)
                 metadata.put("creationDate", it.creationDate)
-            }
 
-            if (mediaResult.type == IONCAMRMediaType.PICTURE.type) {
-                val bitmap = BitmapFactory.decodeFile(mediaResult.uri)
-                if (bitmap == null) {
-                    sendError(IONCAMRError.PROCESS_IMAGE_ERROR)
-                    return
+                if (mediaResult.type == IONCAMRMediaType.PICTURE.type) {
+                    val bitmap = BitmapFactory.decodeFile(mediaResult.uri)
+                    if (bitmap == null) {
+                        sendError(IONCAMRError.PROCESS_IMAGE_ERROR)
+                        return
+                    }
+
+                    val exif = ImageUtils.getExifData(context, bitmap, uri)
+                    metadata.put("exif", exif.toJson())
                 }
 
-                val exif = ImageUtils.getExifData(context, bitmap, uri)
-                metadata.put("exif", exif.toJson())
+                ret.put("metadata", metadata)
             }
-
-            ret.put("metadata", metadata)
             photos.put(ret)
         }
 
