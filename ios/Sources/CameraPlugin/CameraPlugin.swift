@@ -35,6 +35,23 @@ public class CameraPlugin: CAPPlugin, CAPBridgedPlugin {
     private lazy var videoManager = IONCAMRFactory.createVideoManagerWrapper(withDelegate: self, and: self.bridge?.viewController ?? UIViewController())
 
     private var imageCounter = 0
+    
+    public override func load() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(onAppTerminate),
+            name: UIApplication.willTerminateNotification,
+            object: nil
+        )
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc private func onAppTerminate() {
+        cameraManager.cleanTemporaryFiles()
+    }
 
     private func decodeParameters<T: Decodable>(from call: CAPPluginCall) -> T? {
         guard let dict = call.options as? [String: Any],
