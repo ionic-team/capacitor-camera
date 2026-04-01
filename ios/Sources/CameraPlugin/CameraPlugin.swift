@@ -44,6 +44,10 @@ public class CameraPlugin: CAPPlugin, CAPBridgedPlugin {
             object: nil
         )
     }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
     
     @objc private func onAppTerminate() {
         cameraManager.cleanTemporaryFiles()
