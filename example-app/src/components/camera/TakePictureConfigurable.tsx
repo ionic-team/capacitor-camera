@@ -37,13 +37,12 @@ class TakePictureConfigurable extends React.Component<
     this.state = {
       config: {
         quality: 100,
-        allowEdit: false,
+        editable: 'no',
         encodingType: EncodingType.JPEG,
         saveToGallery: false,
         correctOrientation: true,
         cameraDirection: CameraDirection.Rear,
         presentationStyle: 'fullscreen',
-        editInApp: true,
         includeMetadata: false,
       },
     };
@@ -200,23 +199,25 @@ class TakePictureConfigurable extends React.Component<
 
               {/* Boolean toggles */}
               <IonItem>
-                <IonLabel>Allow Edit</IonLabel>
-                <IonToggle
-                  checked={config.allowEdit}
+                <IonLabel position="stacked">
+                  Editable
+                </IonLabel>
+                <IonSelect
+                  value={config.editable}
                   onIonChange={(e) =>
-                    this.updateConfig("allowEdit", e.detail.checked)
+                    this.updateConfig("editable", e.detail.value)
                   }
-                />
-              </IonItem>
-
-              <IonItem>
-                <IonLabel>Edit In App</IonLabel>
-                <IonToggle
-                  checked={config.editInApp}
-                  onIonChange={(e) =>
-                    this.updateConfig("editInApp", e.detail.checked)
-                  }
-                />
+                >
+                  <IonSelectOption value="no">
+                    No
+                  </IonSelectOption>
+                  <IonSelectOption value="in-app">
+                    In-App
+                  </IonSelectOption>
+                  <IonSelectOption value="external">
+                    External (Android only)
+                  </IonSelectOption>
+                </IonSelect>
               </IonItem>
 
               <IonItem>

@@ -40,8 +40,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
         allowMultipleSelection: false,
         limit: 0,
         includeMetadata: false,
-        allowEdit: false,
-        editInApp: true,
+        editable: 'no',
         presentationStyle: 'fullscreen',
         quality: 100,
         correctOrientation: true,
@@ -78,8 +77,7 @@ class ChooseFromGalleryConfigurable extends React.Component<
         allowMultipleSelection: config.allowMultipleSelection,
         limit: config.limit,
         includeMetadata: config.includeMetadata,
-        allowEdit: config.allowEdit,
-        editInApp: config.editInApp,
+        editable: config.editable,
         presentationStyle: config.presentationStyle,
         quality: config.quality,
         targetWidth: config.targetWidth,
@@ -223,19 +221,25 @@ class ChooseFromGalleryConfigurable extends React.Component<
               </IonItem>
 
               <IonItem>
-                <IonLabel>Allow Edit</IonLabel>
-                <IonToggle
-                  checked={config.allowEdit}
-                  onIonChange={(e) => this.updateConfig('allowEdit', e.detail.checked)}
-                />
-              </IonItem>
-
-              <IonItem>
-                <IonLabel>Edit In App</IonLabel>
-                <IonToggle
-                  checked={config.editInApp}
-                  onIonChange={(e) => this.updateConfig('editInApp', e.detail.checked)}
-                />
+                <IonLabel position="stacked">
+                  Editable
+                </IonLabel>
+                <IonSelect
+                  value={config.editable}
+                  onIonChange={(e) =>
+                    this.updateConfig("editable", e.detail.value)
+                  }
+                >
+                  <IonSelectOption value="no">
+                    No
+                  </IonSelectOption>
+                  <IonSelectOption value="in-app">
+                    In-App
+                  </IonSelectOption>
+                  <IonSelectOption value="external">
+                    External (Android only)
+                  </IonSelectOption>
+                </IonSelect>
               </IonItem>
 
               <IonItem>
