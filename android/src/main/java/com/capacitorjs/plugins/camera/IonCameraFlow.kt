@@ -355,7 +355,10 @@ class IonCameraFlow(
         )
 
         val imageBase64 = call.getString("inputImage")
-        if (imageBase64 == null) return
+        if (imageBase64.isNullOrEmpty()) {
+            sendError(IONCAMRError.INVALID_ARGUMENT_ERROR)
+            return
+        }
         manager.editImage(activity, imageBase64, editLauncher)
     }
 
