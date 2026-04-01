@@ -7,8 +7,7 @@ class IonCameraSettings {
     var correctOrientation: Boolean = DEFAULT_CORRECT_ORIENTATION
     var encodingType: Int = 0 //JPEG
     var saveToGallery: Boolean = DEFAULT_SAVE_IMAGE_TO_GALLERY
-    var allowEdit: Boolean = false
-    var editInApp: Boolean = true
+    var editable: IonEditableMode = IonEditableMode.NO
     var includeMetadata: Boolean = false
     var shouldResize: Boolean = false
 
