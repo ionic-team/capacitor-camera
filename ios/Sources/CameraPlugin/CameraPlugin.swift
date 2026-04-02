@@ -96,8 +96,14 @@ public class CameraPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     @objc func editPhoto(_ call: CAPPluginCall) {
-        handleCall(call, error: .editPictureIssue) { (options: IONCAMRPhotoEditOptions) in
-            self.editManager.editPhoto(with: options)
+        struct Options: Decodable { let inputImage: String }
+        handleCall(call, error: .editPictureIssue) { (options: Options) in
+            guard let imageData = Data(base64Encoded: options.inputImage),
+                  let image = UIImage(data: imageData) else {
+                self.sendError(.editPictureIssue)
+                return
+            }
+            self.editManager.editPhoto(image)
         }
     }
 
@@ -692,7 +698,12 @@ extension CameraPlugin: IONCAMRCallbackDelegate {
     }
 
     private func resolveMediaResult(_ item: [String: Any]) -> [String: Any] {
-        guard let uri = item["uri"] as? String else { return item }
+        guard let uri = item["uri"] as? String, !uri.isEmpty else {
+            if let thumbnail = item["thumbnail"] as? String {
+                return ["outputImage": thumbnail]
+            }
+            return item
+        }
         var result = item
         result["webPath"] = resolveWebPath(from: uri)
         if var metadata = result["metadata"] as? [String: Any] {
