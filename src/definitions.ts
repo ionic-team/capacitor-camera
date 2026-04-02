@@ -478,6 +478,8 @@ export interface MediaMetadata {
   /**
    * The format of the image, ex: jpeg, png, mp4.
    *
+   * Android and iOS may return 'jpg' instead of 'jpeg'. The format is the same, just with a different name.
+   * Please compare against both 'jpeg' and 'jpg' when checking if the format of the returned media is JPEG.
    * Web supports jpeg, png and gif, but the exact availability may vary depending on the browser.
    * gif is only supported for `chooseFromGallery` on Web.
    *
