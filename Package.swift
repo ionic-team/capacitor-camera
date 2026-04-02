@@ -11,7 +11,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "8.0.0"),
-        .package(url: "https://github.com/ionic-team/ion-ios-camera.git", branch: "main") // TODO: update to a stable release when available
+        .package(url: "https://github.com/ionic-team/ion-ios-camera.git", branch: "fix/editable") // TODO extra: revert to main before merging PR; TODO: update to a stable release when available
     ],
     targets: [
         .target(

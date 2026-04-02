@@ -201,8 +201,7 @@ class IonCameraFlow(
             allowMultipleSelection = call.getBoolean("allowMultipleSelection") ?: false,
             limit = call.getInt("limit") ?: 0,
             includeMetadata = call.getBoolean("includeMetadata") ?: false,
-            allowEdit = call.getBoolean("allowEdit") ?: false,
-            editInApp = call.getBoolean("editInApp") ?: true,
+            editable = IonEditableMode.fromString(call.getString("editable")),
             quality = call.getInt("quality") ?: DEFAULT_QUALITY,
             width = call.getInt("targetWidth") ?: 0,
             height = call.getInt("targetHeight") ?: 0,
@@ -215,8 +214,7 @@ class IonCameraFlow(
         var allowMultipleSelection: Boolean = false,
         var limit: Int = 0,
         var includeMetadata: Boolean = false,
-        var allowEdit: Boolean = false,
-        var editInApp: Boolean = true,
+        var editable: IonEditableMode = IonEditableMode.NO,
         var quality: Int = 90,
         var width: Int = 0,
         var height: Int = 0,
@@ -235,8 +233,7 @@ class IonCameraFlow(
         settings.correctOrientation = call.getBoolean("correctOrientation") ?: IonCameraSettings.DEFAULT_CORRECT_ORIENTATION
         settings.encodingType = call.getInt("encodingType") ?: IonCameraSettings.DEFAULT_ENCODING_TYPE
         settings.saveToGallery = call.getBoolean("saveToGallery") ?: IonCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY
-        settings.allowEdit = call.getBoolean("allowEdit") ?: false
-        settings.editInApp = call.getBoolean("editInApp") ?: true
+        settings.editable = IonEditableMode.fromString(call.getString("editable"))
         settings.includeMetadata = call.getBoolean("includeMetadata") ?: false
         settings.shouldResize = settings.targetWidth > 0 || settings.targetHeight > 0
         return settings
@@ -392,10 +389,11 @@ class IonCameraFlow(
                     sendError(IONCAMRError.INVALID_ARGUMENT_ERROR)
                     return
                 }
-                if (settings.allowEdit) {
-                    if (settings.editInApp) {
+                when (settings.editable) {
+                    IonEditableMode.IN_APP -> {
                         editPhoto()
-                    } else {
+                    }
+                    IonEditableMode.EXTERNAL -> {
                         val editor = editManager ?: run {
                             sendError(IONCAMRError.CONTEXT_ERROR)
                             return
@@ -422,8 +420,9 @@ class IonCameraFlow(
                             editPhoto()
                         }
                     }
-                } else {
-                    processResult(result.data)
+                    IonEditableMode.NO -> {
+                        processResult(result.data)
+                    }
                 }
             }
             Activity.RESULT_CANCELED -> {
@@ -472,36 +471,40 @@ class IonCameraFlow(
                     return
                 }
 
-                if (settings.allowEdit && uris.size == 1 && settings.mediaType == IONCAMRMediaType.PICTURE) {
+                if (settings.editable != IonEditableMode.NO && uris.size == 1 && settings.mediaType == IONCAMRMediaType.PICTURE) {
                     val originalUri = uris.first()
-                    if (settings.editInApp) {
-                        editor.openCropActivity(
-                            activity,
-                            originalUri,
-                            galleryCropLauncher
-                        )
-                    } else {
-                        val tempUri = if (originalUri.scheme == "content") {
-                            IonCameraUtils.getGalleryTempImage(activity, originalUri)
-                        } else {
-                            originalUri
-                        }
-
-                        if (tempUri == null) {
-                            sendError(IONCAMRError.EDIT_IMAGE_ERROR)
-                            return
-                        }
-
-                        val editIntent = createEditIntent(tempUri)
-                        if (editIntent != null) {
-                            galleryCropLauncher.launch(editIntent)
-                        } else {
+                    when (settings.editable) {
+                        IonEditableMode.IN_APP -> {
                             editor.openCropActivity(
                                 activity,
                                 originalUri,
                                 galleryCropLauncher
                             )
                         }
+                        IonEditableMode.EXTERNAL -> {
+                            val tempUri = if (originalUri.scheme == "content") {
+                                IonCameraUtils.getGalleryTempImage(activity, originalUri)
+                            } else {
+                                originalUri
+                            }
+
+                            if (tempUri == null) {
+                                sendError(IONCAMRError.EDIT_IMAGE_ERROR)
+                                return
+                            }
+
+                            val editIntent = createEditIntent(tempUri)
+                            if (editIntent != null) {
+                                galleryCropLauncher.launch(editIntent)
+                            } else {
+                                editor.openCropActivity(
+                                    activity,
+                                    originalUri,
+                                    galleryCropLauncher
+                                )
+                            }
+                        }
+                        else -> {}
                     }
                 } else {
                     processResultFromGallery(result)
@@ -538,7 +541,7 @@ class IonCameraFlow(
                 lastEditUri = null
             }
             Activity.RESULT_CANCELED -> {
-                if (!settings.editInApp && !lastEditUri.isNullOrEmpty()) {
+                if (settings.editable == IonEditableMode.EXTERNAL && !lastEditUri.isNullOrEmpty()) {
                     val intent = Intent().apply {
                         putExtra(IONCAMRImageEditorActivity.IMAGE_OUTPUT_URI_EXTRAS, lastEditUri)
                     }
@@ -696,7 +699,7 @@ class IonCameraFlow(
                 lastEditUri = null
             }
             Activity.RESULT_CANCELED -> {
-                if (!settings.editInApp && !lastEditUri.isNullOrEmpty()) {
+                if (settings.editable == IonEditableMode.EXTERNAL && !lastEditUri.isNullOrEmpty()) {
                     val intent = Intent().apply {
                         putExtra(IONCAMRImageEditorActivity.IMAGE_OUTPUT_URI_EXTRAS, lastEditUri)
                     }
@@ -936,7 +939,7 @@ class IonCameraFlow(
             targetHeight = targetHeight,
             encodingType = encodingType,
             mediaType = MEDIA_TYPE_PHOTO,
-            allowEdit = allowEdit,
+            allowEdit = editable != IonEditableMode.NO,
             correctOrientation = correctOrientation,
             saveToPhotoAlbum = saveToGallery,
             includeMetadata = includeMetadata,

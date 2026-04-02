@@ -173,24 +173,16 @@ export interface TakePhotoOptions {
   cameraDirection?: CameraDirection;
 
   /**
-   * Whether to allow the user to crop or make small edits.
-   * Note: This option is only supported on Android and iOS.
-   * @default false
+   * Determines if and how the user can edit the photo.
+   * - 'in-app': Use an in-app editor for photo edition.
+   * - 'external': Open a separate (platform-specific) native app to handle photo edition, falling back to the in-app editor if none is available. Note: iOS does not support external editing and will use 'in-app' instead.
+   * - 'no': No editing allowed.
+   * Not available on Web.
+   * @default 'no'
    *
    * @since 8.1.0
    */
-  allowEdit?: boolean;
-
-  /**
-   * If `true`, will use an in-app editor for photo edition.
-   * If `false`, will open a separate (platform-specific) native app to handle photo edition, falling back to the in-app editor if none is available.
-   * Only applicable with `allowEdit` set to true.
-   * Note: This option is only supported on Android and iOS.
-   *
-   * @default true
-   * @since 8.1.0
-   */
-  editInApp?: boolean;
+  editable?: 'in-app' | 'external' | 'no';
 
   /**
    * iOS only: The presentation style of the Camera.
@@ -298,25 +290,17 @@ export interface ChooseFromGalleryOptions {
   includeMetadata?: boolean;
 
   /**
-   * Whether to allow the user to crop or make small edits.
+   * Determines if and how the user can edit the photo.
+   * - 'in-app': Use an in-app editor for photo edition.
+   * - 'external': Open a separate (platform-specific) native app to handle photo edition, falling back to the in-app editor if none is available. Note: iOS does not support external editing and will use 'in-app' instead.
+   * - 'no': No editing allowed.
    * Only applicable for `MediaTypeSelection.Photo` and `allowMultipleSelection` set to `false`.
-   * Note: This option is only supported on Android and iOS.
-   * @default false
+   * Not available on Web.
+   * @default 'no'
    *
    * @since 8.1.0
    */
-  allowEdit?: boolean;
-
-  /**
-   * If `true`, will use an in-app editor for photo edition.
-   * If `false`, will open a separate (platform-specific) native app to handle photo edition, falling back to the in-app editor if none is available.
-   * Only applicable with `allowEdit` set to true.
-   * Note: This option is only supported on Android and iOS.
-   *
-   * @default true
-   * @since 8.1.0
-   */
-  editInApp?: boolean;
+  editable?: 'in-app' | 'external' | 'no';
 
   /**
    * iOS only: The presentation style of media picker.
