@@ -98,6 +98,133 @@ const takePicture = async () => {
 };
 ```
 
+## Migrating to the New API
+
+Version 8.1.0 introduces a new improved API and deprecates `getPhoto` and `pickImages`. The key design change is that the new API separates intent: **taking a photo** and **picking from the gallery** are now distinct methods, and the result type is unified into `MediaResult`.
+
+### Replacing `getPhoto`
+
+`getPhoto` handled three sources via `CameraSource`: `Camera`, `Photos`, and `Prompt`. `Camera` and `Photos` now map to different methods, while `Prompt` was removed.
+
+#### `CameraSource.Camera` → `takePhoto`
+
+```typescript
+// Before
+const photo = await Camera.getPhoto({
+  source: CameraSource.Camera,
+  quality: 90,
+  allowEditing: true,
+  resultType: CameraResultType.Uri,
+  direction: CameraDirection.Rear,
+  width: 1280,
+  height: 720,
+});
+const imageUrl = photo.webPath;
+
+// After
+const result = await Camera.takePhoto({
+  quality: 90,
+  editable: 'in-app',        // replaces allowEditing: true
+  cameraDirection: CameraDirection.Rear, // replaces direction
+  targetWidth: 1280,         // replaces width
+  targetHeight: 720,         // replaces height
+});
+const imageUrl = result.webPath;
+```
+
+#### `CameraSource.Photos` → `chooseFromGallery`
+
+```typescript
+// Before
+const photo = await Camera.getPhoto({
+  source: CameraSource.Photos,
+  quality: 90,
+  resultType: CameraResultType.Uri,
+});
+const imageUrl = photo.webPath;
+
+// After
+const { results } = await Camera.chooseFromGallery({
+  quality: 90,
+});
+const imageUrl = results[0].webPath;
+```
+
+#### `CameraSource.Prompt` (or default)
+
+`getPhoto` previously displayed a native prompt letting the user choose between the camera and the gallery. This prompt is no longer part of the plugin. You should build the prompt using your own UI (for example, with `@capacitor/action-sheet`) and then call `takePhoto` or `chooseFromGallery` based on the user's selection.
+
+```typescript
+// Before
+const photo = await Camera.getPhoto({
+  // source defaults to CameraSource.Prompt
+  quality: 90,
+  resultType: CameraResultType.Uri,
+});
+
+// After: show your own UI to determine the source, then call the appropriate method
+const result = await Camera.takePhoto({ quality: 90 });
+// or
+const { results } = await Camera.chooseFromGallery({ quality: 90 });
+```
+
+#### Result type changes
+
+`getPhoto` returned a `Photo` object where the fields available depended on `resultType`. The new API removes `resultType` entirely — `MediaResult` has a fixed set of fields regardless of how the photo was taken.
+
+| `Photo` field | `MediaResult` equivalent |
+|---|---|
+| `path` | `uri` (not available on Web) |
+| `webPath` | `webPath` |
+| `base64String` | `thumbnail` (on Web, contains the full image base64 encoded; on native, contains a thumbnail) |
+| `dataUrl` | No equivalent. To construct one, combine `thumbnail` (base64) and `metadata.format` (requires `includeMetadata: true`): `` `data:image/${result.metadata.format};base64,${result.thumbnail}` `` |
+| `saved` | `saved` (not available on Web) |
+| `format` | `metadata.format` (requires `includeMetadata: true`) |
+| `exif` | `metadata.exif` (requires `includeMetadata: true`) |
+
+### Replacing `pickImages` → `chooseFromGallery`
+
+`pickImages` allowed selecting multiple photos from the gallery. Pass `allowMultipleSelection: true` to `chooseFromGallery` to get the same behaviour.
+
+```typescript
+// Before
+const { photos } = await Camera.pickImages({
+  quality: 90,
+  limit: 5,
+  width: 1280,
+  height: 720,
+});
+for (const photo of photos) {
+  console.log(photo.webPath);
+}
+
+// After
+const { results } = await Camera.chooseFromGallery({
+  allowMultipleSelection: true,
+  quality: 90,
+  limit: 5,
+  targetWidth: 1280,  // replaces width
+  targetHeight: 720,  // replaces height
+});
+for (const result of results) {
+  console.log(result.webPath);
+}
+```
+
+`chooseFromGallery` can also select videos or mixed media by setting `mediaType` to `MediaTypeSelection.Video` or `MediaTypeSelection.All`.
+
+### Option rename summary
+
+| Old option | New option | Applies to |
+|---|---|---|
+| `width` | `targetWidth` | `takePhoto`, `chooseFromGallery` |
+| `height` | `targetHeight` | `takePhoto`, `chooseFromGallery` |
+| `direction` | `cameraDirection` | `takePhoto` |
+| `allowEditing` | `editable: 'in-app'` | `takePhoto`, `chooseFromGallery` |
+| `resultType` | — (removed) | — |
+| `source` | — (removed, use separate methods) | — |
+| `promptLabel*` | — (removed, build your own UI) | — |
+
 ## API
 
 <docgen-index>
