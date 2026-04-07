@@ -42,7 +42,7 @@ Older devices and Android Go devices running Android 11 or 12 that support Googl
 </service>
 ```
 
-If that entry is not added, the devices that don't support the Photo Picker, the Photo Picker component fallbacks to `Intent.ACTION_OPEN_DOCUMENT`.
+If that entry is not added, on devices that don't support the Photo Picker, the Photo Picker component falls back to `Intent.ACTION_OPEN_DOCUMENT`.
 
 The Camera plugin requires no permissions, unless using `saveToGallery: true`, in that case the following permissions should be added to your `AndroidManifest.xml`:
 
@@ -73,28 +73,78 @@ This plugin will use the following project variables (defined in your app's `var
 
 ## PWA Notes
 
-[PWA Elements](https://capacitorjs.com/docs/web/pwa-elements) are required for Camera plugin to work.
+On Web, `takePhoto` can use the [PWA Elements](https://capacitorjs.com/docs/web/pwa-elements) `pwa-camera-modal` custom element to provide a native-like camera UI. If the element is not registered, the plugin falls back to an `<input type="file">` picker. `chooseFromGallery` always uses `<input type="file">` on Web, regardless of whether PWA Elements are installed.
+
+### Installing PWA Elements programmatically
+
+Install the `@ionic/pwa-elements` package and call `defineCustomElements` before using the plugin:
+
+```bash
+npm install @ionic/pwa-elements
+```
+
+```typescript
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
+
+// Call once at app startup, before any Camera calls
+// Wrapped in try/catch as it may fail on older WebViews (e.g. Android 9)
+try {
+  defineCustomElements(window);
+} catch (e) {
+  console.warn('PWA Elements failed to load:', e);
+}
+```
+
+### Providing a custom camera element
+
+Instead of using `@ionic/pwa-elements`, you can register your own `pwa-camera-modal` custom element. The plugin interacts with it using the following interface:
+
+| Member | Type | Description |
+|---|---|---|
+| `facingMode` | `string` property | Set to `'user'` (front camera) or `'environment'` (rear camera) before presenting |
+| `componentOnReady()` | method → `Promise<void>` | Called by the plugin after creating the element; resolve when the element is ready |
+| `present()` | method | Called by the plugin to display the camera UI |
+| `dismiss()` | method | Called by the plugin to close the camera UI after a photo is taken or cancelled |
+| `onPhoto` | event | Dispatched when the user takes a photo or cancels. `event.detail` must be a `Blob` (photo taken), `null` (user cancelled), or an `Error` (something went wrong) |
+
+```typescript
+class MyCameraModal extends HTMLElement {
+  facingMode = 'environment';
+
+  componentOnReady() {
+    return Promise.resolve();
+  }
+
+  present() {
+    // Show your custom camera UI, then dispatch exactly one 'onPhoto' event when done:
+    //   - Blob: user took a photo
+    //   - null: user cancelled
+    //   - Error: something went wrong
+    // Example:
+    this.dispatchEvent(new CustomEvent('onPhoto', { detail: photoBlob }));
+  }
+
+  dismiss() {
+    // Hide your custom camera UI (called by the plugin after receiving 'onPhoto')
+  }
+}
+
+customElements.define('pwa-camera-modal', MyCameraModal);
+```
 
 ## Example
 
 ```typescript
-import { Camera, CameraResultType } from '@capacitor/camera';
+import { Camera } from '@capacitor/camera';
 
 const takePicture = async () => {
-  const image = await Camera.getPhoto({
+  const result = await Camera.takePhoto({
     quality: 90,
-    allowEditing: true,
-    resultType: CameraResultType.Uri
+    editable: 'in-app',
   });
 
-  // image.webPath will contain a path that can be set as an image src.
-  // You can access the original file using image.path, which can be
-  // passed to the Filesystem API to read the raw data of the image,
-  // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
-  var imageUrl = image.webPath;
-
-  // Can be set to the src of an image now
-  imageElement.src = imageUrl;
+  // result.webPath can be set directly as the src of an image element
+  imageElement.src = result.webPath;
 };
 ```
 
