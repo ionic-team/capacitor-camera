@@ -728,3 +728,35 @@ Allows the user to pick multiple pictures from the photo gallery.
 | **`Photos`** | <code>'PHOTOS'</code> | Pick an existing photo from the gallery or photo album.            |
 
 </docgen-api>
+
+### Errors
+
+The plugin returns structured errors on Android and iOS. Each error has a `code` (e.g. `OS-PLUG-CAMR-0003`) and a `message` with a human-readable description.
+
+| Error code | Platform(s) | Description |
+|---|---|---|
+| OS-PLUG-CAMR-0003 | Android, iOS | Couldn't access camera. Check your camera permissions and try again. |
+| OS-PLUG-CAMR-0005 | Android, iOS | Couldn't access your photo gallery because access wasn't provided. |
+| OS-PLUG-CAMR-0006 | Android, iOS | Couldn't take photo because the process was canceled. |
+| OS-PLUG-CAMR-0007 | Android, iOS | No camera available. |
+| OS-PLUG-CAMR-0008 | iOS | The selected file contains data that isn't valid. |
+| OS-PLUG-CAMR-0009 | Android, iOS | Couldn't edit image. |
+| OS-PLUG-CAMR-0010 | Android, iOS | Couldn't take photo. |
+| OS-PLUG-CAMR-0011 | iOS | Couldn't get image from the gallery. |
+| OS-PLUG-CAMR-0012 | Android, iOS | Couldn't process image. |
+| OS-PLUG-CAMR-0013 | Android, iOS | Couldn't edit photo because the process was canceled. |
+| OS-PLUG-CAMR-0014 | iOS | Couldn't decode the 'Take Photo' action parameters. |
+| OS-PLUG-CAMR-0016 | Android, iOS | Couldn't record video. |
+| OS-PLUG-CAMR-0017 | Android, iOS | Couldn't record video because the process was canceled. |
+| OS-PLUG-CAMR-0018 | Android, iOS | Couldn't choose media from the gallery. |
+| OS-PLUG-CAMR-0019 | iOS | Couldn't encode the media result. |
+| OS-PLUG-CAMR-0020 | Android, iOS | Couldn't choose media from the gallery because the process was canceled. |
+| OS-PLUG-CAMR-0021 | Android | Couldn't get media file path. |
+| OS-PLUG-CAMR-0023 | Android, iOS | Couldn't play video. |
+| OS-PLUG-CAMR-0024 | Android | URI parameter cannot be empty. |
+| OS-PLUG-CAMR-0025 | iOS | Couldn't get video from the gallery. |
+| OS-PLUG-CAMR-0026 | iOS | There's an issue with the plugin. |
+| OS-PLUG-CAMR-0027 | Android, iOS | The selected file doesn't exist. |
+| OS-PLUG-CAMR-0028 | Android, iOS | Couldn't retrieve image from the URI. |
+| OS-PLUG-CAMR-0031 | Android | Invalid argument provided to plugin method. |
+| OS-PLUG-CAMR-0033 | Android | Unable to get the context. |
