@@ -276,6 +276,8 @@ Version 8.1.0 introduces a new improved API and deprecates `getPhoto` and `pickI
 
 #### `CameraSource.Camera` to `takePhoto`
 
+`CameraResultType.Base64` and `CameraResultType.DataUrl` are not supported in the new API. See [Result type changes](#result-type-changes) for alternatives.
+
 ```typescript
 // Before
 const photo = await Camera.getPhoto({
@@ -406,7 +408,7 @@ for (const result of results) {
 | `height` | `targetHeight` * | `takePhoto`, `chooseFromGallery` |
 | `direction` | `cameraDirection` | `takePhoto` |
 | `allowEditing` | `editable: 'in-app'` | `takePhoto`, `chooseFromGallery` |
-| `resultType` | — (removed) | — |
+| `resultType` | — (removed, see [Result type changes](#result-type-changes)) | — |
 | `source` | — (removed, use separate methods) | — |
 | `promptLabel*` | — (removed, build your own UI) | — |
 
