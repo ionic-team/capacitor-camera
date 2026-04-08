@@ -342,13 +342,30 @@ const { results } = await Camera.chooseFromGallery({ quality: 90 });
 
 | `Photo` field | `MediaResult` equivalent |
 |---|---|
-| `path` | `uri` (not available on Web) |
+| `path` | `uri` |
 | `webPath` | `webPath` |
 | `base64String` | `thumbnail` (on Web, contains the full image base64 encoded; on native, contains a thumbnail) |
-| `dataUrl` | No equivalent. To construct one, combine `thumbnail` (base64) and `metadata.format` (requires `includeMetadata: true`): `` `data:image/${result.metadata.format};base64,${result.thumbnail}` `` |
+| `dataUrl` | No direct equivalent — see note below |
 | `saved` | `saved` (not available on Web) |
 | `format` | `metadata.format` (requires `includeMetadata: true`) |
 | `exif` | `metadata.exif` (requires `includeMetadata: true`) |
+
+**Constructing a data URL** — two options are available depending on your needs:
+
+On all platforms, you can combine `thumbnail` and `metadata.format` (requires `includeMetadata: true`). On native, `thumbnail` is lower-resolution:
+
+```typescript
+const dataUrl = `data:image/${result.metadata.format};base64,${result.thumbnail}`;
+```
+
+On native, if you need the full-resolution base64, read `uri` via the Filesystem API and construct the data URL from there:
+
+```typescript
+import { Filesystem } from '@capacitor/filesystem';
+
+const { data } = await Filesystem.readFile({ path: result.uri });
+const dataUrl = `data:image/${result.metadata.format};base64,${data}`;
+```
 
 ### Replacing `pickImages` → `chooseFromGallery`
 
