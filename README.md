@@ -145,6 +145,10 @@ const takePicture = async () => {
 
   // result.webPath can be set directly as the src of an image element
   imageElement.src = result.webPath;
+
+  // On native: pass result.uri to the Filesystem API to get the full-resolution base64,
+  // or use result.thumbnail for a lower-resolution base64 preview.
+  // On Web: result.thumbnail contains the full image base64 encoded.
 };
 ```
 
