@@ -156,7 +156,7 @@ Version 8.1.0 introduces a new improved API and deprecates `getPhoto` and `pickI
 
 `getPhoto` handled three sources via `CameraSource`: `Camera`, `Photos`, and `Prompt`. `Camera` and `Photos` now map to different methods, while `Prompt` was removed.
 
-#### `CameraSource.Camera` → `takePhoto`
+#### `CameraSource.Camera` to `takePhoto`
 
 ```typescript
 // Before
@@ -182,7 +182,7 @@ const result = await Camera.takePhoto({
 const imageUrl = result.webPath;
 ```
 
-#### `CameraSource.Photos` → `chooseFromGallery`
+#### `CameraSource.Photos` to `chooseFromGallery`
 
 ```typescript
 // Before
