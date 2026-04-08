@@ -64,4 +64,4 @@ Publishing is automated based on the branch committed to. When a commit or merge
 
 - In general new developments will go straight to `main`. If we want to have non-stable versions (e.g. for new Capacitor versions or when there are many changes), we may use `next` or `development` branch, and then once they are ready for stable version, open a PR to main (should be merged to keep commit hashes for `semantic-release`).
 
-> **Note**: The [`files`](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#files) array in `package.json` specifies which files get published. If you rename files/directories or add files elsewhere, you may need to update it.
+> **Note**: The [`files`](https://docs.npmjs.com/cli/configuring-npm/package-json) array in `package.json` specifies which files get published. If you rename files/directories or add files elsewhere, you may need to update it.
