@@ -132,23 +132,153 @@ class MyCameraModal extends HTMLElement {
 customElements.define('pwa-camera-modal', MyCameraModal);
 ```
 
-## Example
+## Examples
+
+### Taking a photo
 
 ```typescript
 import { Camera } from '@capacitor/camera';
 
 const takePicture = async () => {
-  const result = await Camera.takePhoto({
-    quality: 90,
-    editable: 'in-app',
-  });
+  try {
+    const result = await Camera.takePhoto({
+      quality: 90,
+      includeMetadata: true,
+    });
 
-  // result.webPath can be set directly as the src of an image element
-  imageElement.src = result.webPath;
+    // result.webPath can be set directly as the src of an image element
+    imageElement.src = result.webPath;
 
-  // On native: pass result.uri to the Filesystem API to get the full-resolution base64,
-  // or use result.thumbnail for a lower-resolution base64 preview.
-  // On Web: result.thumbnail contains the full image base64 encoded.
+    // On native: pass result.uri to the Filesystem API to get the full-resolution base64,
+    // or use result.thumbnail for a lower-resolution base64 preview.
+    // On Web: result.thumbnail contains the full image base64 encoded.
+
+    console.log('Format:', result.metadata?.format);
+    console.log('Resolution:', result.metadata?.resolution);
+  } catch (e) {
+    const error = e as any;
+    // error.code contains the structured error code (e.g. 'OS-PLUG-CAMR-0003')
+    // when thrown by the native layer. See the Errors section for all codes.
+    const message = error.code ? `[${error.code}] ${error.message}` : error.message;
+    console.error('takePhoto failed:', message);
+  }
+};
+```
+
+### Choosing from the gallery
+
+```typescript
+import { Camera, MediaTypeSelection } from '@capacitor/camera';
+
+const pickMedia = async () => {
+  try {
+    const { results } = await Camera.chooseFromGallery({
+      mediaType: MediaTypeSelection.All, // photos, videos, or both
+      allowMultipleSelection: true,
+      limit: 5,
+      includeMetadata: true,
+    });
+
+    for (const item of results) {
+      console.log('Type:', item.type);       // MediaType.Photo or MediaType.Video
+      console.log('webPath:', item.webPath);
+      console.log('Format:', item.metadata?.format);
+      console.log('Size:', item.metadata?.size);
+    }
+  } catch (e) {
+    const error = e as any;
+    const message = error.code ? `[${error.code}] ${error.message}` : error.message;
+    console.error('chooseFromGallery failed:', message);
+  }
+};
+```
+
+### Recording and playing a video
+
+```typescript
+import { Camera } from '@capacitor/camera';
+
+const recordAndPlay = async () => {
+  let videoUri: string | undefined;
+
+  try {
+    const result = await Camera.recordVideo({
+      saveToGallery: false,
+      isPersistent: true, // keep the file available across app launches
+      includeMetadata: true,
+    });
+
+    videoUri = result.uri;
+    console.log('Duration:', result.metadata?.duration);
+    console.log('Saved to gallery:', result.saved);
+  } catch (e) {
+    const error = e as any;
+    const message = error.code ? `[${error.code}] ${error.message}` : error.message;
+    console.error('recordVideo failed:', message);
+    return;
+  }
+
+  if (videoUri) {
+    try {
+      await Camera.playVideo({ uri: videoUri });
+    } catch (e) {
+      const error = e as any;
+      const message = error.code ? `[${error.code}] ${error.message}` : error.message;
+      console.error('playVideo failed:', message);
+    }
+  }
+};
+```
+
+### Editing a photo from a base64 string
+
+`editPhoto` opens an in-app editor from a base64-encoded image and returns the edited image as a base64 string in `outputImage`.
+
+```typescript
+import { Camera } from '@capacitor/camera';
+
+const editFromBase64 = async (base64Image: string) => {
+  try {
+    const { outputImage } = await Camera.editPhoto({
+      inputImage: base64Image, // raw base64, no data URL prefix
+    });
+
+    // outputImage is the edited image, base64 encoded
+    imageElement.src = `data:image/jpeg;base64,${outputImage}`;
+  } catch (e) {
+    const error = e as any;
+    const message = error.code ? `[${error.code}] ${error.message}` : error.message;
+    console.error('editPhoto failed:', message);
+  }
+};
+```
+
+### Editing a photo from a URI
+
+`editURIPhoto` opens an in-app editor from a file URI (e.g. from `takePhoto` or the Filesystem API) and returns a `MediaResult`.
+
+```typescript
+import { Camera } from '@capacitor/camera';
+
+const editFromURI = async (uri: string) => {
+  try {
+    const result = await Camera.editURIPhoto({
+      uri,
+      saveToGallery: false,
+      includeMetadata: true,
+    });
+
+    // result.webPath can be used directly as an image src
+    imageElement.src = result.webPath;
+
+    console.log('Format:', result.metadata?.format);
+    console.log('Size:', result.metadata?.size);
+    console.log('Saved to gallery:', result.saved);
+  } catch (e) {
+    const error = e as any;
+    const message = error.code ? `[${error.code}] ${error.message}` : error.message;
+    console.error('editURIPhoto failed:', message);
+  }
 };
 ```
 
