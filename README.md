@@ -783,7 +783,7 @@ Allows the user to pick multiple pictures from the photo gallery.
 
 ### Errors
 
-The plugin returns structured errors on Android and iOS. Each error has a `code` (e.g. `OS-PLUG-CAMR-0003`) and a `message` with a human-readable description.
+The plugin returns structured errors on Android and iOS. Each error has a `code` (e.g. `OS-PLUG-CAMR-0003`) and a `message` with a human-readable description. Note that these are only available for native platforms starting on the new APIs introduced in version `8.1.0`: `takePhoto`, `chooseFromGallery`, `editPhoto`, `editURIPhoto`, `recordVideo`, and `playVideo`.
 
 | Error code | Platform(s) | Description |
 |---|---|---|
