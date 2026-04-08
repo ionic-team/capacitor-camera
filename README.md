@@ -297,6 +297,8 @@ for (const result of results) {
 
 </docgen-index>
 
+For a list of existing error codes, see [Errors](#errors).
+
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
