@@ -40,7 +40,7 @@ Then, Rollup will bundle the code into a single file at `dist/plugin.js`. This f
 
 Build and validate the web and native projects.
 
-This is useful to run in CI to verify that the plugin builds for all platforms.
+This is run in CI to verify that the plugin builds for all platforms.
 
 #### `npm run lint` / `npm run fmt`
 
