@@ -77,23 +77,7 @@ On Web, `takePhoto` can use the [PWA Elements](https://capacitorjs.com/docs/web/
 
 ### Installing PWA Elements programmatically
 
-Install the `@ionic/pwa-elements` package and call `defineCustomElements` before using the plugin:
-
-```bash
-npm install @ionic/pwa-elements
-```
-
-```typescript
-import { defineCustomElements } from '@ionic/pwa-elements/loader';
-
-// Call once at app startup, before any Camera calls
-// Wrapped in try/catch as it may fail on older WebViews (e.g. Android 9)
-try {
-  defineCustomElements(window);
-} catch (e) {
-  console.warn('PWA Elements failed to load:', e);
-}
-```
+See the [PWA Elements installation guide](https://capacitorjs.com/docs/web/pwa-elements#installation) for full instructions.
 
 ### Providing a custom camera element
 
