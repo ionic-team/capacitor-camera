@@ -310,8 +310,8 @@ const result = await Camera.takePhoto({
   quality: 90,
   editable: 'in-app',        // replaces allowEditing: true
   cameraDirection: CameraDirection.Rear, // replaces direction
-  targetWidth: 1280,         // replaces width
-  targetHeight: 720,         // replaces height
+  targetWidth: 1280,         // * replaces width
+  targetHeight: 720,         // * replaces height
 });
 const imageUrl = result.webPath;
 ```
@@ -387,8 +387,8 @@ const { results } = await Camera.chooseFromGallery({
   allowMultipleSelection: true,
   quality: 90,
   limit: 5,
-  targetWidth: 1280,  // replaces width
-  targetHeight: 720,  // replaces height
+  targetWidth: 1280,  // * replaces width
+  targetHeight: 720,  // * replaces height
 });
 for (const result of results) {
   console.log(result.webPath);
@@ -401,13 +401,15 @@ for (const result of results) {
 
 | Old option | New option | Applies to |
 |---|---|---|
-| `width` | `targetWidth` | `takePhoto`, `chooseFromGallery` |
-| `height` | `targetHeight` | `takePhoto`, `chooseFromGallery` |
+| `width` | `targetWidth` * | `takePhoto`, `chooseFromGallery` |
+| `height` | `targetHeight` * | `takePhoto`, `chooseFromGallery` |
 | `direction` | `cameraDirection` | `takePhoto` |
 | `allowEditing` | `editable: 'in-app'` | `takePhoto`, `chooseFromGallery` |
 | `resultType` | — (removed) | — |
 | `source` | — (removed, use separate methods) | — |
 | `promptLabel*` | — (removed, build your own UI) | — |
+
+\* `width`/`height` each worked independently and set a maximum dimension while preserving aspect ratio. `targetWidth`/`targetHeight` must be used together — setting only one has no effect.
 
 ## API
 
