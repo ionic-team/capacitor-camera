@@ -268,7 +268,7 @@ const editFromURI = async (uri: string) => {
 
 ## Migrating to the New API
 
-Version 8.1.0 introduces a new improved API and deprecates `getPhoto` and `pickImages`. The key design change is that the new API separates intent: **taking a photo** and **picking from the gallery** are now distinct methods, and the result type is unified into `MediaResult`.
+Version 8.1.0 introduces a new improved API and deprecates `getPhoto` and `pickImages`.
 
 ### Replacing `getPhoto`
 
