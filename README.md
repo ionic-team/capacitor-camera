@@ -296,11 +296,13 @@ const result = await Camera.takePhoto({
   quality: 90,
   editable: 'in-app',        // replaces allowEditing: true
   cameraDirection: CameraDirection.Rear, // replaces direction
-  targetWidth: 1280,         // * replaces width
-  targetHeight: 720,         // * replaces height
+  targetWidth: 1280,         // replaces width (1)
+  targetHeight: 720,         // replaces height (1)
 });
 const imageUrl = result.webPath;
 ```
+
+**(1)** `width`/`height` each worked independently and set a maximum dimension while preserving aspect ratio. `targetWidth`/`targetHeight` must be used together — setting only one has no effect.
 
 #### `CameraSource.Photos` to `chooseFromGallery`
 
@@ -390,13 +392,15 @@ const { results } = await Camera.chooseFromGallery({
   allowMultipleSelection: true,
   quality: 90,
   limit: 5,
-  targetWidth: 1280,  // * replaces width
-  targetHeight: 720,  // * replaces height
+  targetWidth: 1280,  // replaces width (1)
+  targetHeight: 720,  // replaces height (1)
 });
 for (const result of results) {
   console.log(result.webPath);
 }
 ```
+
+**(1)** `width`/`height` each worked independently and set a maximum dimension while preserving aspect ratio. `targetWidth`/`targetHeight` must be used together — setting only one has no effect.
 
 `chooseFromGallery` can also select videos or mixed media by setting `mediaType` to `MediaTypeSelection.Video` or `MediaTypeSelection.All`.
 
@@ -404,15 +408,15 @@ for (const result of results) {
 
 | Old option | New option | Applies to |
 |---|---|---|
-| `width` | `targetWidth` * | `takePhoto`, `chooseFromGallery` |
-| `height` | `targetHeight` * | `takePhoto`, `chooseFromGallery` |
+| `width` | `targetWidth` (1) | `takePhoto`, `chooseFromGallery` |
+| `height` | `targetHeight` (1) | `takePhoto`, `chooseFromGallery` |
 | `direction` | `cameraDirection` | `takePhoto` |
 | `allowEditing` | `editable: 'in-app'` | `takePhoto`, `chooseFromGallery` |
 | `resultType` | — (removed, see [Result type changes](#result-type-changes)) | — |
 | `source` | — (removed, use separate methods) | — |
 | `promptLabel*` | — (removed, build your own UI) | — |
 
-\* `width`/`height` each worked independently and set a maximum dimension while preserving aspect ratio. `targetWidth`/`targetHeight` must be used together — setting only one has no effect.
+**(1)** `width`/`height` each worked independently and set a maximum dimension while preserving aspect ratio. `targetWidth`/`targetHeight` must be used together — setting only one has no effect.
 
 ## API
 
