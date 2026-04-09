@@ -90,7 +90,7 @@ class CameraPlugin : Plugin() {
         ionFlow.load()
     }
 
-
+    @Deprecated("Use either takePhoto for CameraSource.Camera or chooseFromGallery for CameraSource.Photos")
     @PluginMethod
     fun getPhoto(call: PluginCall) {
         legacyFlow.getPhoto(call)
@@ -126,6 +126,7 @@ class CameraPlugin : Plugin() {
         ionFlow.editURIPhoto(call)
     }
 
+    @Deprecated("Use chooseFromGallery instead")
     @PluginMethod
     fun pickImages(call: PluginCall) {
         legacyFlow.pickImages(call)
