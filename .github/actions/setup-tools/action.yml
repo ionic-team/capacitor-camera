@@ -18,4 +18,4 @@ runs:
     - name: Set Xcode 26.0  # minimum support Xcode version by Capacitor 8
       if: runner.os == 'macOS'
       shell: bash
-      run: sudo xcode-select --switch /Applications/Xcode_26.0.app
+      run: sudo xcode-select --switch /Applications/Xcode_26.0.1.app
