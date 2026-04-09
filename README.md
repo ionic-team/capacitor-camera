@@ -350,7 +350,7 @@ const { results } = await Camera.chooseFromGallery({ quality: 90 });
 | `webPath` | `webPath` |
 | `base64String` | `thumbnail` (on Web, contains the full image base64 encoded; on native, contains a thumbnail) |
 | `dataUrl` | No direct equivalent — see note below |
-| `saved` | `saved` (not available on Web) |
+| `saved` | `saved` |
 | `format` | `metadata.format` (requires `includeMetadata: true`) |
 | `exif` | `metadata.exif` (requires `includeMetadata: true`) |
 
