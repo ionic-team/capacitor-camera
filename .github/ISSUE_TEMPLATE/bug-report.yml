@@ -1,0 +1,87 @@
+name: Bug Report
+description: File a bug report
+title: ""
+labels: ["triage"]
+type: "bug"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thanks for taking the time to fill out this bug report!
+        Before creating a bug report, be sure to keep the following points in mind:
+        - Search existing reports to make sure there isn't already an existing bug report.
+        - Make sure this is the correct project for your report.  If the report is related to a plugin or Capacitor core, create the bug report on that GitHub project instead.
+        - Feel free to chat with us in [discussions](https://github.com/ionic-team/capacitor/discussions) if you are unsure whether something is a bug or feature request.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: "Give a detailed explanation of the bug you've encountered."
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: "Describe what you expected to happen, or what should be the correct behavior."
+    validations:
+      required: true
+  - type: input
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: "Include a link to a minimal test project that demonstrates the bug."
+    validations:
+      required: false
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshots / Media
+      description: "Include screenshots, video recordings or other collateral that helps illustrate the problem described in the bug."
+    validations:
+      required: false
+  - type: textarea
+    id: env-details
+    attributes:
+      label: Environment Details
+      description: "Please provide the following information with your request and any other relevant technical details (versions of IDEs, local environment info, plugin information or links, etc)."
+      placeholder: |
+          OS version:
+          `npx cap doctor` output:
+          npm --version output:
+          node --version output:
+          pod --version output (iOS Cocoapods issues only):
+      render: Shell
+    validations:
+      required: false
+  - type: checkboxes
+    id: versions-affected
+    attributes:
+      label: Versions Affected
+      description: "Check the versions that this bug is related to."
+      options:
+        - label: 7.x
+          required: false
+        - label: 8.x
+          required: false
+        - label: 9.x
+          required: false
+  - type: checkboxes
+    id: platforms-affected
+    attributes:
+      label: Platforms Affected
+      description: "Check the platforms that this bug is related to."
+      options:
+        - label: iOS
+          required: false
+        - label: Android
+          required: false
+        - label: Web
+          required: false
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes / Comments
+      description: "Anything else we need to know to help? Include it here."
+    validations:
+      required: false

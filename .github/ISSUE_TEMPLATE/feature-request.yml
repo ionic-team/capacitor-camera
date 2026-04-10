@@ -1,0 +1,54 @@
+name: Feature Request
+description: Request a new feature
+title: ""
+labels: ["triage"]
+type: "feature"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thanks for your input on enhancements to Capacitor!
+        Before creating a feature request, be sure to keep the following points in mind:
+        - Search existing feature requests to make sure there isn't already an existing request.
+        - Make sure this is the correct project for your request.  If the request is related to a plugin or Capacitor core, create the request on that relevant GitHub project instead.
+        - Make sure feature requests are relevant to the goals of the project.  If you are unsure, feel free to chat with us in [discussions](https://github.com/ionic-team/capacitor/discussions).
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: "Describe the feature you would like to see."
+    validations:
+      required: true
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Potential Implementation
+      description: "Describe any potential implementation or preferred solution for this feature, or examples of solutions in the wild."
+    validations:
+      required: false
+  - type: checkboxes
+    id: supported-platforms
+    attributes:
+      label: Supported Platforms
+      description: "Check the platforms this feature request is relevant to."
+      options:
+        - label: iOS
+          required: false
+        - label: Android
+          required: false
+        - label: Web
+          required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: "Describe some alternatives, if any."
+    validations:
+      required: false
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes / Comments
+      description: "Include any other information about the feature request here, for example, potential use cases, benefits, etc."
+    validations:
+      required: false
