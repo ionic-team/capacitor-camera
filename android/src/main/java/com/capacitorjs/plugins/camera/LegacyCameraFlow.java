@@ -1,11 +1,10 @@
 package com.capacitorjs.plugins.camera;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -25,20 +24,15 @@ import androidx.activity.result.ActivityResultRegistryOwner;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import com.getcapacitor.Bridge;
 import com.getcapacitor.FileUtils;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Logger;
 import com.getcapacitor.PermissionState;
-import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
-import com.getcapacitor.PluginMethod;
-import com.getcapacitor.annotation.ActivityCallback;
-import com.getcapacitor.annotation.CapacitorPlugin;
-import com.getcapacitor.annotation.Permission;
-import com.getcapacitor.annotation.PermissionCallback;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -50,47 +44,25 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.json.JSONException;
 
-/**
- * The Camera plugin makes it easy to take a photo or have the user select a photo
- * from their albums.
- *
- * On Android, this plugin sends an intent that opens the stock Camera app.
- *
- * Adapted from https://developer.android.com/training/camera/photobasics.html
- */
-@SuppressLint("InlinedApi")
-@CapacitorPlugin(
-    name = "Camera",
-    permissions = {
-        @Permission(strings = { Manifest.permission.CAMERA }, alias = CameraPlugin.CAMERA),
-        @Permission(strings = {}, alias = CameraPlugin.PHOTOS),
-        // SDK VERSIONS 29 AND BELOW
-        @Permission(
-            strings = { Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE },
-            alias = CameraPlugin.SAVE_GALLERY
-        ),
-        /*
-        SDK VERSIONS 30-32
-        This alias is a placeholder and the SAVE_GALLERY alias will be updated to use this permission
-        so that the end user does not need to explicitly use separate aliases depending
-        on the SDK version.
-         */
-        @Permission(strings = { Manifest.permission.READ_EXTERNAL_STORAGE }, alias = CameraPlugin.READ_EXTERNAL_STORAGE)
+public class LegacyCameraFlow {
+
+    /**
+     * Functional interface for starting activities for result.
+     */
+    public interface ActivityStarter {
+        void startActivityForResult(PluginCall call, Intent intent, String callbackName);
     }
-)
-public class CameraPlugin extends Plugin {
 
-    // Permission alias constants
-    static final String CAMERA = "camera";
-    static final String PHOTOS = "photos";
-    static final String SAVE_GALLERY = "saveGallery";
-    static final String READ_EXTERNAL_STORAGE = "readExternalStorage";
+    private final Context context;
+    private final AppCompatActivity activity;
+    private final Bridge bridge;
+    private final String appId;
+    private final PermissionHelper permissionHelper;
+    private final ActivityStarter activityStarter;
 
     // Message constants
     private static final String INVALID_RESULT_TYPE_ERROR = "Invalid resultType option";
@@ -104,7 +76,9 @@ public class CameraPlugin extends Plugin {
     private static final String IMAGE_EDIT_ERROR = "Unable to edit image";
     private static final String IMAGE_GALLERY_SAVE_ERROR = "Unable to save the image in the gallery";
     private static final String USER_CANCELLED = "User cancelled photos app";
-
+    private static final String LOG_TAG = "LegacyCameraFlow";
+    private static final String CAMERA = "camera";
+    private static final String SAVE_GALLERY = "saveGallery";
     private String imageFileSavePath;
     private String imageEditedFileSavePath;
     private Uri imageFileUri;
@@ -117,32 +91,39 @@ public class CameraPlugin extends Plugin {
 
     private final AtomicInteger mNextLocalRequestCode = new AtomicInteger();
 
-    private CameraSettings settings = new CameraSettings();
+    private LegacyCameraSettings settings = new LegacyCameraSettings();
 
-    @Override
-    public void load() {
-        super.load();
+    public LegacyCameraFlow(
+        Context context,
+        AppCompatActivity activity,
+        Bridge bridge,
+        String appId,
+        PermissionHelper permissionHelper,
+        ActivityStarter activityStarter
+    ) {
+        this.context = context;
+        this.activity = activity;
+        this.bridge = bridge;
+        this.appId = appId;
+        this.permissionHelper = permissionHelper;
+        this.activityStarter = activityStarter;
     }
 
-    @PluginMethod
     public void getPhoto(PluginCall call) {
         isEdited = false;
         settings = getSettings(call);
         doShow(call);
     }
 
-    @PluginMethod
     public void pickImages(PluginCall call) {
         settings = getSettings(call);
         openPhotos(call, true);
     }
 
-    @PluginMethod
     public void pickLimitedLibraryPhotos(PluginCall call) {
         call.unimplemented("not supported on android");
     }
 
-    @PluginMethod
     public void getLimitedLibraryPhotos(PluginCall call) {
         call.unimplemented("not supported on android");
     }
@@ -182,11 +163,11 @@ public class CameraPlugin extends Plugin {
             },
             () -> call.reject(USER_CANCELLED)
         );
-        fragment.show(getActivity().getSupportFragmentManager(), "capacitorModalsActionSheet");
+        fragment.show(activity.getSupportFragmentManager(), "capacitorModalsActionSheet");
     }
 
     private void showCamera(final PluginCall call) {
-        if (!getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+        if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             call.reject(NO_CAMERA_ERROR);
             return;
         }
@@ -197,25 +178,25 @@ public class CameraPlugin extends Plugin {
         openPhotos(call);
     }
 
-    private boolean checkCameraPermissions(PluginCall call) {
+    public boolean checkCameraPermissions(PluginCall call) {
         // if the manifest does not contain the camera permissions key, we don't need to ask the user
-        boolean needCameraPerms = isPermissionDeclared(CAMERA);
-        boolean hasCameraPerms = !needCameraPerms || getPermissionState(CAMERA) == PermissionState.GRANTED;
-        boolean hasGalleryPerms = getPermissionState(SAVE_GALLERY) == PermissionState.GRANTED;
+        boolean needCameraPerms = permissionHelper.isPermissionDeclared(CAMERA);
+        boolean hasCameraPerms = !needCameraPerms || permissionHelper.getPermissionState(CAMERA) == PermissionState.GRANTED;
+        boolean hasGalleryPerms = permissionHelper.getPermissionState(SAVE_GALLERY) == PermissionState.GRANTED;
 
         // If we want to save to the gallery, we need two permissions
         // actually we only need permissions to save to gallery for Android <= 9 (API 28)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             // we might still need to request permission for the camera
             if (!hasCameraPerms) {
-                requestPermissionForAlias(CAMERA, call, "cameraPermissionsCallback");
+                permissionHelper.requestPermissionForAlias(CAMERA, call, "cameraPermissionsCallback");
                 return false;
             }
             return true;
         }
 
         // we need to request permissions to save to gallery for Android <= 9
-        if (settings.isSaveToGallery() && !(hasCameraPerms && hasGalleryPerms) && isFirstRequest) {
+        if (settings.getSaveToGallery() && !(hasCameraPerms && hasGalleryPerms) && isFirstRequest) {
             isFirstRequest = false;
             String[] aliases;
             if (needCameraPerms) {
@@ -223,30 +204,23 @@ public class CameraPlugin extends Plugin {
             } else {
                 aliases = new String[] { SAVE_GALLERY };
             }
-            requestPermissionForAliases(aliases, call, "cameraPermissionsCallback");
+            permissionHelper.requestPermissionForAliases(aliases, call, "cameraPermissionsCallback");
             return false;
         }
         // If we don't need to save to the gallery, we can just ask for camera permissions
         else if (!hasCameraPerms) {
-            requestPermissionForAlias(CAMERA, call, "cameraPermissionsCallback");
+            permissionHelper.requestPermissionForAlias(CAMERA, call, "cameraPermissionsCallback");
             return false;
         }
         return true;
     }
 
-    /**
-     * Completes the plugin call after a camera permission request
-     *
-     * @see #getPhoto(PluginCall)
-     * @param call the plugin call
-     */
-    @PermissionCallback
-    private void cameraPermissionsCallback(PluginCall call) {
+    public void handleCameraPermissionsCallback(PluginCall call) {
         if (call.getMethodName().equals("pickImages")) {
             openPhotos(call, true);
         } else {
-            if (settings.getSource() == CameraSource.CAMERA && getPermissionState(CAMERA) != PermissionState.GRANTED) {
-                Logger.debug(getLogTag(), "User denied camera permission: " + getPermissionState(CAMERA).toString());
+            if (settings.getSource() == CameraSource.CAMERA && permissionHelper.getPermissionState(CAMERA) != PermissionState.GRANTED) {
+                Logger.debug(LOG_TAG, "User denied camera permission: " + permissionHelper.getPermissionState(CAMERA));
                 call.reject(PERMISSION_DENIED_ERROR_CAMERA);
                 return;
             }
@@ -254,28 +228,16 @@ public class CameraPlugin extends Plugin {
         }
     }
 
-    @Override
-    protected void requestPermissionForAliases(@NonNull String[] aliases, @NonNull PluginCall call, @NonNull String callbackName) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            for (int i = 0; i < aliases.length; i++) {
-                if (aliases[i].equals(SAVE_GALLERY)) {
-                    aliases[i] = READ_EXTERNAL_STORAGE;
-                }
-            }
-        }
-        super.requestPermissionForAliases(aliases, call, callbackName);
-    }
-
-    private CameraSettings getSettings(PluginCall call) {
-        CameraSettings settings = new CameraSettings();
+    private LegacyCameraSettings getSettings(PluginCall call) {
+        LegacyCameraSettings settings = new LegacyCameraSettings();
         settings.setResultType(getResultType(call.getString("resultType")));
-        settings.setSaveToGallery(call.getBoolean("saveToGallery", CameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY));
+        settings.setSaveToGallery(call.getBoolean("saveToGallery", LegacyCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY));
         settings.setAllowEditing(call.getBoolean("allowEditing", false));
-        settings.setQuality(call.getInt("quality", CameraSettings.DEFAULT_QUALITY));
+        settings.setQuality(call.getInt("quality", LegacyCameraSettings.DEFAULT_QUALITY));
         settings.setWidth(call.getInt("width", 0));
         settings.setHeight(call.getInt("height", 0));
         settings.setShouldResize(settings.getWidth() > 0 || settings.getHeight() > 0);
-        settings.setShouldCorrectOrientation(call.getBoolean("correctOrientation", CameraSettings.DEFAULT_CORRECT_ORIENTATION));
+        settings.setShouldCorrectOrientation(call.getBoolean("correctOrientation", LegacyCameraSettings.DEFAULT_CORRECT_ORIENTATION));
         try {
             settings.setSource(CameraSource.valueOf(call.getString("source", CameraSource.PROMPT.getSource())));
         } catch (IllegalArgumentException ex) {
@@ -291,7 +253,7 @@ public class CameraPlugin extends Plugin {
         try {
             return CameraResultType.valueOf(resultType.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException ex) {
-            Logger.debug(getLogTag(), "Invalid result type \"" + resultType + "\", defaulting to base64");
+            Logger.debug(LOG_TAG, "Invalid result type \"" + resultType + "\", defaulting to base64");
             return CameraResultType.BASE64;
         }
     }
@@ -299,21 +261,21 @@ public class CameraPlugin extends Plugin {
     public void openCamera(final PluginCall call) {
         if (checkCameraPermissions(call)) {
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
+            if (takePictureIntent.resolveActivity(context.getPackageManager()) != null) {
                 // If we will be saving the photo, send the target file along
                 try {
-                    String appId = getAppId();
-                    File photoFile = CameraUtils.createImageFile(getActivity());
+                    String appId = this.appId;
+                    File photoFile = CameraUtils.createImageFile(activity);
                     imageFileSavePath = photoFile.getAbsolutePath();
                     // TODO: Verify provider config exists
-                    imageFileUri = FileProvider.getUriForFile(getActivity(), appId + ".fileprovider", photoFile);
+                    imageFileUri = FileProvider.getUriForFile(activity, appId + ".fileprovider", photoFile);
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
                 } catch (Exception ex) {
                     call.reject(IMAGE_FILE_SAVE_ERROR, ex);
                     return;
                 }
 
-                startActivityForResult(call, takePictureIntent, "processCameraImage");
+                activityStarter.startActivityForResult(call, takePictureIntent, "processCameraImage");
             } else {
                 call.reject(NO_CAMERA_ACTIVITY_ERROR);
             }
@@ -341,6 +303,14 @@ public class CameraPlugin extends Plugin {
 
     private ActivityResultContract<PickVisualMediaRequest, List<Uri>> getContractForCall(final PluginCall call) {
         int limit = call.getInt("limit", 0);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            int maxLimit = MediaStore.getPickImagesMaxLimit();
+            if (limit > maxLimit) {
+                limit = maxLimit;
+            }
+        }
+
         if (limit > 1) {
             return new ActivityResultContracts.PickMultipleVisualMedia(limit);
         } else {
@@ -400,7 +370,6 @@ public class CameraPlugin extends Plugin {
         }
     }
 
-    @ActivityCallback
     public void processCameraImage(PluginCall call, ActivityResult result) {
         settings = getSettings(call);
         if (imageFileSavePath == null) {
@@ -445,7 +414,7 @@ public class CameraPlugin extends Plugin {
         InputStream imageStream = null;
 
         try {
-            imageStream = getContext().getContentResolver().openInputStream(imageUri);
+            imageStream = context.getContentResolver().openInputStream(imageUri);
             Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
 
             if (bitmap == null) {
@@ -463,7 +432,7 @@ public class CameraPlugin extends Plugin {
                 try {
                     imageStream.close();
                 } catch (IOException e) {
-                    Logger.error(getLogTag(), UNABLE_TO_PROCESS_IMAGE, e);
+                    Logger.error(LOG_TAG, UNABLE_TO_PROCESS_IMAGE, e);
                 }
             }
         }
@@ -473,7 +442,7 @@ public class CameraPlugin extends Plugin {
         InputStream imageStream = null;
         JSObject ret = new JSObject();
         try {
-            imageStream = getContext().getContentResolver().openInputStream(imageUri);
+            imageStream = context.getContentResolver().openInputStream(imageUri);
             Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
 
             if (bitmap == null) {
@@ -481,7 +450,7 @@ public class CameraPlugin extends Plugin {
                 return ret;
             }
 
-            ExifWrapper exif = ImageUtils.getExifData(getContext(), bitmap, imageUri);
+            ExifWrapper exif = ImageUtils.getExifData(context, bitmap, imageUri);
             try {
                 bitmap = prepareBitmap(bitmap, imageUri, exif);
             } catch (IOException e) {
@@ -498,7 +467,7 @@ public class CameraPlugin extends Plugin {
                 ret.put("format", "jpeg");
                 ret.put("exif", exif.toJson());
                 ret.put("path", newUri.toString());
-                ret.put("webPath", FileUtils.getPortablePath(getContext(), bridge.getLocalUrl(), newUri));
+                ret.put("webPath", FileUtils.getPortablePath(context, bridge.getLocalUrl(), newUri));
             } else {
                 ret.put("error", UNABLE_TO_PROCESS_IMAGE);
             }
@@ -507,21 +476,20 @@ public class CameraPlugin extends Plugin {
             ret.put("error", "Out of memory");
         } catch (FileNotFoundException ex) {
             ret.put("error", "No such image found");
-            Logger.error(getLogTag(), "No such image found", ex);
+            Logger.error(LOG_TAG, "No such image found", ex);
         } finally {
             if (imageStream != null) {
                 try {
                     imageStream.close();
                 } catch (IOException e) {
-                    Logger.error(getLogTag(), UNABLE_TO_PROCESS_IMAGE, e);
+                    Logger.error(LOG_TAG, UNABLE_TO_PROCESS_IMAGE, e);
                 }
             }
         }
         return ret;
     }
 
-    @ActivityCallback
-    private void processEditedImage(PluginCall call, ActivityResult result) {
+    public void processEditedImage(PluginCall call, ActivityResult result) {
         isEdited = true;
         settings = getSettings(call);
         if (result.getResultCode() == Activity.RESULT_CANCELED) {
@@ -577,7 +545,7 @@ public class CameraPlugin extends Plugin {
         if (!filename.contains(".jpg") && !filename.contains(".jpeg")) {
             filename += "." + (new java.util.Date()).getTime() + ".jpeg";
         }
-        File cacheDir = getContext().getCacheDir();
+        File cacheDir = context.getCacheDir();
         return new File(cacheDir, filename);
     }
 
@@ -589,7 +557,7 @@ public class CameraPlugin extends Plugin {
      */
     @SuppressWarnings("deprecation")
     private void returnResult(PluginCall call, Bitmap bitmap, Uri u) {
-        ExifWrapper exif = ImageUtils.getExifData(getContext(), bitmap, u);
+        ExifWrapper exif = ImageUtils.getExifData(context, bitmap, u);
         try {
             bitmap = prepareBitmap(bitmap, u, exif);
         } catch (IOException e) {
@@ -600,12 +568,12 @@ public class CameraPlugin extends Plugin {
         ByteArrayOutputStream bitmapOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, settings.getQuality(), bitmapOutputStream);
 
-        if (settings.isAllowEditing() && !isEdited) {
+        if (settings.getAllowEditing() && !isEdited) {
             editImage(call, u, bitmapOutputStream);
             return;
         }
 
-        boolean saveToGallery = call.getBoolean("saveToGallery", CameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY);
+        boolean saveToGallery = call.getBoolean("saveToGallery", LegacyCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY);
         if (saveToGallery && (imageEditedFileSavePath != null || imageFileSavePath != null)) {
             isSaved = true;
             try {
@@ -613,7 +581,7 @@ public class CameraPlugin extends Plugin {
                 File fileToSave = new File(fileToSavePath);
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    ContentResolver resolver = getContext().getContentResolver();
+                    ContentResolver resolver = context.getContentResolver();
                     ContentValues values = new ContentValues();
                     values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileToSave.getName());
                     values.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
@@ -638,7 +606,7 @@ public class CameraPlugin extends Plugin {
                     }
                 } else {
                     String inserted = MediaStore.Images.Media.insertImage(
-                        getContext().getContentResolver(),
+                        context.getContentResolver(),
                         fileToSavePath,
                         fileToSave.getName(),
                         ""
@@ -650,10 +618,10 @@ public class CameraPlugin extends Plugin {
                 }
             } catch (FileNotFoundException e) {
                 isSaved = false;
-                Logger.error(getLogTag(), IMAGE_GALLERY_SAVE_ERROR, e);
+                Logger.error(LOG_TAG, IMAGE_GALLERY_SAVE_ERROR, e);
             } catch (IOException e) {
                 isSaved = false;
-                Logger.error(getLogTag(), IMAGE_GALLERY_SAVE_ERROR, e);
+                Logger.error(LOG_TAG, IMAGE_GALLERY_SAVE_ERROR, e);
             }
         }
 
@@ -677,7 +645,7 @@ public class CameraPlugin extends Plugin {
     }
 
     private void deleteImageFile() {
-        if (imageFileSavePath != null && !settings.isSaveToGallery()) {
+        if (imageFileSavePath != null && !settings.getSaveToGallery()) {
             File photoFile = new File(imageFileSavePath);
             if (photoFile.exists()) {
                 photoFile.delete();
@@ -693,7 +661,7 @@ public class CameraPlugin extends Plugin {
             ret.put("format", "jpeg");
             ret.put("exif", exif.toJson());
             ret.put("path", newUri.toString());
-            ret.put("webPath", FileUtils.getPortablePath(getContext(), bridge.getLocalUrl(), newUri));
+            ret.put("webPath", FileUtils.getPortablePath(context, bridge.getLocalUrl(), newUri));
             ret.put("saved", isSaved);
             call.resolve(ret);
         } else {
@@ -713,7 +681,7 @@ public class CameraPlugin extends Plugin {
                 try {
                     bis.close();
                 } catch (IOException e) {
-                    Logger.error(getLogTag(), UNABLE_TO_PROCESS_IMAGE, e);
+                    Logger.error(LOG_TAG, UNABLE_TO_PROCESS_IMAGE, e);
                 }
             }
         }
@@ -729,12 +697,12 @@ public class CameraPlugin extends Plugin {
      * @return
      */
     private Bitmap prepareBitmap(Bitmap bitmap, Uri imageUri, ExifWrapper exif) throws IOException {
-        if (settings.isShouldCorrectOrientation()) {
-            final Bitmap newBitmap = ImageUtils.correctOrientation(getContext(), bitmap, imageUri, exif);
+        if (settings.getShouldCorrectOrientation()) {
+            final Bitmap newBitmap = ImageUtils.correctOrientation(context, bitmap, imageUri, exif);
             bitmap = replaceBitmap(bitmap, newBitmap);
         }
 
-        if (settings.isShouldResize()) {
+        if (settings.getShouldResize()) {
             final Bitmap newBitmap = ImageUtils.resize(bitmap, settings.getWidth(), settings.getHeight());
             bitmap = replaceBitmap(bitmap, newBitmap);
         }
@@ -772,69 +740,12 @@ public class CameraPlugin extends Plugin {
         call.resolve(data);
     }
 
-    @Override
-    @PluginMethod
-    public void requestPermissions(PluginCall call) {
-        // If the camera permission is defined in the manifest, then we have to prompt the user
-        // or else we will get a security exception when trying to present the camera. If, however,
-        // it is not defined in the manifest then we don't need to prompt and it will just work.
-        if (isPermissionDeclared(CAMERA)) {
-            // just request normally
-            super.requestPermissions(call);
-        } else {
-            // the manifest does not define camera permissions, so we need to decide what to do
-            // first, extract the permissions being requested
-            JSArray providedPerms = call.getArray("permissions");
-            List<String> permsList = null;
-            if (providedPerms != null) {
-                try {
-                    permsList = providedPerms.toList();
-                } catch (JSONException e) {}
-            }
-
-            if (
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ||
-                (permsList != null && permsList.size() == 1 && (permsList.contains(CAMERA) || permsList.contains(PHOTOS)))
-            ) {
-                // either we're on Android 13+ (storage permissions do not apply)
-                // or the only thing being asked for was the camera so we can just return the current state
-                checkPermissions(call);
-            } else {
-                requestPermissionForAlias(SAVE_GALLERY, call, "checkPermissions");
-            }
-        }
-    }
-
-    @Override
-    public Map<String, PermissionState> getPermissionStates() {
-        Map<String, PermissionState> permissionStates = super.getPermissionStates();
-
-        // If Camera is not in the manifest and therefore not required, say the permission is granted
-        if (!isPermissionDeclared(CAMERA)) {
-            permissionStates.put(CAMERA, PermissionState.GRANTED);
-        }
-
-        if (permissionStates.containsKey(PHOTOS)) {
-            permissionStates.put(PHOTOS, PermissionState.GRANTED);
-        }
-
-        // If the SDK version is 30 or higher, update the SAVE_GALLERY state to match the READ_EXTERNAL_STORAGE state.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            String alias = READ_EXTERNAL_STORAGE;
-            if (permissionStates.containsKey(alias)) {
-                permissionStates.put(SAVE_GALLERY, permissionStates.get(alias));
-            }
-        }
-
-        return permissionStates;
-    }
-
     private void editImage(PluginCall call, Uri uri, ByteArrayOutputStream bitmapOutputStream) {
         try {
             Uri tempImage = getTempImage(uri, bitmapOutputStream);
             Intent editIntent = createEditIntent(tempImage);
             if (editIntent != null) {
-                startActivityForResult(call, editIntent, "processEditedImage");
+                activityStarter.startActivityForResult(call, editIntent, "processEditedImage");
             } else {
                 call.reject(IMAGE_EDIT_ERROR);
             }
@@ -846,7 +757,7 @@ public class CameraPlugin extends Plugin {
     private Intent createEditIntent(Uri origPhotoUri) {
         try {
             File editFile = new File(origPhotoUri.getPath());
-            Uri editUri = FileProvider.getUriForFile(getActivity(), getContext().getPackageName() + ".fileprovider", editFile);
+            Uri editUri = FileProvider.getUriForFile(activity, context.getPackageName() + ".fileprovider", editFile);
             Intent editIntent = new Intent(Intent.ACTION_EDIT);
             editIntent.setDataAndType(editUri, "image/*");
             imageEditedFileSavePath = editFile.getAbsolutePath();
@@ -857,7 +768,7 @@ public class CameraPlugin extends Plugin {
             List<ResolveInfo> resInfoList;
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                resInfoList = getContext()
+                resInfoList = context
                     .getPackageManager()
                     .queryIntentActivities(editIntent, PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY));
             } else {
@@ -866,7 +777,7 @@ public class CameraPlugin extends Plugin {
 
             for (ResolveInfo resolveInfo : resInfoList) {
                 String packageName = resolveInfo.activityInfo.packageName;
-                getContext().grantUriPermission(packageName, editUri, flags);
+                context.grantUriPermission(packageName, editUri, flags);
             }
             return editIntent;
         } catch (Exception ex) {
@@ -876,31 +787,23 @@ public class CameraPlugin extends Plugin {
 
     @SuppressWarnings("deprecation")
     private List<ResolveInfo> legacyQueryIntentActivities(Intent intent) {
-        return getContext().getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        return context.getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
     }
 
-    @Override
-    protected Bundle saveInstanceState() {
-        Bundle bundle = super.saveInstanceState();
+    public void onSaveInstanceState(Bundle bundle) {
         if (bundle != null) {
             bundle.putString("cameraImageFileSavePath", imageFileSavePath);
         }
-        return bundle;
     }
 
-    @Override
-    protected void restoreState(Bundle state) {
+    public void onRestoreState(Bundle state) {
         String storedImageFileSavePath = state.getString("cameraImageFileSavePath");
         if (storedImageFileSavePath != null) {
             imageFileSavePath = storedImageFileSavePath;
         }
     }
 
-    /**
-     * Unregister activity result launches to prevent leaks.
-     */
-    @Override
-    protected void handleOnDestroy() {
+    public void onDestroy() {
         if (pickMedia != null) {
             pickMedia.unregister();
         }

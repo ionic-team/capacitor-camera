@@ -9,9 +9,10 @@ Pod::Spec.new do |s|
   s.license = package['license']
   s.homepage = 'https://capacitorjs.com'
   s.author = package['author']
-  s.source = { :git => 'https://github.com/ionic-team/capacitor-plugins.git', :tag => package['name'] + '@' + package['version'] }
-  s.source_files = 'ios/Sources/**/*.{swift,h,m,c,cc,mm,cpp}', 'camera/ios/Sources/**/*.{swift,h,m,c,cc,mm,cpp}'
+  s.source = { :git => 'https://github.com/ionic-team/capacitor-camera.git', :tag => "v#{s.version}" }
+  s.source_files = 'ios/Sources/**/*.{swift,h,m,c,cc,mm,cpp}',
   s.ios.deployment_target = '15.0'
   s.dependency 'Capacitor'
+  s.dependency 'IONCameraLib', spec='~> 1.0.0'
   s.swift_version = '5.1'
 end
