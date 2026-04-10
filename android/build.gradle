@@ -74,6 +74,8 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    
+    implementation 'io.ionic.libs:ioncamera-android:1.0.0'
 
     if (System.getenv("CAP_PLUGIN_PUBLISH") == "true") {
         implementation "com.capacitorjs:core:$capacitorVersion"
@@ -89,5 +91,4 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'io.ionic.libs:ioncamera-android:0.1.0'
 }
