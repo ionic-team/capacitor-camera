@@ -1,7 +1,30 @@
-# Change Log
+## [8.1.0](https://github.com/ionic-team/capacitor-camera/compare/v8.0.2...v8.1.0) (2026-04-13)
 
-All notable changes to this project will be documented in this file.
-See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+This minor plugin version introduces significant API changes and deprecations. While backward compatibility is maintained, migration is strongly recommended. Please read the release notes in full, and refer to https://capacitorjs.com/docs/apis/camera for full documentation, including migration guides.
+
+### Deprecations
+
+- `getPhoto` method is deprecated. Use `takePhoto` for a camera photo, or `chooseFromGallery` to select from the gallery. For creating a prompt for the user to select which source, use `@capacitor/action-sheet` or any UI component of your choosing.
+- `pickImages` method is deprecated. Use `chooseFromGallery` instead. Refer to the Camera API documentation for more information on migrating.
+- `Photo`, `GalleryImageOptions`, and `CameraResultType` are deprecated, only use them if you are still using the deprecated `getPhoto` and/or `pickImages`.
+- These deprecated items will be removed in a future major version of the Camera Plugin, please consider migrating to the new ones.
+
+### Features
+
+- New `takePhoto` method added. It allows capturing a photo with the device's camera.
+- New `recordVideo` method added. It allows recording a video with the device's camera. Currently not available in Web. Addresses [capacitor-plugins#229](https://github.com/ionic-team/capacitor-plugins/issues/229).
+- New `playVideo` method added. It opens a native player to play the provided video. Currently not available in Web.
+- New `chooseFromGallery` method added. Use it to select photos and/or videos from the device.
+- New `MediaResult` and `MediaMetadata` interfaces, which are returned by `takePhoto`, `recordVideo` and `chooseFromGallery` (metadata only if input parameter `includeMetadata` is **true**). Besides providing most of the existing functionality from deprecated `getPhoto` / `pickImages`, it can include additional metadata like creation date, video duration, among others.
+- New `editPhoto` method added. Opens an in-app screen to edit a provided base64 encoded image. Supported editing features include image cropping and rotation. Currently not available in Web.
+- New `editURIPhoto` method added. Opens an in-app screen to edit a provided image from a URI. You may use the URIs returned by `takePhoto` and `chooseFromGallery` as input to `editURIPhoto`. Supported editing features include image cropping and rotation. Currently not available in Web.
+- New Error structure when promise is rejected in new methods: `code` in `OS-PLUG-CAMR-XXXX` format + `message`. Refer to plugin documentation for available errors. Existing methods from version 8.0.2 and older retain the same error structure as before for backwards-compatibility.
+- New methods implementation in new native libraries: https://github.com/ionic-team/ion-android-camera and https://github.com/ionic-team/ion-ios-camera.
+
+### Bug Fixes
+
+- **android:** Restrict `pickImages` **limit** to maximum number supported by the device (clone of [capacitor-plugins#2309](https://github.com/ionic-team/capacitor-plugins/pull/2309))
+
 
 ## [8.0.2](https://github.com/ionic-team/capacitor-plugins/compare/@capacitor/camera@8.0.1...@capacitor/camera@8.0.2) (2026-03-06)
 
