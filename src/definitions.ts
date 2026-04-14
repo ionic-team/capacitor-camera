@@ -504,7 +504,7 @@ export interface MediaMetadata {
   creationDate?: string;
 
   /**
-   * Exif data, if any, retreived from the media item.
+   * Exif data, if any, retrieved from the media item.
    * Only available for `MediaType.Photo`.
    * Not available on Web.
    *
