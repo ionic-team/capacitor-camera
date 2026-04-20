@@ -865,3 +865,146 @@ export type CameraPhoto = Photo;
  * @since 1.0.0
  */
 export type CameraOptions = ImageOptions;
+
+/**
+ * Error codes returned by the Camera plugin.
+ * These values match the `code` field on rejected promises.
+ *
+ * @since 8.2.0
+ */
+export enum CameraErrorCode {
+  // Permissions
+  /**
+   * Camera access was denied by the user.
+   */
+  CameraPermissionDenied = 'OS-PLUG-CAMR-0003',
+
+  /**
+   * Photo library / gallery access was denied by the user.
+   */
+  GalleryPermissionDenied = 'OS-PLUG-CAMR-0005',
+
+  /**
+   * No camera hardware is available on the device.
+   */
+  NoCameraAvailable = 'OS-PLUG-CAMR-0007',
+
+  // Take Photo
+  /**
+   * The user cancelled the take photo action.
+   */
+  TakePhotoCancelled = 'OS-PLUG-CAMR-0006',
+
+  /**
+   * Failed to take photo.
+   */
+  TakePhotoFailed = 'OS-PLUG-CAMR-0010',
+
+  /**
+   * The take photo action received invalid arguments.
+   * @platform ios
+   */
+  TakePhotoInvalidArguments = 'OS-PLUG-CAMR-0014',
+
+  // Edit Photo
+  /**
+   * The selected file contains invalid image data.
+   * @platform ios
+   */
+  InvalidImageData = 'OS-PLUG-CAMR-0008',
+
+  /**
+   * Failed to edit image.
+   */
+  EditPhotoFailed = 'OS-PLUG-CAMR-0009',
+
+  /**
+   * The user cancelled the edit photo action.
+   */
+  EditPhotoCancelled = 'OS-PLUG-CAMR-0013',
+
+  /**
+   * The URI parameter for editing is empty.
+   * @platform android
+   */
+  EditPhotoEmptyUri = 'OS-PLUG-CAMR-0024',
+
+  // Choose from Gallery
+  /**
+   * Failed to retrieve an image from the gallery.
+   */
+  ImageNotFound = 'OS-PLUG-CAMR-0011',
+
+  /**
+   * Failed to process the selected image.
+   */
+  ProcessImageFailed = 'OS-PLUG-CAMR-0012',
+
+  /**
+   * Failed to choose media from the gallery.
+   */
+  ChooseMediaFailed = 'OS-PLUG-CAMR-0018',
+
+  /**
+   * The user cancelled choosing media from the gallery.
+   */
+  ChooseMediaCancelled = 'OS-PLUG-CAMR-0020',
+
+  /**
+   * Failed to retrieve the media file path.
+   * @platform android
+   */
+  MediaPathError = 'OS-PLUG-CAMR-0021',
+
+  /**
+   * Failed to retrieve an image from the provided URI.
+   */
+  FetchImageFromUriFailed = 'OS-PLUG-CAMR-0028',
+
+  // Record Video
+  /**
+   * Failed to record video.
+   */
+  RecordVideoFailed = 'OS-PLUG-CAMR-0016',
+
+  /**
+   * The user cancelled the video recording.
+   */
+  RecordVideoCancelled = 'OS-PLUG-CAMR-0017',
+
+  /**
+   * Failed to retrieve a video from the gallery.
+   * @platform ios
+   */
+  VideoNotFound = 'OS-PLUG-CAMR-0025',
+
+  // Play Video
+  /**
+   * Failed to play video.
+   */
+  PlayVideoFailed = 'OS-PLUG-CAMR-0023',
+
+  // General
+  /**
+   * Failed to encode the media result.
+   * @platform ios
+   */
+  EncodeResultFailed = 'OS-PLUG-CAMR-0019',
+
+  /**
+   * The selected file does not exist.
+   */
+  FileNotFound = 'OS-PLUG-CAMR-0027',
+
+  /**
+   * Invalid argument provided to a plugin method.
+   * @platform android
+   */
+  InvalidArgument = 'OS-PLUG-CAMR-0031',
+
+  /**
+   * A general plugin error occurred.
+   * @platform ios
+   */
+  GeneralError = 'OS-PLUG-CAMR-0026',
+}
