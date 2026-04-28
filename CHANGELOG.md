@@ -1,3 +1,17 @@
+# [8.2.0](https://github.com/ionic-team/capacitor-camera/compare/v8.1.0...v8.2.0) (2026-04-28)
+
+
+### Bug Fixes
+
+* bump ioncamera-android to 1.0.1 to resolve duplicate webPath on Android gallery multi-select ([#49](https://github.com/ionic-team/capacitor-camera/issues/49)) ([1bb0cd4](https://github.com/ionic-team/capacitor-camera/commit/1bb0cd4aef4ef5f792a5f423a856e753e037db58))
+* bump IONCameraLib to 1.0.3 to resolve iOS 15 SwiftUI core crash ([#46](https://github.com/ionic-team/capacitor-camera/issues/46)) ([8fb9688](https://github.com/ionic-team/capacitor-camera/commit/8fb96880cc7c99b08c8a0c3bfe832a5c599d0980))
+* bump IONCameraLib to 1.0.4 to apply presentationStyle in chooseFromGallery ([#50](https://github.com/ionic-team/capacitor-camera/issues/50)) ([8c50403](https://github.com/ionic-team/capacitor-camera/commit/8c50403bd9b64a94362a0eaca2065df6e6fa1e22))
+
+
+### Features
+
+* add CameraErrorCode enum for type-safe error handling ([#45](https://github.com/ionic-team/capacitor-camera/issues/45)) ([11abcbe](https://github.com/ionic-team/capacitor-camera/commit/11abcbe0edf44053b8e4046db6d8d9cfc21100ff))
+
 ## [8.1.0](https://github.com/ionic-team/capacitor-camera/compare/v8.0.2...v8.1.0) (2026-04-13)
 
 This minor plugin version introduces significant API changes and deprecations. While backward compatibility is maintained, migration is strongly recommended. Please read the release notes in full, and refer to https://capacitorjs.com/docs/apis/camera for full documentation, including migration guides.
