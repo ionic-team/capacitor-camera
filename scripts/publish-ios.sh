@@ -33,8 +33,7 @@ publish_plugin_ios () {
     mkdir -p ./tmp
     # publish to Trunk
     printf %"s\n" "Attempting to build and publish plugin $PLUGIN_NAME for version $PLUGIN_VERSION to production..."
-    pod trunk push $PODSPEC_FILE_PATH --allow-warnings > $LOG_OUTPUT 2>&1
-    if grep -q "passed" $LOG_OUTPUT; then
+    if pod trunk push $PODSPEC_FILE_PATH --allow-warnings > $LOG_OUTPUT 2>&1; then
         printf %"s\n\n" "Success: $PLUGIN_NAME published to CocoaPods Trunk."
     else
         printf %"s\n\n" "Error publishing $PLUGIN_NAME, check $LOG_OUTPUT for more info!"
