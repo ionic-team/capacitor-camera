@@ -75,7 +75,7 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     
-    implementation 'io.ionic.libs:ioncamera-android:1.0.0'
+    implementation 'io.ionic.libs:ioncamera-android:1.0.1'
 
     if (System.getenv("CAP_PLUGIN_PUBLISH") == "true") {
         implementation "com.capacitorjs:core:$capacitorVersion"
