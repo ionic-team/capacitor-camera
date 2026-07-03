@@ -270,6 +270,7 @@ public class LegacyCameraFlow {
                     // TODO: Verify provider config exists
                     imageFileUri = FileProvider.getUriForFile(activity, appId + ".fileprovider", photoFile);
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
+                    takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 } catch (Exception ex) {
                     call.reject(IMAGE_FILE_SAVE_ERROR, ex);
                     return;
