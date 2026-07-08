@@ -1,3 +1,10 @@
+## [8.2.1](https://github.com/ionic-team/capacitor-camera/compare/v8.2.0...v8.2.1) (2026-07-08)
+
+
+### Bug Fixes
+
+* **android:** explicitly grant URI permissions for legacy camera capture ([#60](https://github.com/ionic-team/capacitor-camera/issues/60)) ([df4b6d7](https://github.com/ionic-team/capacitor-camera/commit/df4b6d708a8996be6c921c3b6c732ff198ce9260))
+
 # [8.2.0](https://github.com/ionic-team/capacitor-camera/compare/v8.1.0...v8.2.0) (2026-04-28)
 
 
