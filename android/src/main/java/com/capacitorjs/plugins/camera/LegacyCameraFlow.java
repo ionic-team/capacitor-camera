@@ -544,7 +544,7 @@ public class LegacyCameraFlow {
     private File getTempFile(Uri uri) {
         String filename = Uri.parse(Uri.decode(uri.toString())).getLastPathSegment();
         if (!filename.contains(".jpg") && !filename.contains(".jpeg")) {
-            filename += "." + (new java.util.Date()).getTime() + ".jpeg";
+            filename += "." + new java.util.Date().getTime() + ".jpeg";
         }
         File cacheDir = context.getCacheDir();
         return new File(cacheDir, filename);
