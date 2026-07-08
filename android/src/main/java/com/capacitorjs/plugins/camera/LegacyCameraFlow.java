@@ -270,6 +270,7 @@ public class LegacyCameraFlow {
                     // TODO: Verify provider config exists
                     imageFileUri = FileProvider.getUriForFile(activity, appId + ".fileprovider", photoFile);
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
+                    takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 } catch (Exception ex) {
                     call.reject(IMAGE_FILE_SAVE_ERROR, ex);
                     return;
@@ -543,7 +544,7 @@ public class LegacyCameraFlow {
     private File getTempFile(Uri uri) {
         String filename = Uri.parse(Uri.decode(uri.toString())).getLastPathSegment();
         if (!filename.contains(".jpg") && !filename.contains(".jpeg")) {
-            filename += "." + (new java.util.Date()).getTime() + ".jpeg";
+            filename += "." + new java.util.Date().getTime() + ".jpeg";
         }
         File cacheDir = context.getCacheDir();
         return new File(cacheDir, filename);
