@@ -3,14 +3,14 @@ import PackageDescription
 
 let package = Package(
     name: "CapacitorCamera",
-    platforms: [.iOS(.v15)],
+    platforms: [.iOS(.v16)],
     products: [
         .library(
             name: "CapacitorCamera",
             targets: ["CameraPlugin"])
     ],
     dependencies: [
-        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "8.0.0"),
+        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "9.0.0-alpha.5"),
         .package(url: "https://github.com/ionic-team/ion-ios-camera.git", from: "1.0.4")
     ],
     targets: [
@@ -18,7 +18,6 @@ let package = Package(
             name: "CameraPlugin",
             dependencies: [
                 .product(name: "Capacitor", package: "capacitor-swift-pm"),
-                .product(name: "Cordova", package: "capacitor-swift-pm"),
                 .product(name: "IONCameraLib", package: "ion-ios-camera")
             ],
             path: "ios/Sources/CameraPlugin"),
