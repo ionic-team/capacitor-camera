@@ -16,7 +16,7 @@
     "@capacitor/camera": "file:../",
     "@capacitor/core": "next",
     "@capacitor/filesystem": "next",
-    "@capacitor/file-viewer": "^2.0.1",
+    "@capacitor/file-viewer": "next",
     "@capacitor/ios": "next",
     "@ionic/pwa-elements": "^3.4.0",
     "@ionic/react": "^8.8.1",
