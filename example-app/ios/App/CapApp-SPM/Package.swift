@@ -12,6 +12,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "9.0.0-alpha.6"),
+        .package(name: "CapacitorApp", path: "../../../node_modules/@capacitor/app"),
         .package(name: "CapacitorCamera", path: "../../../.."),
         .package(name: "CapacitorFilesystem", path: "../../../node_modules/@capacitor/filesystem"),
         .package(name: "CapacitorFileViewer", path: "../../../node_modules/@capacitor/file-viewer")
@@ -21,6 +22,7 @@ let package = Package(
             name: "CapApp-SPM",
             dependencies: [
                 .product(name: "Capacitor", package: "capacitor-swift-pm"),
+                .product(name: "CapacitorApp", package: "CapacitorApp"),
                 .product(name: "CapacitorCamera", package: "CapacitorCamera"),
                 .product(name: "CapacitorFilesystem", package: "CapacitorFilesystem"),
                 .product(name: "CapacitorFileViewer", package: "CapacitorFileViewer")
