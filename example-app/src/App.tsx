@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import {
   IonApp,
@@ -6,6 +7,7 @@ import {
   setupIonicReact,
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
+import { App as CapacitorApp } from '@capacitor/app';
 import Menu from './components/Menu';
 import { routes } from './routes';
 
@@ -46,8 +48,23 @@ import './theme/variables.css';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
+const App: React.FC = () => {
+  useEffect(() => {
+    const listener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+      if (canGoBack) {
+        window.history.back();
+      } else {
+        CapacitorApp.exitApp();
+      }
+    });
+
+    return () => {
+      listener.then((handle) => handle.remove());
+    };
+  }, []);
+
+  return (
+    <IonApp>
     <IonReactRouter>
       <IonSplitPane contentId="main">
         <Menu />
@@ -64,6 +81,7 @@ const App: React.FC = () => (
       </IonSplitPane>
     </IonReactRouter>
   </IonApp>
-);
+  );
+};
 
 export default App;

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@capacitor/android": "next",
+    "@capacitor/app": "next",
     "@capacitor/camera": "file:../",
     "@capacitor/core": "next",
     "@capacitor/filesystem": "next",

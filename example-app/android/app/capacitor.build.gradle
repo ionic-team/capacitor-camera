@@ -8,6 +8,7 @@ android {
 }
 
 dependencies {
+    implementation project(':capacitor-app')
     implementation project(':capacitor-camera')
     implementation project(':capacitor-filesystem')
     implementation project(':capacitor-file-viewer')
