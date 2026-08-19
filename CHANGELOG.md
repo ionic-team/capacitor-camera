@@ -1,3 +1,10 @@
+## [8.2.3](https://github.com/ionic-team/capacitor-camera/compare/v8.2.2...v8.2.3) (2026-08-19)
+
+
+### Bug Fixes
+
+* **android:** only apply kotlin-android plugin if not already applied ([#71](https://github.com/ionic-team/capacitor-camera/issues/71)) ([32f3094](https://github.com/ionic-team/capacitor-camera/commit/32f3094c88a59bcf3469ec1ffec75a39dcfffb4f))
+
 ## [8.2.2](https://github.com/ionic-team/capacitor-camera/compare/v8.2.1...v8.2.2) (2026-07-31)
 
 
