@@ -1,3 +1,11 @@
+## [8.2.4](https://github.com/ionic-team/capacitor-camera/compare/v8.2.3...v8.2.4) (2026-09-01)
+
+
+### Bug Fixes
+
+* **ios:** align ion-ios-camera version range across SwiftPM and CocoaPods ([#79](https://github.com/ionic-team/capacitor-camera/issues/79)) ([89e7b58](https://github.com/ionic-team/capacitor-camera/commit/89e7b58d42883eba342ee9bf1d74ff862e37bfef)), closes [#46](https://github.com/ionic-team/capacitor-camera/issues/46) [#50](https://github.com/ionic-team/capacitor-camera/issues/50) [#66](https://github.com/ionic-team/capacitor-camera/issues/66) [#77](https://github.com/ionic-team/capacitor-camera/issues/77)
+* **ios:** bump ion-ios-camera to 2.0.0 ([#77](https://github.com/ionic-team/capacitor-camera/issues/77)) ([9e227e8](https://github.com/ionic-team/capacitor-camera/commit/9e227e8e7a8fb19333d1f4d538e215eda29f15a2))
+
 ## [8.2.3](https://github.com/ionic-team/capacitor-camera/compare/v8.2.2...v8.2.3) (2026-08-19)
 
 
