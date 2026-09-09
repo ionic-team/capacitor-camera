@@ -2,13 +2,9 @@ package com.capacitorjs.plugins.camera
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.result.ActivityResult
-import com.getcapacitor.Logger
 import com.getcapacitor.PermissionState
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
@@ -18,6 +14,7 @@ import com.getcapacitor.annotation.CapacitorPlugin
 import com.getcapacitor.annotation.Permission
 import com.getcapacitor.annotation.PermissionCallback
 import org.json.JSONException
+
 /**
  * The Camera plugin makes it easy to take a photo or have the user select a photo
  * from their albums.
@@ -74,11 +71,10 @@ class CameraPlugin : Plugin() {
             activity,
             bridge,
             appId,
-            permissionHelper,
-            LegacyCameraFlow.ActivityStarter { call, intent, callbackName ->
-                startActivityForResult(call, intent, callbackName)
-            }
-        )
+            permissionHelper
+        ) { call, intent, callbackName ->
+            startActivityForResult(call, intent, callbackName)
+        }
 
         ionFlow = IonCameraFlow(
             context,
@@ -205,7 +201,7 @@ class CameraPlugin : Plugin() {
             if (providedPerms != null) {
                 try {
                     permsList = providedPerms.toList<String?>()
-                } catch (e: JSONException) {
+                } catch (_: JSONException) {
                 }
             }
 
@@ -228,43 +224,22 @@ class CameraPlugin : Plugin() {
 
         // If Camera is not in the manifest and therefore not required, say the permission is granted
         if (!isPermissionDeclared(CAMERA)) {
-            permissionStates.put(CAMERA, PermissionState.GRANTED)
+            permissionStates[CAMERA] = PermissionState.GRANTED
         }
 
         if (permissionStates.containsKey(PHOTOS)) {
-            permissionStates.put(PHOTOS, PermissionState.GRANTED)
+            permissionStates[PHOTOS] = PermissionState.GRANTED
         }
 
         // If the SDK version is 30 or higher, update the SAVE_GALLERY state to match the READ_EXTERNAL_STORAGE state.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val alias: String = READ_EXTERNAL_STORAGE
             if (permissionStates.containsKey(alias)) {
-                permissionStates.put(SAVE_GALLERY, permissionStates.get(alias))
+                permissionStates[SAVE_GALLERY] = permissionStates[alias]
             }
         }
 
         return permissionStates
-    }
-
-    private fun getResultType(resultType: String?): CameraResultType? {
-        if (resultType == null) {
-            return null
-        }
-        try {
-            return CameraResultType.valueOf(resultType.uppercase())
-        } catch (ex: java.lang.IllegalArgumentException) {
-            Logger.debug(
-                getLogTag(),
-                "Invalid result type \"" + resultType + "\", defaulting to base64"
-            )
-            return CameraResultType.BASE64
-        }
-    }
-
-    @Suppress("deprecation")
-    private fun legacyQueryIntentActivities(intent: Intent): MutableList<ResolveInfo> {
-        return getContext().getPackageManager()
-            .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
     }
 
     protected override fun saveInstanceState(): Bundle? {
