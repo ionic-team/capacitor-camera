@@ -23,8 +23,8 @@ interface IRecordVideoPageState {
   thumbnail: string | null;
 }
 
-class RecordVideoPage extends React.Component<{}, IRecordVideoPageState> {
-  constructor(props: {}) {
+class RecordVideoPage extends React.Component<object, IRecordVideoPageState> {
+  constructor(props: object) {
     super(props);
     this.state = {
       filePath: null,

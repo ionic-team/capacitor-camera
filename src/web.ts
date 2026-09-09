@@ -455,7 +455,7 @@ export class CameraWeb extends WebPlugin implements CameraPlugin {
         });
 
         cameraModal.present();
-      } catch (e) {
+      } catch {
         fallbackCallback();
       }
     } else {
