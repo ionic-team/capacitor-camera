@@ -28,8 +28,8 @@ interface ITakePicturePageState {
   editedPhoto: MediaResult | null;
 }
 
-class TakePicturePage extends React.Component<{}, ITakePicturePageState> {
-  constructor(props: {}) {
+class TakePicturePage extends React.Component<object, ITakePicturePageState> {
+  constructor(props: object) {
     super(props);
     this.state = {
       filePath: null,
