@@ -8,7 +8,7 @@ enum class IonEditableMode(val value: String) {
     companion object {
         fun fromString(value: String?): IonEditableMode {
             if (value == null) return NO
-            return values().find {
+            return entries.find {
                 it.value.equals(value, ignoreCase = true)
             } ?: NO
         }

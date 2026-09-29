@@ -17,7 +17,7 @@ object IonCameraUtils {
             inputStream.use {
                 saveImage(context, uri, it)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }
@@ -38,7 +38,7 @@ object IonCameraUtils {
                 inputStream.copyTo(output)
             }
             Uri.fromFile(tempFile)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }
