@@ -15,8 +15,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import com.capacitorjs.plugins.camera.IonCameraSettings.Companion.DEFAULT_CORRECT_ORIENTATION
-import com.capacitorjs.plugins.camera.IonCameraSettings.Companion.DEFAULT_QUALITY
 import com.getcapacitor.Bridge
 import com.getcapacitor.FileUtils
 import com.getcapacitor.JSArray
@@ -202,10 +200,10 @@ class IonCameraFlow(
             limit = call.getInt("limit") ?: 0,
             includeMetadata = call.getBoolean("includeMetadata") ?: false,
             editable = IonEditableMode.fromString(call.getString("editable")),
-            quality = call.getInt("quality") ?: DEFAULT_QUALITY,
+            quality = call.getInt("quality") ?: IonCameraSettings.DEFAULT_QUALITY,
             width = call.getInt("targetWidth") ?: 0,
             height = call.getInt("targetHeight") ?: 0,
-            correctOrientation = call.getBoolean("correctOrientation") ?:  DEFAULT_CORRECT_ORIENTATION
+            correctOrientation = call.getBoolean("correctOrientation") ?: IonCameraSettings.DEFAULT_CORRECT_ORIENTATION
         )
     }
 
@@ -223,14 +221,14 @@ class IonCameraFlow(
 
     fun getCameraSettings(call: PluginCall): IonCameraSettings {
         val settings = IonCameraSettings()
-        settings.quality = call.getInt("quality") ?: DEFAULT_QUALITY
+        settings.quality = call.getInt("quality") ?: IonCameraSettings.DEFAULT_QUALITY
 
         val width = call.getInt("targetWidth") ?: 0
         val height = call.getInt("targetHeight") ?: 0
 
         settings.targetWidth = if (width < 1) -1 else width
         settings.targetHeight = if (height < 1) -1 else height
-        settings.correctOrientation = call.getBoolean("correctOrientation") ?: DEFAULT_CORRECT_ORIENTATION
+        settings.correctOrientation = call.getBoolean("correctOrientation") ?: IonCameraSettings.DEFAULT_CORRECT_ORIENTATION
         settings.encodingType = call.getInt("encodingType") ?: IonCameraSettings.DEFAULT_ENCODING_TYPE
         settings.saveToGallery = call.getBoolean("saveToGallery") ?: IonCameraSettings.DEFAULT_SAVE_IMAGE_TO_GALLERY
         settings.editable = IonEditableMode.fromString(call.getString("editable"))
