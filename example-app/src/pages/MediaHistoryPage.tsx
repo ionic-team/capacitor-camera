@@ -25,14 +25,14 @@ import { Capacitor } from "@capacitor/core";
 const MediaHistoryPage: React.FC = () => {
   const [history, setHistory] = useState<MediaHistoryItem[]>([]);
 
-  useIonViewWillEnter(() => {
-    loadHistory();
-  });
-
   const loadHistory = (): void => {
     const history = MediaHistoryService.getAllMedia();
     setHistory(history);
   };
+
+  useIonViewWillEnter(() => {
+    loadHistory();
+  });
 
   const openFile = async (item: MediaHistoryItem): Promise<void> => {
     try {

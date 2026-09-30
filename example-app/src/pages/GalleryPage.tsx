@@ -41,8 +41,8 @@ interface IGalleryPageState {
   editedPhoto: MediaResult | null;
 }
 
-class GalleryPage extends React.Component<{}, IGalleryPageState> {
-  constructor(props: {}) {
+class GalleryPage extends React.Component<object, IGalleryPageState> {
+  constructor(props: object) {
     super(props);
     this.state = {
       singlePhoto: null,
