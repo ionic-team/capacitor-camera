@@ -1,3 +1,10 @@
+## [8.2.6-next.1](https://github.com/ionic-team/capacitor-camera/compare/v8.2.5...v8.2.6-next.1) (2026-10-02)
+
+
+### Bug Fixes
+
+* **ios:** bump ion-ios-camera to 1.0.5 for iOS 27 UIScene compliance ([#67](https://github.com/ionic-team/capacitor-camera/issues/67)) ([b110010](https://github.com/ionic-team/capacitor-camera/commit/b1100107688dee5fcf217e23cd8e457c63e2c38c))
+
 ## [8.2.5](https://github.com/ionic-team/capacitor-camera/compare/v8.2.4...v8.2.5) (2026-10-02)
 
 
