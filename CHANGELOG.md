@@ -1,3 +1,10 @@
+## [8.2.5](https://github.com/ionic-team/capacitor-camera/compare/v8.2.4...v8.2.5) (2026-10-02)
+
+
+### Bug Fixes
+
+* **android:** fix build warnings ([#81](https://github.com/ionic-team/capacitor-camera/issues/81)) ([ae77487](https://github.com/ionic-team/capacitor-camera/commit/ae7748738229eab5f777c871c920b7bead9004ba))
+
 ## [8.2.4](https://github.com/ionic-team/capacitor-camera/compare/v8.2.3...v8.2.4) (2026-09-01)
 
 
