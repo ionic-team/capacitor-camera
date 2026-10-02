@@ -15,8 +15,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import com.capacitorjs.plugins.camera.IonCameraSettings.Companion.DEFAULT_CORRECT_ORIENTATION
-import com.capacitorjs.plugins.camera.IonCameraSettings.Companion.DEFAULT_QUALITY
 import com.getcapacitor.Bridge
 import com.getcapacitor.FileUtils
 import com.getcapacitor.JSArray
@@ -202,10 +200,10 @@ class IonCameraFlow(
             limit = call.getInt("limit") ?: 0,
             includeMetadata = call.getBoolean("includeMetadata") ?: false,
             editable = IonEditableMode.fromString(call.getString("editable")),
-            quality = call.getInt("quality") ?: DEFAULT_QUALITY,
+            quality = call.getInt("quality") ?: IonCameraSettings.DEFAULT_QUALITY,
             width = call.getInt("targetWidth") ?: 0,
             height = call.getInt("targetHeight") ?: 0,
-            correctOrientation = call.getBoolean("correctOrientation") ?:  DEFAULT_CORRECT_ORIENTATION
+            correctOrientation = call.getBoolean("correctOrientation") ?: IonCameraSettings.DEFAULT_CORRECT_ORIENTATION
         )
     }
 
@@ -241,7 +239,7 @@ class IonCameraFlow(
 
 
     private fun showCamera(call: PluginCall) {
-        if (!context.getPackageManager()
+        if (!context.packageManager
                 .hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
         ) {
             sendError(IONCAMRError.NO_CAMERA_AVAILABLE_ERROR)
@@ -264,7 +262,7 @@ class IonCameraFlow(
                 }
                 currentCall = call
                 manager.takePhoto(activity, settings.encodingType, cameraLauncher)
-            } catch (ex: Exception) {
+            } catch (_: Exception) {
                 sendError(IONCAMRError.TAKE_PHOTO_ERROR)
             }
         }
@@ -290,7 +288,7 @@ class IonCameraFlow(
                 ) {
                     sendError(it)
                 }
-            } catch (ex: Exception) {
+            } catch (_: Exception) {
                 sendError(IONCAMRError.CAPTURE_VIDEO_ERROR)
             }
         }
@@ -647,15 +645,14 @@ class IonCameraFlow(
             editIntent.addFlags(flags)
             editIntent.putExtra(MediaStore.EXTRA_OUTPUT, editUri)
 
-            val resInfoList: MutableList<ResolveInfo>?
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                resInfoList = context
-                    .packageManager
-                    .queryIntentActivities(editIntent, PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong()))
-            } else {
-                resInfoList = legacyQueryIntentActivities(editIntent)
-            }
+            val resInfoList: MutableList<ResolveInfo> =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    context
+                        .packageManager
+                        .queryIntentActivities(editIntent, PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong()))
+                } else {
+                    legacyQueryIntentActivities(editIntent)
+                }
 
             for (resolveInfo in resInfoList) {
                 val packageName = resolveInfo.activityInfo.packageName
@@ -663,12 +660,11 @@ class IonCameraFlow(
             }
 
             editIntent
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }
 
-    @Suppress("deprecation")
     private fun legacyQueryIntentActivities(intent: Intent): MutableList<ResolveInfo> {
         return context.packageManager
             .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
@@ -861,10 +857,6 @@ class IonCameraFlow(
                     .getString(STORE, "")
             fromPreferences.let { uri = Uri.parse(fromPreferences) }
         }
-        if (activity == null) {
-            sendError(IONCAMRError.CAPTURE_VIDEO_ERROR)
-            return
-        }
         val settings = videoParameters ?: run {
             sendError(IONCAMRError.INVALID_ARGUMENT_ERROR)
             return
@@ -1044,7 +1036,7 @@ class IonCameraFlow(
             jsonResult.put("message", error.description)
             currentCall?.reject(error.description, formatErrorCode(error.code))
             currentCall = null
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             currentCall?.reject("There was an error performing the operation.")
             currentCall = null
         } finally {
@@ -1053,7 +1045,7 @@ class IonCameraFlow(
     }
 
     private fun formatErrorCode(code: Int): String {
-        val stringCode = Integer.toString(code)
+        val stringCode = code.toString()
         return ERROR_FORMAT_PREFIX + "0000$stringCode".substring(stringCode.length)
     }
 
