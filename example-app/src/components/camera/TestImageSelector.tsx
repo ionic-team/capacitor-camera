@@ -51,7 +51,7 @@ const TestImageSelector: React.FC<TestImageSelectorProps> = ({ onImageSelected }
           style={{ width: "100%", height: "auto" }}
           onSlideChange={handleSlideChange}
         >
-          {TEST_IMAGES.map((image, index) => (
+          {TEST_IMAGES.map((image) => (
             <SwiperSlide key={image.id}>
               <div
                 style={{

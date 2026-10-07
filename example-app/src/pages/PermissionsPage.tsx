@@ -26,8 +26,8 @@ interface IPermissionsPageState {
   photosPermission: CameraPermissionState | null;
 }
 
-class PermissionsPage extends React.Component<{}, IPermissionsPageState> {
-  constructor(props: {}) {
+class PermissionsPage extends React.Component<object, IPermissionsPageState> {
+  constructor(props: object) {
     super(props);
     this.state = {
       cameraPermission: null,
