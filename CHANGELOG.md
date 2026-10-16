@@ -1,3 +1,10 @@
+## [8.2.6](https://github.com/ionic-team/capacitor-camera/compare/v8.2.5...v8.2.6) (2026-10-16)
+
+
+### Bug Fixes
+
+* **android:** use bridge.registerForActivityResult for Fragment compatibility ([#84](https://github.com/ionic-team/capacitor-camera/issues/84)) ([41ece15](https://github.com/ionic-team/capacitor-camera/commit/41ece151d2fd80c5957c76338010b55e3181ae1a))
+
 ## [8.2.5](https://github.com/ionic-team/capacitor-camera/compare/v8.2.4...v8.2.5) (2026-10-02)
 
 
