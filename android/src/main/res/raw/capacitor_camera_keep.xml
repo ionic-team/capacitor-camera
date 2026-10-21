@@ -1,0 +1,1 @@
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@layout/activity_image_editor,@layout/image_editor_view" />
