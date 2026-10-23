@@ -1,3 +1,10 @@
+## [8.2.6-next.2](https://github.com/ionic-team/capacitor-camera/compare/v8.2.6-next.1...v8.2.6-next.2) (2026-10-23)
+
+
+### Bug Fixes
+
+* **android:** keep image editor layouts when shrinking resources ([a10cdae](https://github.com/ionic-team/capacitor-camera/commit/a10cdae894910300a22e48a43135fa7610353ca8))
+
 ## [8.2.6-next.1](https://github.com/ionic-team/capacitor-camera/compare/v8.2.5...v8.2.6-next.1) (2026-10-02)
 
 
