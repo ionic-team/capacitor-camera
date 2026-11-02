@@ -68,6 +68,15 @@ kotlin {
     jvmToolchain(21)
 }
 
+// RMET-5348 TEST ONLY - do not merge: resolve the locally built native library bundled in this plugin (android/local-maven).
+// Registered on every project because the app project resolves the plugin's dependencies with its own repositories.
+def rmet5348LocalMaven = uri("$projectDir/local-maven")
+rootProject.allprojects {
+    repositories {
+        maven { url rmet5348LocalMaven }
+    }
+}
+
 repositories {
     google()
     mavenCentral()
@@ -77,7 +86,7 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     
-    implementation 'io.ionic.libs:ioncamera-android:1.0.2'
+    implementation 'io.ionic.libs:ioncamera-android:99.0.0-rmet5348'
 
     if (System.getenv("CAP_PLUGIN_PUBLISH") == "true") {
         implementation "com.capacitorjs:core:$capacitorVersion"

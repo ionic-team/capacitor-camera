@@ -1,0 +1,173 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "io.ionic.libs",
+    "module": "ioncamera-android",
+    "version": "99.0.0-rmet5348",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.14.3"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseVariantReleaseApiPublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.25"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ioncamera-android-99.0.0-rmet5348.aar",
+          "url": "ioncamera-android-99.0.0-rmet5348.aar",
+          "size": 300913,
+          "sha512": "f6c4bc4d7609a2fad7294b5f6b6ba66327bc10dec574be4b33748e46494dabd8e6dc1c42c4d068f71fbf8c76584b6feb3218b2d513d0afeccc876bfa9a811182",
+          "sha256": "8905b559698f276e0de44c7ae3ca5eaaabe57bcdfad066ca97feb9eab767a91d",
+          "sha1": "de637821f0cc7a82e5767dd6b29a27158e1f124e",
+          "md5": "27e46c2ea60c4cde17e68be202e46c55"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseRuntimePublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.16.0"
+          }
+        },
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.7.1"
+          }
+        },
+        {
+          "group": "androidx.activity",
+          "module": "activity-ktx",
+          "version": {
+            "requires": "1.10.1"
+          }
+        },
+        {
+          "group": "com.google.android.material",
+          "module": "material",
+          "version": {
+            "requires": "1.13.0"
+          }
+        },
+        {
+          "group": "androidx.constraintlayout",
+          "module": "constraintlayout",
+          "version": {
+            "requires": "2.2.1"
+          }
+        },
+        {
+          "group": "junit",
+          "module": "junit",
+          "version": {
+            "requires": "4.13.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core-jvm",
+          "version": {
+            "requires": "1.9.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-android",
+          "version": {
+            "requires": "1.9.0"
+          }
+        },
+        {
+          "group": "com.google.code.gson",
+          "module": "gson",
+          "version": {
+            "requires": "2.13.2"
+          }
+        },
+        {
+          "group": "androidx.camera",
+          "module": "camera-core",
+          "version": {
+            "requires": "1.4.2"
+          }
+        },
+        {
+          "group": "androidx.exifinterface",
+          "module": "exifinterface",
+          "version": {
+            "requires": "1.4.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.25"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ioncamera-android-99.0.0-rmet5348.aar",
+          "url": "ioncamera-android-99.0.0-rmet5348.aar",
+          "size": 300913,
+          "sha512": "f6c4bc4d7609a2fad7294b5f6b6ba66327bc10dec574be4b33748e46494dabd8e6dc1c42c4d068f71fbf8c76584b6feb3218b2d513d0afeccc876bfa9a811182",
+          "sha256": "8905b559698f276e0de44c7ae3ca5eaaabe57bcdfad066ca97feb9eab767a91d",
+          "sha1": "de637821f0cc7a82e5767dd6b29a27158e1f124e",
+          "md5": "27e46c2ea60c4cde17e68be202e46c55"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseSourcePublication",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "ioncamera-android-99.0.0-rmet5348-sources.jar",
+          "url": "ioncamera-android-99.0.0-rmet5348-sources.jar",
+          "size": 49440,
+          "sha512": "f4c0e31f4b8eb4d880f28b886d258053bd92b93f25a33cc0e5e87e8d95ac5d29ddc592162ec6acd9dc6612e6630c31a8b1ec0a1603fda9ce3cc0b81f036e5e75",
+          "sha256": "23db977c141fc00a8ee4643837b23c293db3ed3427eee96ecb6f0fb56399cd6f",
+          "sha1": "967bf748f4fc9c143ea43687f1c61d687a7fb6f1",
+          "md5": "bb74aab189518637ae7462f134f063e9"
+        }
+      ]
+    }
+  ]
+}
