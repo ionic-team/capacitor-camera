@@ -1,3 +1,10 @@
+## [8.2.6-next.3](https://github.com/ionic-team/capacitor-camera/compare/v8.2.6-next.2...v8.2.6-next.3) (2026-11-06)
+
+
+### Bug Fixes
+
+* native android publishing compatibility with Gradle 9 / AGP 9 ([#90](https://github.com/ionic-team/capacitor-camera/issues/90)) ([f2c068c](https://github.com/ionic-team/capacitor-camera/commit/f2c068cda1733b64940503f426cd79552c45a050))
+
 ## [8.2.6-next.2](https://github.com/ionic-team/capacitor-camera/compare/v8.2.6-next.1...v8.2.6-next.2) (2026-10-23)
 
 
