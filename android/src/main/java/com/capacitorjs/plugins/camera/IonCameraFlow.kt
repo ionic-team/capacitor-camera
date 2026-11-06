@@ -143,6 +143,30 @@ class IonCameraFlow(
         callEditURIPhoto(call)
     }
 
+    private fun decodeSampledBitmap(path: String, maxSize: Int = 2048): android.graphics.Bitmap? {
+        val options = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+        }
+
+        BitmapFactory.decodeFile(path, options)
+
+        var sampleSize = 1
+        while (
+            options.outWidth / sampleSize > maxSize ||
+            options.outHeight / sampleSize > maxSize
+        ) {
+            sampleSize *= 2
+        }
+
+        return BitmapFactory.decodeFile(
+            path,
+            BitmapFactory.Options().apply {
+                inSampleSize = sampleSize
+            }
+        )
+    }
+
+
     // ----------------------------------------------------
     // Launchers
     // ----------------------------------------------------
@@ -719,7 +743,7 @@ class IonCameraFlow(
     private fun handleMediaResult(mediaResult: IONCAMRMediaResult) {
         val file = File(mediaResult.uri)
         val uri = Uri.fromFile(file)
-        val bitmap = BitmapFactory.decodeFile(mediaResult.uri)
+        val bitmap = decodeSampledBitmap(mediaResult.uri)
         if (bitmap == null) {
             sendError(IONCAMRError.PROCESS_IMAGE_ERROR)
             return
@@ -799,7 +823,7 @@ class IonCameraFlow(
                 metadata.put("creationDate", it.creationDate)
 
                 if (mediaResult.type == IONCAMRMediaType.PICTURE.type) {
-                    val bitmap = BitmapFactory.decodeFile(mediaResult.uri)
+                    val bitmap = decodeSampledBitmap(mediaResult.uri)
                     if (bitmap == null) {
                         sendError(IONCAMRError.PROCESS_IMAGE_ERROR)
                         return
