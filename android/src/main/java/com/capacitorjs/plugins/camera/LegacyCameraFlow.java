@@ -371,6 +371,64 @@ public class LegacyCameraFlow {
         }
     }
 
+    
+private static final int MAX_BITMAP_SIZE = 2048;
+
+private int calculateInSampleSize(
+    BitmapFactory.Options options,
+    int maxSize
+) {
+    int width = options.outWidth;
+    int height = options.outHeight;
+    int inSampleSize = 1;
+
+    while (width / inSampleSize > maxSize ||
+           height / inSampleSize > maxSize) {
+        inSampleSize *= 2;
+    }
+
+    return inSampleSize;
+}
+
+private Bitmap decodeSampledBitmapFromFile(String path) {
+    BitmapFactory.Options options = new BitmapFactory.Options();
+    options.inJustDecodeBounds = true;
+
+    BitmapFactory.decodeFile(path, options);
+
+    options.inSampleSize =
+        calculateInSampleSize(options, MAX_BITMAP_SIZE);
+    options.inJustDecodeBounds = false;
+
+    return BitmapFactory.decodeFile(path, options);
+}
+
+    private Bitmap decodeSampledBitmapFromUri(Uri uri)
+        throws FileNotFoundException {
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+
+        try (InputStream stream =
+                context.getContentResolver().openInputStream(uri)) {
+            BitmapFactory.decodeStream(stream, null, options);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to read image", e);
+        }
+
+        options.inSampleSize =
+            calculateInSampleSize(options, MAX_BITMAP_SIZE);
+        options.inJustDecodeBounds = false;
+
+        try (InputStream stream =
+                context.getContentResolver().openInputStream(uri)) {
+            return BitmapFactory.decodeStream(stream, null, options);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to read image", e);
+        }
+    }
+
+
     public void processCameraImage(PluginCall call, ActivityResult result) {
         settings = getSettings(call);
         if (imageFileSavePath == null) {
@@ -379,9 +437,8 @@ public class LegacyCameraFlow {
         }
         // Load the image as a Bitmap
         File f = new File(imageFileSavePath);
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         Uri contentUri = Uri.fromFile(f);
-        Bitmap bitmap = BitmapFactory.decodeFile(imageFileSavePath, bmOptions);
+        Bitmap bitmap = decodeSampledBitmapFromFile(imageFileSavePath);
 
         if (bitmap == null) {
             call.reject(USER_CANCELLED);
@@ -415,9 +472,7 @@ public class LegacyCameraFlow {
         InputStream imageStream = null;
 
         try {
-            imageStream = context.getContentResolver().openInputStream(imageUri);
-            Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
-
+            Bitmap bitmap = decodeSampledBitmapFromUri(imageUri);
             if (bitmap == null) {
                 call.reject("Unable to process bitmap");
                 return;
@@ -443,9 +498,8 @@ public class LegacyCameraFlow {
         InputStream imageStream = null;
         JSObject ret = new JSObject();
         try {
-            imageStream = context.getContentResolver().openInputStream(imageUri);
-            Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
 
+            Bitmap bitmap = decodeSampledBitmapFromUri(imageUri);
             if (bitmap == null) {
                 ret.put("error", "Unable to process bitmap");
                 return ret;
