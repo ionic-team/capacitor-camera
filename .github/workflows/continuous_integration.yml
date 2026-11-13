@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: ionic-team/capacitor-actions/lint-plugin@v1.0.0
         with:
-          working-directory: ./packages/capacitor-plugin
+          working-directory: .
           gh-token: ${{ github.token }}
 
   build:
