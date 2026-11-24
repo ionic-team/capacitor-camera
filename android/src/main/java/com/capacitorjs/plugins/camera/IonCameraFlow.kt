@@ -262,7 +262,8 @@ class IonCameraFlow(
                 }
                 currentCall = call
                 manager.takePhoto(activity, settings.encodingType, cameraLauncher)
-            } catch (_: Exception) {
+            } catch (ex: Exception) {
+                android.util.Log.e("Capacitor/Camera", "Failed to launch photo capture", ex)
                 sendError(IONCAMRError.TAKE_PHOTO_ERROR)
             }
         }
