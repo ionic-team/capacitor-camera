@@ -25,6 +25,9 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            // shrinkResources is not on by default on Capacitor 9; 
+            // turned on to test situations where consuming apps may turn it on.
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
