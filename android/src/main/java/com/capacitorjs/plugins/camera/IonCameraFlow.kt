@@ -147,37 +147,37 @@ class IonCameraFlow(
     // Launchers
     // ----------------------------------------------------
     private fun setupLaunchers() {
-        cameraLauncher = activity.registerForActivityResult(
+        cameraLauncher = bridge.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             handleCameraResult(result)
         }
 
-        cameraCropLauncher = activity.registerForActivityResult(
+        cameraCropLauncher = bridge.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             handleCameraCropResult(result)
         }
 
-        videoLauncher = activity.registerForActivityResult(
+        videoLauncher = bridge.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             handleVideoResult(result)
         }
 
-        galleryLauncher = activity.registerForActivityResult(
+        galleryLauncher = bridge.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             handleGalleryResult(result)
         }
 
-        galleryCropLauncher = activity.registerForActivityResult(
+        galleryCropLauncher = bridge.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             handleGalleryCropResult(result)
         }
 
-        editLauncher = activity.registerForActivityResult(
+        editLauncher = bridge.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             handleEditResult(result)

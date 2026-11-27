@@ -1,3 +1,10 @@
+## [8.2.7](https://github.com/ionic-team/capacitor-camera/compare/v8.2.6...v8.2.7) (2026-11-27)
+
+
+### Bug Fixes
+
+* **android:** bump ioncamera-android to 1.0.3 ([#97](https://github.com/ionic-team/capacitor-camera/issues/97)) ([0e07305](https://github.com/ionic-team/capacitor-camera/commit/0e073054f927c425fd094e1ef6577e4a59dbf1bb))
+
 ## [8.2.6-next.3](https://github.com/ionic-team/capacitor-camera/compare/v8.2.6-next.2...v8.2.6-next.3) (2026-11-06)
 
 
@@ -11,6 +18,13 @@
 ### Bug Fixes
 
 * **android:** keep image editor layouts when shrinking resources ([a10cdae](https://github.com/ionic-team/capacitor-camera/commit/a10cdae894910300a22e48a43135fa7610353ca8))
+
+## [8.2.6](https://github.com/ionic-team/capacitor-camera/compare/v8.2.5...v8.2.6) (2026-10-16)
+
+
+### Bug Fixes
+
+* **android:** use bridge.registerForActivityResult for Fragment compatibility ([#84](https://github.com/ionic-team/capacitor-camera/issues/84)) ([41ece15](https://github.com/ionic-team/capacitor-camera/commit/41ece151d2fd80c5957c76338010b55e3181ae1a))
 
 ## [8.2.6-next.1](https://github.com/ionic-team/capacitor-camera/compare/v8.2.5...v8.2.6-next.1) (2026-10-02)
 
