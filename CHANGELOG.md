@@ -1,3 +1,10 @@
+## [8.2.7](https://github.com/ionic-team/capacitor-camera/compare/v8.2.6...v8.2.7) (2026-11-27)
+
+
+### Bug Fixes
+
+* **android:** bump ioncamera-android to 1.0.3 ([#97](https://github.com/ionic-team/capacitor-camera/issues/97)) ([0e07305](https://github.com/ionic-team/capacitor-camera/commit/0e073054f927c425fd094e1ef6577e4a59dbf1bb))
+
 ## [8.2.6](https://github.com/ionic-team/capacitor-camera/compare/v8.2.5...v8.2.6) (2026-10-16)
 
 
