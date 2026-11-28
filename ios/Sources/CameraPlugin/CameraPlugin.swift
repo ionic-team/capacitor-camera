@@ -662,6 +662,9 @@ private extension CameraPlugin {
 extension CameraPlugin: IONCAMRCallbackDelegate {
 
     public func callback(error: IONCAMRError) {
+        if case .takePictureIssue = error {
+            NSLog("Capacitor/Camera: OS-PLUG-CAMR-0010: %@", error.localizedDescription)
+        }
         sendError(error)
     }
 
